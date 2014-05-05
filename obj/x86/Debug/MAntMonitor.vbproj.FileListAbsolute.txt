@@ -1,0 +1,9 @@
+C:\source\github\MAntMonitor\bin\Debug\MAntMonitor.exe
+C:\source\github\MAntMonitor\bin\Debug\MAntMonitor.pdb
+C:\source\github\MAntMonitor\bin\Debug\MAntMonitor.xml
+C:\source\github\MAntMonitor\obj\x86\Debug\MAntMonitor.frmAntMonitor.resources
+C:\source\github\MAntMonitor\obj\x86\Debug\MAntMonitor.Resources.resources
+C:\source\github\MAntMonitor\obj\x86\Debug\MAntMonitor.vbproj.GenerateResource.Cache
+C:\source\github\MAntMonitor\obj\x86\Debug\MAntMonitor.exe
+C:\source\github\MAntMonitor\obj\x86\Debug\MAntMonitor.xml
+C:\source\github\MAntMonitor\obj\x86\Debug\MAntMonitor.pdb
