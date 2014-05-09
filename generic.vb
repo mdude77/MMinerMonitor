@@ -60,6 +60,14 @@ Public Class ControlsByRegistry
 
     End Sub
 
+    Public Sub SetControlByRegKey(ByRef cmbAny As ComboBox, Optional ByVal sDefault As String = "")
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey)
+            Call SetControlByRegKey(key, cmbAny, sDefault)
+        End Using
+
+    End Sub
+
     Public Sub SetControlByRegKey(ByRef txtAny As TextBox, Optional ByVal sDefault As String = "")
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey)

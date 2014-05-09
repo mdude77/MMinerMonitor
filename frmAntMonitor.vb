@@ -8,9 +8,11 @@ Public Class frmAntMonitor
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v1.0"
+    Private Const csVersion As String = "M's Ant Monitor v1.2"
 
     Private iCountDown, iWatchDog, bAnt As Integer
+
+    Private iRefreshRate As Integer
 
     Private ctlsByKey As ControlsByRegistry
 
@@ -93,18 +95,24 @@ Public Class frmAntMonitor
         ctlsByKey.AddControl(Me.txtUserName, "Username")
         ctlsByKey.AddControl(Me.chkSavePassword, "SavePassword")
         ctlsByKey.AddControl(Me.chklstAnts, "AntList")
+        ctlsByKey.AddControl(Me.txtRefreshRate, "RefreshRateValue")
+        ctlsByKey.AddControl(Me.cmbRefreshRate, "RefreshRateVolume")
 
         Call ctlsByKey.SetControlByRegKey(Me.chkRebootIfXd, True)
         Call ctlsByKey.SetControlByRegKey(Me.txtPassword, "root")
         Call ctlsByKey.SetControlByRegKey(Me.txtUserName, "root")
         Call ctlsByKey.SetControlByRegKey(Me.chkSavePassword, True)
         Call ctlsByKey.SetControlByRegKey(Me.chklstAnts)
+        Call ctlsByKey.SetControlByRegKey(Me.txtRefreshRate, "300")
+        Call ctlsByKey.SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
 
         'check each of the boxes
         For x As Integer = 0 To Me.chklstAnts.Items.Count - 1
             Me.chklstAnts.SetItemChecked(x, True)
         Next
-        
+
+        Call CalcRefreshRate()
+
         Call RefreshGrid()
 
     End Sub
@@ -118,6 +126,18 @@ Public Class frmAntMonitor
         Dim wb As WebBrowser
 
         wb = sender
+
+        'Select Case wb.Name
+        '    Case "WebBrowser1"
+        '        Me.lblWB1.Text = wb.Url.AbsoluteUri
+
+        '    Case "WebBrowser2"
+        '        Me.lblWB2.Text = wb.Url.AbsoluteUri
+
+        '    Case "WebBrowser3"
+        '        Me.lblWB3.Text = wb.Url.AbsoluteUri
+
+        'End Select
 
         If wb.Document.All(1).OuterHtml.ToLower.Contains("authorization") Then
             wb.Document.All("username").SetAttribute("value", Me.txtUserName.Text)
@@ -173,14 +193,28 @@ Public Class frmAntMonitor
                                       UInt64.Parse(wb.Document.All(84).Children(2).Children(7).Children(0).OuterText.TrimEnd.Replace(",", ""))), "##0.###%")
                     dr.Item("BestShare") = wb.Document.All(84).Children(2).Children(16).Children(0).OuterText.TrimEnd
                     dr.Item("P0Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(2).Children(3).Children(0).OuterText.TrimEnd
-                    dr.Item("P1Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(3).Children(3).Children(0).OuterText.TrimEnd
-                    dr.Item("P2Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(4).Children(3).Children(0).OuterText.TrimEnd
-                    dr.Item("Fan1") = wb.Document.All(443).Children(2).Children(0).Children(0).Children(2).Children(3).OuterText.TrimEnd
-                    dr.Item("Temp1") = wb.Document.All(443).Children(2).Children(0).Children(0).Children(2).Children(4).OuterText.TrimEnd
-                    dr.Item("Status1") = wb.Document.All(443).Children(2).Children(0).Children(0).Children(2).Children(5).OuterText.TrimEnd
-                    dr.Item("Fan2") = wb.Document.All(443).Children(2).Children(0).Children(0).Children(3).Children(3).OuterText.TrimEnd
-                    dr.Item("Temp2") = wb.Document.All(443).Children(2).Children(0).Children(0).Children(3).Children(4).OuterText.TrimEnd
-                    dr.Item("Status2") = wb.Document.All(443).Children(2).Children(0).Children(0).Children(3).Children(5).OuterText.TrimEnd
+
+                    If wb.Document.All(192).Children(2).Children(0).Children(0).Children.Count > 3 Then
+                        dr.Item("P1Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(3).Children(3).Children(0).OuterText.TrimEnd
+
+                        If wb.Document.All(192).Children(2).Children(0).Children(0).Children.Count > 4 Then
+                            dr.Item("P2Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(4).Children(3).Children(0).OuterText.TrimEnd
+                            x = 443
+                        Else
+                            dr.Item("P2Status") = "N/A"
+                            x = 374
+                        End If
+                    Else
+                        dr.Item("P1Status") = "N/A"
+                        x = 305
+                    End If
+
+                    dr.Item("Fan1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(3).OuterText.TrimEnd
+                    dr.Item("Temp1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(4).OuterText.TrimEnd
+                    dr.Item("Status1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(5).OuterText.TrimEnd
+                    dr.Item("Fan2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(3).OuterText.TrimEnd
+                    dr.Item("Temp2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(4).OuterText.TrimEnd
+                    dr.Item("Status2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(5).OuterText.TrimEnd
                 End If
 
                 If (dr.Item("Status1").ToString.Contains("x") OrElse dr.Item("Status2").ToString.Contains("x")) AndAlso Me.chkRebootIfXd.Checked = True Then
@@ -199,7 +233,7 @@ Public Class frmAntMonitor
             End If
 
             Me.dataAnts.Refresh()
-        End If
+            End If
 
     End Sub
 
@@ -208,7 +242,7 @@ Public Class frmAntMonitor
         iCountDown -= 1
 
         If iCountDown < 0 Then
-            iCountDown = 300
+            iCountDown = iRefreshRate
         End If
 
         If iCountDown = 0 Then
@@ -227,7 +261,7 @@ Public Class frmAntMonitor
 
             Call RefreshGrid()
 
-            iCountDown = 300    '5 minutes
+            iCountDown = iRefreshRate
         End If
 
         Me.cmdRefresh.Text = "Refreshing in " & iCountDown
@@ -436,6 +470,9 @@ Public Class frmAntMonitor
         Call ctlsByKey.SetRegKeyByControl(Me.txtUserName)
         Call ctlsByKey.SetRegKeyByControl(Me.chklstAnts)
 
+        Call ctlsByKey.SetRegKeyByControl(Me.txtRefreshRate)
+        Call ctlsByKey.SetRegKeyByControl(Me.cmbRefreshRate)
+
     End Sub
 
     'will re-enable the normal countdown if it counts down to 0 
@@ -475,6 +512,57 @@ Public Class frmAntMonitor
         End If
 
         Me.chklstAnts.Items.RemoveAt(Me.chklstAnts.SelectedIndex)
+
+    End Sub
+
+    Private Sub cmbRefreshRate_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles cmbRefreshRate.KeyPress
+
+        e.Handled = True
+
+    End Sub
+
+    Private Sub txtRefreshRate_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtRefreshRate.KeyPress
+
+        Select Case e.KeyChar
+            Case "0" To "9", vbBack
+                'okay
+
+            Case Else
+                e.Handled = True
+
+        End Select
+
+    End Sub
+
+    Private Sub CalcRefreshRate()
+
+        Select Case Me.cmbRefreshRate.Text
+            Case "Seconds"
+                iRefreshRate = Val(Me.txtRefreshRate.Text)
+
+            Case "Minutes"
+                iRefreshRate = Val(Me.txtRefreshRate.Text) * 60
+
+            Case "Hours"
+                iRefreshRate = Val(Me.txtRefreshRate.Text) * 60 * 60
+
+        End Select
+
+        If iRefreshRate = 0 Then
+            iRefreshRate = 300
+        End If
+
+    End Sub
+
+    Private Sub txtRefreshRate_LostFocus(sender As Object, e As System.EventArgs) Handles txtRefreshRate.LostFocus
+
+        Call CalcRefreshRate()
+
+    End Sub
+
+    Private Sub cmbRefreshRate_LostFocus(sender As Object, e As System.EventArgs) Handles cmbRefreshRate.LostFocus
+
+        Call CalcRefreshRate()
 
     End Sub
 End Class
