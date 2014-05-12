@@ -1,0 +1,8 @@
+v1.3
+- Added the ability to resize the font.  The grid doesn't seem to auto resize nicely for all fonts, some manual effort may be required for really large or really small fonts.
+- Added the ability to specify how many browser instances you want to run to keep an eye on your Ants.  The higher the number, the faster it'll go, but the more memory it will use.
+- Added a log tab to show timing information, when an Ant is rebooted, and other info I might find useful to add.
+
+v1.2
+- Makes the refresh rate as customizable as you want.  Enter the value you want and pick seconds, minutes, or hours.  You won't see the new value until the next refresh, so click on the refresh button for it to take effect sooner.  Note that you can set a value too small.  I wouldn't go lower than 5, maybe even 10 seconds.
+- Fixes the problem with it not working properly with Ants set to less than 3 pools.  Note that it still requires atleast one pool.

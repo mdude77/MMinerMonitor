@@ -2,13 +2,14 @@
 
 Public Class frmAntMonitor
 
-    Private wb(0 To 2) As WebBrowser
+    Private wb(0 To 9) As WebBrowser
 
     Private ds As DataSet
+    Private bBrowserCount As Byte
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v1.2"
+    Private Const csVersion As String = "M's Ant Monitor v1.3"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -25,6 +26,8 @@ Public Class frmAntMonitor
     Private Sub Form1_Load(sender As Object, e As System.EventArgs) Handles Me.Load
 
         Dim host As System.Net.IPHostEntry
+
+        AddToLog(csVersion & " starting")
 
         host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName)
 
@@ -64,14 +67,6 @@ Public Class frmAntMonitor
 
         ctlsByKey = New ControlsByRegistry(csRegKey)
 
-        wb(0) = New WebBrowser
-        wb(1) = New WebBrowser
-        wb(2) = New WebBrowser
-
-        AddHandler wb(0).DocumentCompleted, AddressOf Me.wb_completed
-        AddHandler wb(1).DocumentCompleted, AddressOf Me.wb_completed
-        AddHandler wb(2).DocumentCompleted, AddressOf Me.wb_completed
-
         Call SetGridSizes("\Columns\dataAnts", Me.dataAnts)
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey)
@@ -97,6 +92,8 @@ Public Class frmAntMonitor
         ctlsByKey.AddControl(Me.chklstAnts, "AntList")
         ctlsByKey.AddControl(Me.txtRefreshRate, "RefreshRateValue")
         ctlsByKey.AddControl(Me.cmbRefreshRate, "RefreshRateVolume")
+        ctlsByKey.AddControl(Me.cmbBrowserInstances, "BrowserInstances")
+        ctlsByKey.AddControl(Me.cmbFontSize, "FontSize")
 
         Call ctlsByKey.SetControlByRegKey(Me.chkRebootIfXd, True)
         Call ctlsByKey.SetControlByRegKey(Me.txtPassword, "root")
@@ -105,6 +102,8 @@ Public Class frmAntMonitor
         Call ctlsByKey.SetControlByRegKey(Me.chklstAnts)
         Call ctlsByKey.SetControlByRegKey(Me.txtRefreshRate, "300")
         Call ctlsByKey.SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
+        Call ctlsByKey.SetControlByRegKey(Me.cmbBrowserInstances, "3")
+        Call ctlsByKey.SetControlByRegKey(Me.cmbFontSize, "10")
 
         'check each of the boxes
         For x As Integer = 0 To Me.chklstAnts.Items.Count - 1
@@ -176,9 +175,9 @@ Public Class frmAntMonitor
                 dr = ds.Tables(0).NewRow
             End If
 
-            Debug.Print(sAnt)
-
             dr.Item("Name") = wb.Url.AbsoluteUri.Substring(y, x - y - 1)
+
+            AddToLog(dr.Item("Name") & " responded")
 
             If wb.Url.AbsoluteUri.Contains("minerstatus") AndAlso wb.Document.All.Count > 75 Then
                 dr.Item("Uptime") = wb.Document.All(84).Children(2).Children(0).Children(0).OuterText.TrimEnd
@@ -218,7 +217,7 @@ Public Class frmAntMonitor
                 End If
 
                 If (dr.Item("Status1").ToString.Contains("x") OrElse dr.Item("Status2").ToString.Contains("x")) AndAlso Me.chkRebootIfXd.Checked = True Then
-                    Debug.Print("REBOOTING " & dr.Item("Name"))
+                    AddToLog("REBOOTING " & dr.Item("Name"))
 
                     wb.Navigate("http://192.168.0." & dr.Item("Name") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
                 Else
@@ -233,7 +232,7 @@ Public Class frmAntMonitor
             End If
 
             Me.dataAnts.Refresh()
-            End If
+        End If
 
     End Sub
 
@@ -248,6 +247,7 @@ Public Class frmAntMonitor
         If iCountDown = 0 Then
             Me.TimerRefresh.Enabled = False
             Me.cmdPause.Enabled = False
+            Me.cmbBrowserInstances.Enabled = False
 
             iWatchDog = 300 '5 minutes
             Me.TimerWatchdog.Enabled = True
@@ -258,6 +258,8 @@ Public Class frmAntMonitor
             Next
 
             Me.dataAnts.Refresh()
+
+            AddToLog("Initiated refresh")
 
             Call RefreshGrid()
 
@@ -286,40 +288,43 @@ Public Class frmAntMonitor
             Exit Sub
         End If
 
-        If bAnt <> Me.chklstAnts.CheckedItems.Count Then
-            If wb(0).IsBusy = False Then
-                Debug.Print("0: submit " & Me.chklstAnts.CheckedItems(bAnt))
+        For x As Byte = 0 To bBrowserCount - 1
+            If bAnt <> Me.chklstAnts.CheckedItems.Count Then
+                If wb(x).IsBusy = False Then
+                    AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance " & x)
 
-                wb(0).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+                    wb(x).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
-                bAnt += 1
+                    bAnt += 1
+                End If
             End If
-        End If
+        Next
 
-        If bAnt <> Me.chklstAnts.CheckedItems.Count Then
-            If wb(1).IsBusy = False Then
-                Debug.Print("1: submit " & Me.chklstAnts.CheckedItems(bAnt))
+        'If bAnt <> Me.chklstAnts.CheckedItems.Count Then
+        '    If wb(1).IsBusy = False Then
+        '        Debug.Print("1: submit " & Me.chklstAnts.CheckedItems(bAnt))
 
-                wb(1).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+        '        wb(1).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
-                bAnt += 1
-            End If
-        End If
+        '        bAnt += 1
+        '    End If
+        'End If
 
-        If bAnt <> Me.chklstAnts.CheckedItems.Count Then
-            If wb(2).IsBusy = False Then
-                Debug.Print("2: submit " & Me.chklstAnts.CheckedItems(bAnt))
+        'If bAnt <> Me.chklstAnts.CheckedItems.Count Then
+        '    If wb(2).IsBusy = False Then
+        '        Debug.Print("2: submit " & Me.chklstAnts.CheckedItems(bAnt))
 
-                wb(2).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+        '        wb(2).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
-                bAnt += 1
-            End If
-        End If
+        '        bAnt += 1
+        '    End If
+        'End If
 
         If bAnt = Me.chklstAnts.CheckedItems.Count Then
             Me.cmdPause.Enabled = True
             Me.TimerRefresh.Enabled = True
             Me.TimerWatchdog.Enabled = False
+            Me.cmbBrowserInstances.Enabled = True
             bAnt = 0
 
             Me.Text = csVersion & " - Refreshed " & Now.ToString
@@ -473,6 +478,10 @@ Public Class frmAntMonitor
         Call ctlsByKey.SetRegKeyByControl(Me.txtRefreshRate)
         Call ctlsByKey.SetRegKeyByControl(Me.cmbRefreshRate)
 
+        Call ctlsByKey.SetRegKeyByControl(Me.cmbBrowserInstances)
+
+        Call ctlsByKey.SetRegKeyByControl(Me.cmbFontSize)
+
     End Sub
 
     'will re-enable the normal countdown if it counts down to 0 
@@ -563,6 +572,54 @@ Public Class frmAntMonitor
     Private Sub cmbRefreshRate_LostFocus(sender As Object, e As System.EventArgs) Handles cmbRefreshRate.LostFocus
 
         Call CalcRefreshRate()
+
+    End Sub
+
+    Private Sub cmbBrowserInstances_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles cmbBrowserInstances.KeyPress
+
+        e.Handled = True
+
+    End Sub
+
+    Private Sub cmbBrowserInstances_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbBrowserInstances.SelectedIndexChanged
+
+        Dim x As Byte
+
+        bBrowserCount = Val(Me.cmbBrowserInstances.Text)
+
+        If bBrowserCount = 0 OrElse bBrowserCount > 10 Then
+            bBrowserCount = 3
+        End If
+
+        Array.Resize(wb, bBrowserCount)
+
+        For x = 0 To bBrowserCount - 1
+            If wb(x) Is Nothing Then
+                wb(x) = New WebBrowser
+
+                AddHandler wb(x).DocumentCompleted, AddressOf Me.wb_completed
+            End If
+        Next
+
+    End Sub
+
+    Private Sub AddToLog(ByVal sText As String)
+
+        Me.txtLog.AppendText(Now.ToLocalTime & ": " & sText & vbCrLf)
+
+    End Sub
+
+    Private Sub cmbFontSize_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbFontSize.SelectedIndexChanged
+
+        Dim x As Integer
+
+        x = Val(Me.cmbFontSize.Text)
+
+        If x = 0 Then x = 10
+
+        Me.Font = New Font(Me.Font.Name, x)
+        Me.Refresh()
+        Me.dataAnts.Refresh()
 
     End Sub
 End Class

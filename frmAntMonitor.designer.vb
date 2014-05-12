@@ -30,6 +30,8 @@ Partial Class frmAntMonitor
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tabAnts = New System.Windows.Forms.TabPage()
         Me.tabConfig = New System.Windows.Forms.TabPage()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.cmbBrowserInstances = New System.Windows.Forms.ComboBox()
         Me.cmbRefreshRate = New System.Windows.Forms.ComboBox()
         Me.txtRefreshRate = New System.Windows.Forms.TextBox()
         Me.Label16 = New System.Windows.Forms.Label()
@@ -55,10 +57,15 @@ Partial Class frmAntMonitor
         Me.TimerWatchdog = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.txtPleaseSupport = New System.Windows.Forms.TextBox()
+        Me.tabLog = New System.Windows.Forms.TabPage()
+        Me.txtLog = New System.Windows.Forms.TextBox()
+        Me.cmbFontSize = New System.Windows.Forms.ComboBox()
+        Me.Label7 = New System.Windows.Forms.Label()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
         Me.tabConfig.SuspendLayout()
+        Me.tabLog.SuspendLayout()
         Me.SuspendLayout()
         '
         'dataAnts
@@ -76,7 +83,7 @@ Partial Class frmAntMonitor
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1155, 254)
+        Me.dataAnts.Size = New System.Drawing.Size(1139, 284)
         Me.dataAnts.TabIndex = 0
         '
         'TimerRefresh
@@ -102,6 +109,7 @@ Partial Class frmAntMonitor
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.tabAnts)
         Me.TabControl1.Controls.Add(Me.tabConfig)
+        Me.TabControl1.Controls.Add(Me.tabLog)
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -121,6 +129,10 @@ Partial Class frmAntMonitor
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.Label7)
+        Me.tabConfig.Controls.Add(Me.cmbFontSize)
+        Me.tabConfig.Controls.Add(Me.Label6)
+        Me.tabConfig.Controls.Add(Me.cmbBrowserInstances)
         Me.tabConfig.Controls.Add(Me.cmbRefreshRate)
         Me.tabConfig.Controls.Add(Me.txtRefreshRate)
         Me.tabConfig.Controls.Add(Me.Label16)
@@ -150,11 +162,31 @@ Partial Class frmAntMonitor
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
         '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(552, 261)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(86, 20)
+        Me.Label6.TabIndex = 49
+        Me.Label6.Text = "Instances:"
+        '
+        'cmbBrowserInstances
+        '
+        Me.cmbBrowserInstances.FormattingEnabled = True
+        Me.cmbBrowserInstances.Items.AddRange(New Object() {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"})
+        Me.cmbBrowserInstances.Location = New System.Drawing.Point(667, 261)
+        Me.cmbBrowserInstances.Name = "cmbBrowserInstances"
+        Me.cmbBrowserInstances.Size = New System.Drawing.Size(45, 28)
+        Me.cmbBrowserInstances.TabIndex = 48
+        Me.cmbBrowserInstances.Text = "3"
+        Me.ToolTip1.SetToolTip(Me.cmbBrowserInstances, "The more instances, the faster it refreshes, at the cost of more memory.")
+        '
         'cmbRefreshRate
         '
         Me.cmbRefreshRate.FormattingEnabled = True
         Me.cmbRefreshRate.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
-        Me.cmbRefreshRate.Location = New System.Drawing.Point(851, 219)
+        Me.cmbRefreshRate.Location = New System.Drawing.Point(618, 221)
         Me.cmbRefreshRate.Name = "cmbRefreshRate"
         Me.cmbRefreshRate.Size = New System.Drawing.Size(94, 28)
         Me.cmbRefreshRate.TabIndex = 47
@@ -162,7 +194,7 @@ Partial Class frmAntMonitor
         '
         'txtRefreshRate
         '
-        Me.txtRefreshRate.Location = New System.Drawing.Point(789, 220)
+        Me.txtRefreshRate.Location = New System.Drawing.Point(556, 222)
         Me.txtRefreshRate.Name = "txtRefreshRate"
         Me.txtRefreshRate.Size = New System.Drawing.Size(55, 27)
         Me.txtRefreshRate.TabIndex = 46
@@ -171,7 +203,7 @@ Partial Class frmAntMonitor
         'Label16
         '
         Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(785, 197)
+        Me.Label16.Location = New System.Drawing.Point(552, 199)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(118, 20)
         Me.Label16.TabIndex = 45
@@ -181,7 +213,7 @@ Partial Class frmAntMonitor
         '
         Me.lblScanning.AutoSize = True
         Me.lblScanning.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblScanning.Location = New System.Drawing.Point(681, 12)
+        Me.lblScanning.Location = New System.Drawing.Point(448, 14)
         Me.lblScanning.Name = "lblScanning"
         Me.lblScanning.Size = New System.Drawing.Size(411, 20)
         Me.lblScanning.TabIndex = 18
@@ -193,7 +225,7 @@ Partial Class frmAntMonitor
         Me.Label5.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label5.AutoSize = True
         Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(331, 263)
+        Me.Label5.Location = New System.Drawing.Point(6, 238)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(234, 20)
         Me.Label5.TabIndex = 17
@@ -212,7 +244,7 @@ Partial Class frmAntMonitor
         '
         'cmdSaveConfig
         '
-        Me.cmdSaveConfig.Location = New System.Drawing.Point(789, 256)
+        Me.cmdSaveConfig.Location = New System.Drawing.Point(738, 262)
         Me.cmdSaveConfig.Name = "cmdSaveConfig"
         Me.cmdSaveConfig.Size = New System.Drawing.Size(121, 32)
         Me.cmdSaveConfig.TabIndex = 15
@@ -224,7 +256,7 @@ Partial Class frmAntMonitor
         Me.chkSavePassword.AutoSize = True
         Me.chkSavePassword.Checked = True
         Me.chkSavePassword.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkSavePassword.Location = New System.Drawing.Point(578, 264)
+        Me.chkSavePassword.Location = New System.Drawing.Point(345, 266)
         Me.chkSavePassword.Name = "chkSavePassword"
         Me.chkSavePassword.Size = New System.Drawing.Size(147, 24)
         Me.chkSavePassword.TabIndex = 14
@@ -234,7 +266,7 @@ Partial Class frmAntMonitor
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(785, 85)
+        Me.Label3.Location = New System.Drawing.Point(552, 87)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(137, 20)
         Me.Label3.TabIndex = 13
@@ -243,7 +275,7 @@ Partial Class frmAntMonitor
         'cmbLocalIPs
         '
         Me.cmbLocalIPs.FormattingEnabled = True
-        Me.cmbLocalIPs.Location = New System.Drawing.Point(789, 108)
+        Me.cmbLocalIPs.Location = New System.Drawing.Point(556, 110)
         Me.cmbLocalIPs.Name = "cmbLocalIPs"
         Me.cmbLocalIPs.Size = New System.Drawing.Size(183, 28)
         Me.cmbLocalIPs.TabIndex = 12
@@ -253,7 +285,7 @@ Partial Class frmAntMonitor
         Me.chkRebootIfXd.AutoSize = True
         Me.chkRebootIfXd.Checked = True
         Me.chkRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkRebootIfXd.Location = New System.Drawing.Point(789, 144)
+        Me.chkRebootIfXd.Location = New System.Drawing.Point(556, 146)
         Me.chkRebootIfXd.Name = "chkRebootIfXd"
         Me.chkRebootIfXd.Size = New System.Drawing.Size(183, 24)
         Me.chkRebootIfXd.TabIndex = 11
@@ -262,7 +294,7 @@ Partial Class frmAntMonitor
         '
         'txtPassword
         '
-        Me.txtPassword.Location = New System.Drawing.Point(672, 231)
+        Me.txtPassword.Location = New System.Drawing.Point(439, 233)
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.Size = New System.Drawing.Size(100, 27)
         Me.txtPassword.TabIndex = 10
@@ -270,7 +302,7 @@ Partial Class frmAntMonitor
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(574, 234)
+        Me.Label2.Location = New System.Drawing.Point(341, 236)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(88, 20)
         Me.Label2.TabIndex = 9
@@ -278,7 +310,7 @@ Partial Class frmAntMonitor
         '
         'txtUserName
         '
-        Me.txtUserName.Location = New System.Drawing.Point(671, 197)
+        Me.txtUserName.Location = New System.Drawing.Point(438, 199)
         Me.txtUserName.Name = "txtUserName"
         Me.txtUserName.Size = New System.Drawing.Size(100, 27)
         Me.txtUserName.TabIndex = 8
@@ -286,7 +318,7 @@ Partial Class frmAntMonitor
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(574, 204)
+        Me.Label1.Location = New System.Drawing.Point(341, 206)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(91, 20)
         Me.Label1.TabIndex = 7
@@ -294,7 +326,7 @@ Partial Class frmAntMonitor
         '
         'cmdDelAnt
         '
-        Me.cmdDelAnt.Location = New System.Drawing.Point(672, 142)
+        Me.cmdDelAnt.Location = New System.Drawing.Point(439, 144)
         Me.cmdDelAnt.Name = "cmdDelAnt"
         Me.cmdDelAnt.Size = New System.Drawing.Size(74, 32)
         Me.cmdDelAnt.TabIndex = 2
@@ -303,7 +335,7 @@ Partial Class frmAntMonitor
         '
         'cmdAddAnt
         '
-        Me.cmdAddAnt.Location = New System.Drawing.Point(578, 142)
+        Me.cmdAddAnt.Location = New System.Drawing.Point(345, 144)
         Me.cmdAddAnt.Name = "cmdAddAnt"
         Me.cmdAddAnt.Size = New System.Drawing.Size(74, 32)
         Me.cmdAddAnt.TabIndex = 1
@@ -312,7 +344,7 @@ Partial Class frmAntMonitor
         '
         'txtAntAddress
         '
-        Me.txtAntAddress.Location = New System.Drawing.Point(578, 109)
+        Me.txtAntAddress.Location = New System.Drawing.Point(345, 111)
         Me.txtAntAddress.Name = "txtAntAddress"
         Me.txtAntAddress.Size = New System.Drawing.Size(168, 27)
         Me.txtAntAddress.TabIndex = 0
@@ -321,7 +353,7 @@ Partial Class frmAntMonitor
         '
         Me.ProgressBar1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ProgressBar1.Location = New System.Drawing.Point(578, 44)
+        Me.ProgressBar1.Location = New System.Drawing.Point(345, 46)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(569, 23)
         Me.ProgressBar1.TabIndex = 3
@@ -329,7 +361,7 @@ Partial Class frmAntMonitor
         '
         'cmdScan
         '
-        Me.cmdScan.Location = New System.Drawing.Point(578, 8)
+        Me.cmdScan.Location = New System.Drawing.Point(345, 10)
         Me.cmdScan.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdScan.Name = "cmdScan"
         Me.cmdScan.Size = New System.Drawing.Size(94, 31)
@@ -344,7 +376,7 @@ Partial Class frmAntMonitor
         Me.chklstAnts.FormattingEnabled = True
         Me.chklstAnts.Location = New System.Drawing.Point(6, 8)
         Me.chklstAnts.Name = "chklstAnts"
-        Me.chklstAnts.Size = New System.Drawing.Size(559, 246)
+        Me.chklstAnts.Size = New System.Drawing.Size(333, 224)
         Me.chklstAnts.TabIndex = 0
         '
         'cmdPause
@@ -372,6 +404,48 @@ Partial Class frmAntMonitor
         Me.txtPleaseSupport.TabStop = False
         Me.txtPleaseSupport.Text = "Please support this app: 1PA1sji28iztspKxDquwFrNjp5SksjkCHE"
         '
+        'tabLog
+        '
+        Me.tabLog.Controls.Add(Me.txtLog)
+        Me.tabLog.Location = New System.Drawing.Point(4, 4)
+        Me.tabLog.Name = "tabLog"
+        Me.tabLog.Size = New System.Drawing.Size(1153, 298)
+        Me.tabLog.TabIndex = 2
+        Me.tabLog.Text = "Log"
+        Me.tabLog.UseVisualStyleBackColor = True
+        '
+        'txtLog
+        '
+        Me.txtLog.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtLog.Location = New System.Drawing.Point(6, 7)
+        Me.txtLog.Multiline = True
+        Me.txtLog.Name = "txtLog"
+        Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtLog.Size = New System.Drawing.Size(1135, 288)
+        Me.txtLog.TabIndex = 0
+        '
+        'cmbFontSize
+        '
+        Me.cmbFontSize.FormattingEnabled = True
+        Me.cmbFontSize.Items.AddRange(New Object() {"6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"})
+        Me.cmbFontSize.Location = New System.Drawing.Point(756, 110)
+        Me.cmbFontSize.Name = "cmbFontSize"
+        Me.cmbFontSize.Size = New System.Drawing.Size(51, 28)
+        Me.cmbFontSize.TabIndex = 50
+        Me.cmbFontSize.Text = "10"
+        Me.ToolTip1.SetToolTip(Me.cmbFontSize, "The more instances, the faster it refreshes, at the cost of more memory.")
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(752, 87)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(85, 20)
+        Me.Label7.TabIndex = 51
+        Me.Label7.Text = "Font Size:"
+        '
         'frmAntMonitor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
@@ -386,12 +460,14 @@ Partial Class frmAntMonitor
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmAntMonitor"
-        Me.Text = "M's Ant Monitor v1.2"
+        Me.Text = "M's Ant Monitor v1.3"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControl1.ResumeLayout(False)
         Me.tabAnts.ResumeLayout(False)
         Me.tabConfig.ResumeLayout(False)
         Me.tabConfig.PerformLayout()
+        Me.tabLog.ResumeLayout(False)
+        Me.tabLog.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -427,5 +503,11 @@ Partial Class frmAntMonitor
     Friend WithEvents cmbRefreshRate As System.Windows.Forms.ComboBox
     Friend WithEvents txtRefreshRate As System.Windows.Forms.TextBox
     Friend WithEvents Label16 As System.Windows.Forms.Label
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents cmbBrowserInstances As System.Windows.Forms.ComboBox
+    Friend WithEvents tabLog As System.Windows.Forms.TabPage
+    Friend WithEvents txtLog As System.Windows.Forms.TextBox
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents cmbFontSize As System.Windows.Forms.ComboBox
 
 End Class
