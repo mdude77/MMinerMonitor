@@ -2,20 +2,21 @@
 
 Public Class frmAntMonitor
 
-    Private wb(0 To 9) As WebBrowser
+    Private wb(0 To 2) As WebBrowser
 
     Private ds As DataSet
-    Private bBrowserCount As Byte
-
+    
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v1.3"
+    Private Const csVersion As String = "M's Ant Monitor v1.4"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
     Private iRefreshRate As Integer
 
     Private ctlsByKey As ControlsByRegistry
+
+    Private bStarted As Boolean
 
 #If DEBUG Then
     Private Const bErrorHandle As Boolean = False
@@ -28,6 +29,8 @@ Public Class frmAntMonitor
         Dim host As System.Net.IPHostEntry
 
         AddToLog(csVersion & " starting")
+
+        bStarted = True
 
         host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName)
 
@@ -53,15 +56,15 @@ Public Class frmAntMonitor
                 .Add("Blocks")
                 .Add("HWE%")
                 .Add("BestShare")
-                .Add("P0Status")
-                .Add("P1Status")
-                .Add("P2Status")
-                .Add("Fan1")
-                .Add("Temp1")
-                .Add("Status1")
-                .Add("Fan2")
-                .Add("Temp2")
-                .Add("Status2")
+                .Add("Pools")
+                '.Add("P1Status")
+                '.Add("P2Status")
+                .Add("Fans")
+                .Add("Temps")
+                .Add("Status")
+                '.Add("Fan2")
+                '.Add("Temp2")
+                '.Add("Status2")
             End With
         End With
 
@@ -85,32 +88,60 @@ Public Class frmAntMonitor
             End If
         End Using
 
-        ctlsByKey.AddControl(Me.chkRebootIfXd, "RebootAntIfXd")
-        ctlsByKey.AddControl(Me.txtPassword, "Password")
-        ctlsByKey.AddControl(Me.txtUserName, "Username")
-        ctlsByKey.AddControl(Me.chkSavePassword, "SavePassword")
-        ctlsByKey.AddControl(Me.chklstAnts, "AntList")
-        ctlsByKey.AddControl(Me.txtRefreshRate, "RefreshRateValue")
-        ctlsByKey.AddControl(Me.cmbRefreshRate, "RefreshRateVolume")
-        ctlsByKey.AddControl(Me.cmbBrowserInstances, "BrowserInstances")
-        ctlsByKey.AddControl(Me.cmbFontSize, "FontSize")
+        With ctlsByKey
+            .AddControl(Me.chkRebootIfXd, "RebootAntIfXd")
+            .AddControl(Me.txtPassword, "Password")
+            .AddControl(Me.txtUserName, "Username")
+            .AddControl(Me.chkSavePassword, "SavePassword")
+            .AddControl(Me.chklstAnts, "AntList")
+            .AddControl(Me.txtRefreshRate, "RefreshRateValue")
+            .AddControl(Me.cmbRefreshRate, "RefreshRateVolume")
+            .AddControl(Me.chkShowBestShare, "ShowBestShare")
+            .AddControl(Me.chkShowBlocks, "ShowBlocks")
+            .AddControl(Me.chkShowFans, "ShowFans")
+            .AddControl(Me.chkShowGHs5s, "ShowGHs5s")
+            .AddControl(Me.chkShowGHsAvg, "ShowGHsAvg")
+            .AddControl(Me.chkShowHWE, "ShowHWE")
+            .AddControl(Me.chkShowPools, "ShowPools")
+            .AddControl(Me.chkShowStatus, "ShowStatus")
+            .AddControl(Me.chkShowTemps, "ShowTemps")
+            .AddControl(Me.chkShowUptime, "ShowUptime")
 
-        Call ctlsByKey.SetControlByRegKey(Me.chkRebootIfXd, True)
-        Call ctlsByKey.SetControlByRegKey(Me.txtPassword, "root")
-        Call ctlsByKey.SetControlByRegKey(Me.txtUserName, "root")
-        Call ctlsByKey.SetControlByRegKey(Me.chkSavePassword, True)
-        Call ctlsByKey.SetControlByRegKey(Me.chklstAnts)
-        Call ctlsByKey.SetControlByRegKey(Me.txtRefreshRate, "300")
-        Call ctlsByKey.SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
-        Call ctlsByKey.SetControlByRegKey(Me.cmbBrowserInstances, "3")
-        Call ctlsByKey.SetControlByRegKey(Me.cmbFontSize, "10")
-
+            .SetControlByRegKey(Me.chkRebootIfXd, True)
+            .SetControlByRegKey(Me.txtPassword, "root")
+            .SetControlByRegKey(Me.txtUserName, "root")
+            .SetControlByRegKey(Me.chkSavePassword, True)
+            .SetControlByRegKey(Me.chklstAnts)
+            .SetControlByRegKey(Me.txtRefreshRate, "300")
+            .SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
+            .SetControlByRegKey(Me.chkShowBestShare, True)
+            .SetControlByRegKey(Me.chkShowBlocks, True)
+            .SetControlByRegKey(Me.chkShowFans, True)
+            .SetControlByRegKey(Me.chkShowGHs5s, True)
+            .SetControlByRegKey(Me.chkShowGHsAvg, True)
+            .SetControlByRegKey(Me.chkShowHWE, True)
+            .SetControlByRegKey(Me.chkShowPools, True)
+            .SetControlByRegKey(Me.chkShowStatus, True)
+            .SetControlByRegKey(Me.chkShowTemps, True)
+            .SetControlByRegKey(Me.chkShowUptime, True)
+        End With
+        
+        
         'check each of the boxes
         For x As Integer = 0 To Me.chklstAnts.Items.Count - 1
             Me.chklstAnts.SetItemChecked(x, True)
         Next
 
         Call CalcRefreshRate()
+
+        wb(0) = New WebBrowser
+        AddHandler wb(0).DocumentCompleted, AddressOf Me.wb_completed
+
+        wb(1) = New WebBrowser
+        AddHandler wb(1).DocumentCompleted, AddressOf Me.wb_completed
+
+        wb(2) = New WebBrowser
+        AddHandler wb(2).DocumentCompleted, AddressOf Me.wb_completed
 
         Call RefreshGrid()
 
@@ -123,6 +154,8 @@ Public Class frmAntMonitor
         Dim sAnt As String
         Dim bAntFound As Boolean
         Dim wb As WebBrowser
+        Dim sbTemp As System.Text.StringBuilder
+        Dim count(0 To 9) As Integer
 
         wb = sender
 
@@ -137,6 +170,8 @@ Public Class frmAntMonitor
         '        Me.lblWB3.Text = wb.Url.AbsoluteUri
 
         'End Select
+
+        sbTemp = New System.Text.StringBuilder
 
         If wb.Document.All(1).OuterHtml.ToLower.Contains("authorization") Then
             wb.Document.All("username").SetAttribute("value", Me.txtUserName.Text)
@@ -191,32 +226,79 @@ Public Class frmAntMonitor
                                       UInt64.Parse(wb.Document.All(84).Children(2).Children(14).Children(0).OuterText.TrimEnd.Replace(",", "")) + _
                                       UInt64.Parse(wb.Document.All(84).Children(2).Children(7).Children(0).OuterText.TrimEnd.Replace(",", ""))), "##0.###%")
                     dr.Item("BestShare") = wb.Document.All(84).Children(2).Children(16).Children(0).OuterText.TrimEnd
-                    dr.Item("P0Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(2).Children(3).Children(0).OuterText.TrimEnd
+
+                    Select Case wb.Document.All(192).Children(2).Children(0).Children(0).Children(2).Children(3).Children(0).OuterText.TrimEnd
+                        Case "Alive"
+                            sbTemp.Append("U")
+
+                        Case "Dead"
+                            sbTemp.Append("D")
+
+                    End Select
+
+                    'dr.Item("P0Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(2).Children(3).Children(0).OuterText.TrimEnd
 
                     If wb.Document.All(192).Children(2).Children(0).Children(0).Children.Count > 3 Then
-                        dr.Item("P1Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(3).Children(3).Children(0).OuterText.TrimEnd
+                        'dr.Item("P1Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(3).Children(3).Children(0).OuterText.TrimEnd
+
+                        Select Case wb.Document.All(192).Children(2).Children(0).Children(0).Children(3).Children(3).Children(0).OuterText.TrimEnd
+                            Case "Alive"
+                                sbTemp.Append("U")
+
+                            Case "Dead"
+                                sbTemp.Append("D")
+
+                        End Select
 
                         If wb.Document.All(192).Children(2).Children(0).Children(0).Children.Count > 4 Then
-                            dr.Item("P2Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(4).Children(3).Children(0).OuterText.TrimEnd
+                            'dr.Item("P2Status") = wb.Document.All(192).Children(2).Children(0).Children(0).Children(4).Children(3).Children(0).OuterText.TrimEnd
+
+                            Select Case wb.Document.All(192).Children(2).Children(0).Children(0).Children(4).Children(3).Children(0).OuterText.TrimEnd
+                                Case "Alive"
+                                    sbTemp.Append("U")
+
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                            End Select
+
                             x = 443
                         Else
-                            dr.Item("P2Status") = "N/A"
+                            'dr.Item("P2Status") = "N/A"
+                            sbTemp.Append("N")
+
                             x = 374
                         End If
                     Else
-                        dr.Item("P1Status") = "N/A"
+                        'dr.Item("P1Status") = "N/A"
+                        sbTemp.Append("NN")
+
                         x = 305
                     End If
+                    dr.Item("Pools") = sbTemp.ToString
 
-                    dr.Item("Fan1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(3).OuterText.TrimEnd
-                    dr.Item("Temp1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(4).OuterText.TrimEnd
-                    dr.Item("Status1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(5).OuterText.TrimEnd
-                    dr.Item("Fan2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(3).OuterText.TrimEnd
-                    dr.Item("Temp2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(4).OuterText.TrimEnd
-                    dr.Item("Status2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(5).OuterText.TrimEnd
+                    sbTemp.Clear()
+
+                    dr.Item("Fans") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(3).OuterText.TrimEnd & " " & _
+                                      wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(3).OuterText.TrimEnd
+
+                    dr.Item("Temps") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(4).OuterText.TrimEnd & " " & _
+                                       wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(4).OuterText.TrimEnd
+
+
+                    count(0) = HowManyInString(wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(5).OuterText.TrimEnd, "x")
+                    count(1) = HowManyInString(wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(5).OuterText.TrimEnd, "x")
+
+                    dr.Item("Status") = count(0) & "X " & count(1) & "X"
+                    'dr.Item("Fan1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(3).OuterText.TrimEnd
+                    'dr.Item("Temp1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(4).OuterText.TrimEnd
+                    'dr.Item("Status1") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(2).Children(5).OuterText.TrimEnd
+                    'dr.Item("Fan2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(3).OuterText.TrimEnd
+                    'dr.Item("Temp2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(4).OuterText.TrimEnd
+                    'dr.Item("Status2") = wb.Document.All(x).Children(2).Children(0).Children(0).Children(3).Children(5).OuterText.TrimEnd
                 End If
 
-                If (dr.Item("Status1").ToString.Contains("x") OrElse dr.Item("Status2").ToString.Contains("x")) AndAlso Me.chkRebootIfXd.Checked = True Then
+                If (count(0) <> 0 OrElse count(1) <> 0) AndAlso Me.chkRebootIfXd.Checked = True Then
                     AddToLog("REBOOTING " & dr.Item("Name"))
 
                     wb.Navigate("http://192.168.0." & dr.Item("Name") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
@@ -236,6 +318,20 @@ Public Class frmAntMonitor
 
     End Sub
 
+    Private Function HowManyInString(ByVal sString As String, sSearch As String) As Integer
+
+        Dim i, x As Integer
+
+        For x = 0 To sString.Length - 1
+            If sString.Substring(x, 1).ToLower = sSearch.ToLower Then
+                i += 1
+            End If
+        Next
+
+        Return i
+
+    End Function
+
     Private Sub TimerRefresh_Tick(sender As Object, e As System.EventArgs) Handles TimerRefresh.Tick
 
         iCountDown -= 1
@@ -247,8 +343,7 @@ Public Class frmAntMonitor
         If iCountDown = 0 Then
             Me.TimerRefresh.Enabled = False
             Me.cmdPause.Enabled = False
-            Me.cmbBrowserInstances.Enabled = False
-
+            
             iWatchDog = 300 '5 minutes
             Me.TimerWatchdog.Enabled = True
 
@@ -288,43 +383,40 @@ Public Class frmAntMonitor
             Exit Sub
         End If
 
-        For x As Byte = 0 To bBrowserCount - 1
-            If bAnt <> Me.chklstAnts.CheckedItems.Count Then
-                If wb(x).IsBusy = False Then
-                    AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance " & x)
+        If bAnt <> Me.chklstAnts.CheckedItems.Count Then
+            If wb(0).IsBusy = False Then
+                AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 0")
 
-                    wb(x).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+                wb(0).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
-                    bAnt += 1
-                End If
+                bAnt += 1
             End If
-        Next
+        End If
 
-        'If bAnt <> Me.chklstAnts.CheckedItems.Count Then
-        '    If wb(1).IsBusy = False Then
-        '        Debug.Print("1: submit " & Me.chklstAnts.CheckedItems(bAnt))
+        If bAnt <> Me.chklstAnts.CheckedItems.Count Then
+            If wb(1).IsBusy = False Then
+                AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 1")
 
-        '        wb(1).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+                wb(1).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
-        '        bAnt += 1
-        '    End If
-        'End If
+                bAnt += 1
+            End If
+        End If
 
-        'If bAnt <> Me.chklstAnts.CheckedItems.Count Then
-        '    If wb(2).IsBusy = False Then
-        '        Debug.Print("2: submit " & Me.chklstAnts.CheckedItems(bAnt))
+        If bAnt <> Me.chklstAnts.CheckedItems.Count Then
+            If wb(2).IsBusy = False Then
+                AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 2")
 
-        '        wb(2).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+                wb(2).Navigate("http://" & Me.chklstAnts.CheckedItems(bAnt) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
-        '        bAnt += 1
-        '    End If
-        'End If
+                bAnt += 1
+            End If
+        End If
 
         If bAnt = Me.chklstAnts.CheckedItems.Count Then
             Me.cmdPause.Enabled = True
             Me.TimerRefresh.Enabled = True
             Me.TimerWatchdog.Enabled = False
-            Me.cmbBrowserInstances.Enabled = True
             bAnt = 0
 
             Me.Text = csVersion & " - Refreshed " & Now.ToString
@@ -463,24 +555,34 @@ Public Class frmAntMonitor
 
     Private Sub cmdSaveConfig_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveConfig.Click
 
-        Call ctlsByKey.SetRegKeyByControl(Me.chkRebootIfXd)
-        Call ctlsByKey.SetRegKeyByControl(Me.chkSavePassword)
+        With ctlsByKey
+            .SetRegKeyByControl(Me.chkRebootIfXd)
+            .SetRegKeyByControl(Me.chkSavePassword)
 
-        If Me.chkSavePassword.Checked = True Then
-            Call ctlsByKey.SetRegKeyByControl(Me.txtPassword)
-        Else
-            Call ctlsByKey.SetRegKeyByControl(Me.txtPassword, "")
-        End If
+            If Me.chkSavePassword.Checked = True Then
+                .SetRegKeyByControl(Me.txtPassword)
+            Else
+                .SetRegKeyByControl(Me.txtPassword, "")
+            End If
 
-        Call ctlsByKey.SetRegKeyByControl(Me.txtUserName)
-        Call ctlsByKey.SetRegKeyByControl(Me.chklstAnts)
+            .SetRegKeyByControl(Me.txtUserName)
+            .SetRegKeyByControl(Me.chklstAnts)
 
-        Call ctlsByKey.SetRegKeyByControl(Me.txtRefreshRate)
-        Call ctlsByKey.SetRegKeyByControl(Me.cmbRefreshRate)
+            .SetRegKeyByControl(Me.txtRefreshRate)
+            .SetRegKeyByControl(Me.cmbRefreshRate)
 
-        Call ctlsByKey.SetRegKeyByControl(Me.cmbBrowserInstances)
-
-        Call ctlsByKey.SetRegKeyByControl(Me.cmbFontSize)
+            .SetRegKeyByControl(Me.chkShowBestShare)
+            .SetRegKeyByControl(Me.chkShowBlocks)
+            .SetRegKeyByControl(Me.chkShowFans)
+            .SetRegKeyByControl(Me.chkShowGHs5s)
+            .SetRegKeyByControl(Me.chkShowGHsAvg)
+            .SetRegKeyByControl(Me.chkShowHWE)
+            .SetRegKeyByControl(Me.chkShowPools)
+            .SetRegKeyByControl(Me.chkShowStatus)
+            .SetRegKeyByControl(Me.chkShowTemps)
+            .SetRegKeyByControl(Me.chkShowUptime)
+        End With
+        
 
     End Sub
 
@@ -575,50 +677,58 @@ Public Class frmAntMonitor
 
     End Sub
 
-    Private Sub cmbBrowserInstances_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles cmbBrowserInstances.KeyPress
-
-        e.Handled = True
-
-    End Sub
-
-    Private Sub cmbBrowserInstances_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbBrowserInstances.SelectedIndexChanged
-
-        Dim x As Byte
-
-        bBrowserCount = Val(Me.cmbBrowserInstances.Text)
-
-        If bBrowserCount = 0 OrElse bBrowserCount > 10 Then
-            bBrowserCount = 3
-        End If
-
-        Array.Resize(wb, bBrowserCount)
-
-        For x = 0 To bBrowserCount - 1
-            If wb(x) Is Nothing Then
-                wb(x) = New WebBrowser
-
-                AddHandler wb(x).DocumentCompleted, AddressOf Me.wb_completed
-            End If
-        Next
-
-    End Sub
-
     Private Sub AddToLog(ByVal sText As String)
 
         Me.txtLog.AppendText(Now.ToLocalTime & ": " & sText & vbCrLf)
 
     End Sub
 
-    Private Sub cmbFontSize_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles cmbFontSize.SelectedIndexChanged
+    Private Sub chkShow_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkShowBestShare.CheckedChanged, chkShowBlocks.CheckedChanged, _
+        chkShowFans.CheckedChanged, chkShowGHs5s.CheckedChanged, chkShowGHsAvg.CheckedChanged, chkShowHWE.CheckedChanged, chkShowPools.CheckedChanged, _
+        chkShowStatus.CheckedChanged, chkShowTemps.CheckedChanged, chkShowUptime.CheckedChanged
 
-        Dim x As Integer
+        Dim chkAny As CheckBox
 
-        x = Val(Me.cmbFontSize.Text)
+        If bStarted = False Then Exit Sub
 
-        If x = 0 Then x = 10
+        chkAny = DirectCast(sender, CheckBox)
 
-        Me.Font = New Font(Me.Font.Name, x)
-        Me.Refresh()
+        Select Case chkAny.Name
+            Case "chkShowUptime"
+                Me.dataAnts.Columns("Uptime").Visible = chkAny.Checked
+
+            Case "chkShowGHs5s"
+                Me.dataAnts.Columns("GH/s(5s)").Visible = chkAny.Checked
+
+            Case "chkShowGHsAvg"
+                Me.dataAnts.Columns("GH/s(avg)").Visible = chkAny.Checked
+
+            Case "chkShowBlocks"
+                Me.dataAnts.Columns("Blocks").Visible = chkAny.Checked
+
+            Case "chkShowHWE"
+                Me.dataAnts.Columns("HWE%").Visible = chkAny.Checked
+
+            Case "chkShowBestShare"
+                Me.dataAnts.Columns("BestShare").Visible = chkAny.Checked
+
+            Case "chkShowPools"
+                Me.dataAnts.Columns("Pools").Visible = chkAny.Checked
+
+            Case "chkShowFans"
+                Me.dataAnts.Columns("Fans").Visible = chkAny.Checked
+
+            Case "chkShowTemps"
+                Me.dataAnts.Columns("Temps").Visible = chkAny.Checked
+
+            Case "chkShowStatus"
+                Me.dataAnts.Columns("Status").Visible = chkAny.Checked
+
+            Case Else
+                MsgBox(chkAny.Name & " not found!", MsgBoxStyle.Critical Or MsgBoxStyle.OkOnly)
+
+        End Select
+
         Me.dataAnts.Refresh()
 
     End Sub

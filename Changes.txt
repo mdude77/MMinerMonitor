@@ -1,3 +1,9 @@
+v1.4
+- Removed the ability to resize the font.  It caused problems for too many people.
+- Removed the ability to conrol how many browser instances you want to use.  It's back to as it was in 1.2, fixed at 3.  This also caused problems for some people.
+- Redid the Ant grid to massively reduce the amount of space the fields take up.
+- Added the ability to hide columns in the Ant grid.
+
 v1.3
 - Added the ability to resize the font.  The grid doesn't seem to auto resize nicely for all fonts, some manual effort may be required for really large or really small fonts.
 - Added the ability to specify how many browser instances you want to run to keep an eye on your Ants.  The higher the number, the faster it'll go, but the more memory it will use.
