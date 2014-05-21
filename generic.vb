@@ -23,7 +23,7 @@ Public Class ControlsByRegistry
             Dim sTemp As String
 
             For Each sTemp In key.GetValueNames
-                chklstAny.Items.Add(sTemp)
+                chklstAny.Items.Add(key.GetValue(sTemp))
             Next
         End Using
 

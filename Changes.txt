@@ -1,6 +1,12 @@
+v1.5
+- Added support for S2s
+- Added logic to prevent auto rebooting more than once every 15 minutes
+- Added a Freqs column to show the frequences of the Ant chains
+- Readded the Browser tabs for troubleshooting purposes.  These are real live browser tabs showing what's going on, and *are* usable.
+
 v1.4
 - Removed the ability to resize the font.  It caused problems for too many people.
-- Removed the ability to conrol how many browser instances you want to use.  It's back to as it was in 1.2, fixed at 3.  This also caused problems for some people.
+- Removed the ability to control how many browser instances you want to use.  It's back to as it was in 1.2, fixed at 3.  This also caused problems for some people.
 - Redid the Ant grid to massively reduce the amount of space the fields take up.
 - Added the ability to hide columns in the Ant grid.
 
