@@ -30,15 +30,22 @@ Partial Class frmAntMonitor
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tabAnts = New System.Windows.Forms.TabPage()
         Me.tabConfig = New System.Windows.Forms.TabPage()
+        Me.chkUseAPI = New System.Windows.Forms.CheckBox()
         Me.optAddS2 = New System.Windows.Forms.RadioButton()
         Me.optAddS1 = New System.Windows.Forms.RadioButton()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.chkShowStale = New System.Windows.Forms.CheckBox()
+        Me.chkShowRej = New System.Windows.Forms.CheckBox()
+        Me.chkShowXCount = New System.Windows.Forms.CheckBox()
+        Me.chkShowHighTemp = New System.Windows.Forms.CheckBox()
+        Me.chkShowHighFan = New System.Windows.Forms.CheckBox()
         Me.chkShowFreqs = New System.Windows.Forms.CheckBox()
         Me.chkShowStatus = New System.Windows.Forms.CheckBox()
         Me.chkShowTemps = New System.Windows.Forms.CheckBox()
         Me.chkShowFans = New System.Windows.Forms.CheckBox()
         Me.chkShowPools = New System.Windows.Forms.CheckBox()
         Me.chkShowBestShare = New System.Windows.Forms.CheckBox()
+        Me.cmdSaveConfig = New System.Windows.Forms.Button()
         Me.chkShowHWE = New System.Windows.Forms.CheckBox()
         Me.chkShowBlocks = New System.Windows.Forms.CheckBox()
         Me.chkShowGHsAvg = New System.Windows.Forms.CheckBox()
@@ -50,15 +57,14 @@ Partial Class frmAntMonitor
         Me.lblScanning = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.cmdSaveConfig = New System.Windows.Forms.Button()
-        Me.chkSavePassword = New System.Windows.Forms.CheckBox()
+        Me.chkWBSavePassword = New System.Windows.Forms.CheckBox()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.cmbLocalIPs = New System.Windows.Forms.ComboBox()
-        Me.chkRebootIfXd = New System.Windows.Forms.CheckBox()
-        Me.txtPassword = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.txtUserName = New System.Windows.Forms.TextBox()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.chkWBRebootIfXd = New System.Windows.Forms.CheckBox()
+        Me.txtWBPassword = New System.Windows.Forms.TextBox()
+        Me.lblWBPassword = New System.Windows.Forms.Label()
+        Me.txtWBUserName = New System.Windows.Forms.TextBox()
+        Me.lblWBUserName = New System.Windows.Forms.Label()
         Me.cmdDelAnt = New System.Windows.Forms.Button()
         Me.cmdAddAnt = New System.Windows.Forms.Button()
         Me.txtAntAddress = New System.Windows.Forms.TextBox()
@@ -71,24 +77,12 @@ Partial Class frmAntMonitor
         Me.TimerWatchdog = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.txtPleaseSupport = New System.Windows.Forms.TextBox()
-        Me.TabPage1 = New System.Windows.Forms.TabPage()
-        Me.TabPage2 = New System.Windows.Forms.TabPage()
-        Me.TabPage3 = New System.Windows.Forms.TabPage()
-        Me.WebBrowser3 = New System.Windows.Forms.WebBrowser()
-        Me.WebBrowser2 = New System.Windows.Forms.WebBrowser()
-        Me.WebBrowser1 = New System.Windows.Forms.WebBrowser()
-        Me.lblBrowser1 = New System.Windows.Forms.Label()
-        Me.lblBrowser2 = New System.Windows.Forms.Label()
-        Me.lblBrowser3 = New System.Windows.Forms.Label()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
         Me.tabConfig.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.tabLog.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        Me.TabPage2.SuspendLayout()
-        Me.TabPage3.SuspendLayout()
         Me.SuspendLayout()
         '
         'dataAnts
@@ -121,7 +115,7 @@ Partial Class frmAntMonitor
         Me.cmdRefresh.Name = "cmdRefresh"
         Me.cmdRefresh.Size = New System.Drawing.Size(164, 29)
         Me.cmdRefresh.TabIndex = 1
-        Me.cmdRefresh.Text = "Refreshing..."
+        Me.cmdRefresh.Text = "Refresh"
         Me.cmdRefresh.UseVisualStyleBackColor = True
         '
         'TabControl1
@@ -133,13 +127,10 @@ Partial Class frmAntMonitor
         Me.TabControl1.Controls.Add(Me.tabAnts)
         Me.TabControl1.Controls.Add(Me.tabConfig)
         Me.TabControl1.Controls.Add(Me.tabLog)
-        Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Controls.Add(Me.TabPage2)
-        Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1161, 331)
+        Me.TabControl1.Size = New System.Drawing.Size(1029, 331)
         Me.TabControl1.TabIndex = 2
         '
         'tabAnts
@@ -148,13 +139,14 @@ Partial Class frmAntMonitor
         Me.tabAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabAnts.Name = "tabAnts"
         Me.tabAnts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAnts.Size = New System.Drawing.Size(1153, 298)
+        Me.tabAnts.Size = New System.Drawing.Size(1021, 298)
         Me.tabAnts.TabIndex = 0
         Me.tabAnts.Text = "Ants"
         Me.tabAnts.UseVisualStyleBackColor = True
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.chkUseAPI)
         Me.tabConfig.Controls.Add(Me.optAddS2)
         Me.tabConfig.Controls.Add(Me.optAddS1)
         Me.tabConfig.Controls.Add(Me.GroupBox1)
@@ -164,15 +156,14 @@ Partial Class frmAntMonitor
         Me.tabConfig.Controls.Add(Me.lblScanning)
         Me.tabConfig.Controls.Add(Me.Label5)
         Me.tabConfig.Controls.Add(Me.Label4)
-        Me.tabConfig.Controls.Add(Me.cmdSaveConfig)
-        Me.tabConfig.Controls.Add(Me.chkSavePassword)
+        Me.tabConfig.Controls.Add(Me.chkWBSavePassword)
         Me.tabConfig.Controls.Add(Me.Label3)
         Me.tabConfig.Controls.Add(Me.cmbLocalIPs)
-        Me.tabConfig.Controls.Add(Me.chkRebootIfXd)
-        Me.tabConfig.Controls.Add(Me.txtPassword)
-        Me.tabConfig.Controls.Add(Me.Label2)
-        Me.tabConfig.Controls.Add(Me.txtUserName)
-        Me.tabConfig.Controls.Add(Me.Label1)
+        Me.tabConfig.Controls.Add(Me.chkWBRebootIfXd)
+        Me.tabConfig.Controls.Add(Me.txtWBPassword)
+        Me.tabConfig.Controls.Add(Me.lblWBPassword)
+        Me.tabConfig.Controls.Add(Me.txtWBUserName)
+        Me.tabConfig.Controls.Add(Me.lblWBUserName)
         Me.tabConfig.Controls.Add(Me.cmdDelAnt)
         Me.tabConfig.Controls.Add(Me.cmdAddAnt)
         Me.tabConfig.Controls.Add(Me.txtAntAddress)
@@ -182,10 +173,23 @@ Partial Class frmAntMonitor
         Me.tabConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabConfig.Name = "tabConfig"
         Me.tabConfig.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConfig.Size = New System.Drawing.Size(1153, 298)
+        Me.tabConfig.Size = New System.Drawing.Size(1021, 298)
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
+        '
+        'chkUseAPI
+        '
+        Me.chkUseAPI.AutoSize = True
+        Me.chkUseAPI.Checked = True
+        Me.chkUseAPI.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkUseAPI.Location = New System.Drawing.Point(347, 225)
+        Me.chkUseAPI.Name = "chkUseAPI"
+        Me.chkUseAPI.Size = New System.Drawing.Size(92, 24)
+        Me.chkUseAPI.TabIndex = 53
+        Me.chkUseAPI.Text = "Use API"
+        Me.ToolTip1.SetToolTip(Me.chkUseAPI, "If unchecked, will use a browser control, that has mixed results for some users.")
+        Me.chkUseAPI.UseVisualStyleBackColor = True
         '
         'optAddS2
         '
@@ -194,7 +198,6 @@ Partial Class frmAntMonitor
         Me.optAddS2.Name = "optAddS2"
         Me.optAddS2.Size = New System.Drawing.Size(50, 24)
         Me.optAddS2.TabIndex = 50
-        Me.optAddS2.TabStop = True
         Me.optAddS2.Text = "S2"
         Me.optAddS2.UseVisualStyleBackColor = True
         '
@@ -205,18 +208,23 @@ Partial Class frmAntMonitor
         Me.optAddS1.Name = "optAddS1"
         Me.optAddS1.Size = New System.Drawing.Size(50, 24)
         Me.optAddS1.TabIndex = 49
-        Me.optAddS1.TabStop = True
         Me.optAddS1.Text = "S1"
         Me.optAddS1.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.chkShowStale)
+        Me.GroupBox1.Controls.Add(Me.chkShowRej)
+        Me.GroupBox1.Controls.Add(Me.chkShowXCount)
+        Me.GroupBox1.Controls.Add(Me.chkShowHighTemp)
+        Me.GroupBox1.Controls.Add(Me.chkShowHighFan)
         Me.GroupBox1.Controls.Add(Me.chkShowFreqs)
         Me.GroupBox1.Controls.Add(Me.chkShowStatus)
         Me.GroupBox1.Controls.Add(Me.chkShowTemps)
         Me.GroupBox1.Controls.Add(Me.chkShowFans)
         Me.GroupBox1.Controls.Add(Me.chkShowPools)
         Me.GroupBox1.Controls.Add(Me.chkShowBestShare)
+        Me.GroupBox1.Controls.Add(Me.cmdSaveConfig)
         Me.GroupBox1.Controls.Add(Me.chkShowHWE)
         Me.GroupBox1.Controls.Add(Me.chkShowBlocks)
         Me.GroupBox1.Controls.Add(Me.chkShowGHsAvg)
@@ -224,17 +232,77 @@ Partial Class frmAntMonitor
         Me.GroupBox1.Controls.Add(Me.chkShowUptime)
         Me.GroupBox1.Location = New System.Drawing.Point(556, 75)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(331, 121)
+        Me.GroupBox1.Size = New System.Drawing.Size(451, 145)
         Me.GroupBox1.TabIndex = 48
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Output options"
+        '
+        'chkShowStale
+        '
+        Me.chkShowStale.AutoSize = True
+        Me.chkShowStale.Checked = True
+        Me.chkShowStale.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowStale.Location = New System.Drawing.Point(109, 89)
+        Me.chkShowStale.Name = "chkShowStale"
+        Me.chkShowStale.Size = New System.Drawing.Size(89, 24)
+        Me.chkShowStale.TabIndex = 30
+        Me.chkShowStale.Text = "Stale %"
+        Me.chkShowStale.UseVisualStyleBackColor = True
+        '
+        'chkShowRej
+        '
+        Me.chkShowRej.AutoSize = True
+        Me.chkShowRej.Checked = True
+        Me.chkShowRej.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowRej.Location = New System.Drawing.Point(109, 68)
+        Me.chkShowRej.Name = "chkShowRej"
+        Me.chkShowRej.Size = New System.Drawing.Size(99, 24)
+        Me.chkShowRej.TabIndex = 29
+        Me.chkShowRej.Text = "Reject %"
+        Me.chkShowRej.UseVisualStyleBackColor = True
+        '
+        'chkShowXCount
+        '
+        Me.chkShowXCount.AutoSize = True
+        Me.chkShowXCount.Checked = True
+        Me.chkShowXCount.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowXCount.Location = New System.Drawing.Point(347, 26)
+        Me.chkShowXCount.Name = "chkShowXCount"
+        Me.chkShowXCount.Size = New System.Drawing.Size(86, 24)
+        Me.chkShowXCount.TabIndex = 28
+        Me.chkShowXCount.Text = "XCount"
+        Me.chkShowXCount.UseVisualStyleBackColor = True
+        '
+        'chkShowHighTemp
+        '
+        Me.chkShowHighTemp.AutoSize = True
+        Me.chkShowHighTemp.Checked = True
+        Me.chkShowHighTemp.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowHighTemp.Location = New System.Drawing.Point(217, 46)
+        Me.chkShowHighTemp.Name = "chkShowHighTemp"
+        Me.chkShowHighTemp.Size = New System.Drawing.Size(113, 24)
+        Me.chkShowHighTemp.TabIndex = 27
+        Me.chkShowHighTemp.Text = "High Temp"
+        Me.chkShowHighTemp.UseVisualStyleBackColor = True
+        '
+        'chkShowHighFan
+        '
+        Me.chkShowHighFan.AutoSize = True
+        Me.chkShowHighFan.Checked = True
+        Me.chkShowHighFan.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowHighFan.Location = New System.Drawing.Point(109, 109)
+        Me.chkShowHighFan.Name = "chkShowHighFan"
+        Me.chkShowHighFan.Size = New System.Drawing.Size(99, 24)
+        Me.chkShowHighFan.TabIndex = 26
+        Me.chkShowHighFan.Text = "High Fan"
+        Me.chkShowHighFan.UseVisualStyleBackColor = True
         '
         'chkShowFreqs
         '
         Me.chkShowFreqs.AutoSize = True
         Me.chkShowFreqs.Checked = True
         Me.chkShowFreqs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowFreqs.Location = New System.Drawing.Point(221, 47)
+        Me.chkShowFreqs.Location = New System.Drawing.Point(217, 89)
         Me.chkShowFreqs.Name = "chkShowFreqs"
         Me.chkShowFreqs.Size = New System.Drawing.Size(74, 24)
         Me.chkShowFreqs.TabIndex = 25
@@ -246,7 +314,7 @@ Partial Class frmAntMonitor
         Me.chkShowStatus.AutoSize = True
         Me.chkShowStatus.Checked = True
         Me.chkShowStatus.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowStatus.Location = New System.Drawing.Point(221, 68)
+        Me.chkShowStatus.Location = New System.Drawing.Point(217, 109)
         Me.chkShowStatus.Name = "chkShowStatus"
         Me.chkShowStatus.Size = New System.Drawing.Size(79, 24)
         Me.chkShowStatus.TabIndex = 24
@@ -258,7 +326,7 @@ Partial Class frmAntMonitor
         Me.chkShowTemps.AutoSize = True
         Me.chkShowTemps.Checked = True
         Me.chkShowTemps.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowTemps.Location = New System.Drawing.Point(222, 26)
+        Me.chkShowTemps.Location = New System.Drawing.Point(218, 68)
         Me.chkShowTemps.Name = "chkShowTemps"
         Me.chkShowTemps.Size = New System.Drawing.Size(82, 24)
         Me.chkShowTemps.TabIndex = 23
@@ -270,7 +338,7 @@ Partial Class frmAntMonitor
         Me.chkShowFans.AutoSize = True
         Me.chkShowFans.Checked = True
         Me.chkShowFans.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowFans.Location = New System.Drawing.Point(118, 89)
+        Me.chkShowFans.Location = New System.Drawing.Point(217, 26)
         Me.chkShowFans.Name = "chkShowFans"
         Me.chkShowFans.Size = New System.Drawing.Size(68, 24)
         Me.chkShowFans.TabIndex = 22
@@ -282,7 +350,7 @@ Partial Class frmAntMonitor
         Me.chkShowPools.AutoSize = True
         Me.chkShowPools.Checked = True
         Me.chkShowPools.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowPools.Location = New System.Drawing.Point(118, 68)
+        Me.chkShowPools.Location = New System.Drawing.Point(109, 47)
         Me.chkShowPools.Name = "chkShowPools"
         Me.chkShowPools.Size = New System.Drawing.Size(73, 24)
         Me.chkShowPools.TabIndex = 21
@@ -294,19 +362,28 @@ Partial Class frmAntMonitor
         Me.chkShowBestShare.AutoSize = True
         Me.chkShowBestShare.Checked = True
         Me.chkShowBestShare.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowBestShare.Location = New System.Drawing.Point(118, 47)
+        Me.chkShowBestShare.Location = New System.Drawing.Point(109, 26)
         Me.chkShowBestShare.Name = "chkShowBestShare"
         Me.chkShowBestShare.Size = New System.Drawing.Size(110, 24)
         Me.chkShowBestShare.TabIndex = 20
         Me.chkShowBestShare.Text = "BestShare"
         Me.chkShowBestShare.UseVisualStyleBackColor = True
         '
+        'cmdSaveConfig
+        '
+        Me.cmdSaveConfig.Location = New System.Drawing.Point(324, 101)
+        Me.cmdSaveConfig.Name = "cmdSaveConfig"
+        Me.cmdSaveConfig.Size = New System.Drawing.Size(121, 32)
+        Me.cmdSaveConfig.TabIndex = 15
+        Me.cmdSaveConfig.Text = "Save Config"
+        Me.cmdSaveConfig.UseVisualStyleBackColor = True
+        '
         'chkShowHWE
         '
         Me.chkShowHWE.AutoSize = True
         Me.chkShowHWE.Checked = True
         Me.chkShowHWE.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowHWE.Location = New System.Drawing.Point(118, 26)
+        Me.chkShowHWE.Location = New System.Drawing.Point(9, 109)
         Me.chkShowHWE.Name = "chkShowHWE"
         Me.chkShowHWE.Size = New System.Drawing.Size(86, 24)
         Me.chkShowHWE.TabIndex = 19
@@ -365,7 +442,7 @@ Partial Class frmAntMonitor
         '
         Me.cmbRefreshRate.FormattingEnabled = True
         Me.cmbRefreshRate.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
-        Me.cmbRefreshRate.Location = New System.Drawing.Point(792, 221)
+        Me.cmbRefreshRate.Location = New System.Drawing.Point(529, 258)
         Me.cmbRefreshRate.Name = "cmbRefreshRate"
         Me.cmbRefreshRate.Size = New System.Drawing.Size(94, 28)
         Me.cmbRefreshRate.TabIndex = 47
@@ -373,7 +450,7 @@ Partial Class frmAntMonitor
         '
         'txtRefreshRate
         '
-        Me.txtRefreshRate.Location = New System.Drawing.Point(730, 222)
+        Me.txtRefreshRate.Location = New System.Drawing.Point(467, 259)
         Me.txtRefreshRate.Name = "txtRefreshRate"
         Me.txtRefreshRate.Size = New System.Drawing.Size(55, 27)
         Me.txtRefreshRate.TabIndex = 46
@@ -382,7 +459,7 @@ Partial Class frmAntMonitor
         'Label16
         '
         Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(729, 199)
+        Me.Label16.Location = New System.Drawing.Point(346, 261)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(118, 20)
         Me.Label16.TabIndex = 45
@@ -421,26 +498,18 @@ Partial Class frmAntMonitor
         Me.Label4.TabIndex = 16
         Me.Label4.Text = "Unchecked items are skipped"
         '
-        'cmdSaveConfig
+        'chkWBSavePassword
         '
-        Me.cmdSaveConfig.Location = New System.Drawing.Point(745, 251)
-        Me.cmdSaveConfig.Name = "cmdSaveConfig"
-        Me.cmdSaveConfig.Size = New System.Drawing.Size(121, 32)
-        Me.cmdSaveConfig.TabIndex = 15
-        Me.cmdSaveConfig.Text = "Save Config"
-        Me.cmdSaveConfig.UseVisualStyleBackColor = True
-        '
-        'chkSavePassword
-        '
-        Me.chkSavePassword.AutoSize = True
-        Me.chkSavePassword.Checked = True
-        Me.chkSavePassword.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkSavePassword.Location = New System.Drawing.Point(345, 266)
-        Me.chkSavePassword.Name = "chkSavePassword"
-        Me.chkSavePassword.Size = New System.Drawing.Size(147, 24)
-        Me.chkSavePassword.TabIndex = 14
-        Me.chkSavePassword.Text = "Save Password"
-        Me.chkSavePassword.UseVisualStyleBackColor = True
+        Me.chkWBSavePassword.AutoSize = True
+        Me.chkWBSavePassword.Checked = True
+        Me.chkWBSavePassword.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkWBSavePassword.Location = New System.Drawing.Point(642, 258)
+        Me.chkWBSavePassword.Name = "chkWBSavePassword"
+        Me.chkWBSavePassword.Size = New System.Drawing.Size(147, 24)
+        Me.chkWBSavePassword.TabIndex = 14
+        Me.chkWBSavePassword.Text = "Save Password"
+        Me.chkWBSavePassword.UseVisualStyleBackColor = True
+        Me.chkWBSavePassword.Visible = False
         '
         'Label3
         '
@@ -459,49 +528,54 @@ Partial Class frmAntMonitor
         Me.cmbLocalIPs.Size = New System.Drawing.Size(183, 28)
         Me.cmbLocalIPs.TabIndex = 12
         '
-        'chkRebootIfXd
+        'chkWBRebootIfXd
         '
-        Me.chkRebootIfXd.AutoSize = True
-        Me.chkRebootIfXd.Checked = True
-        Me.chkRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkRebootIfXd.Location = New System.Drawing.Point(556, 263)
-        Me.chkRebootIfXd.Name = "chkRebootIfXd"
-        Me.chkRebootIfXd.Size = New System.Drawing.Size(183, 24)
-        Me.chkRebootIfXd.TabIndex = 11
-        Me.chkRebootIfXd.Text = "Reboot Ants with Xs"
-        Me.chkRebootIfXd.UseVisualStyleBackColor = True
+        Me.chkWBRebootIfXd.AutoSize = True
+        Me.chkWBRebootIfXd.Checked = True
+        Me.chkWBRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkWBRebootIfXd.Location = New System.Drawing.Point(795, 257)
+        Me.chkWBRebootIfXd.Name = "chkWBRebootIfXd"
+        Me.chkWBRebootIfXd.Size = New System.Drawing.Size(183, 24)
+        Me.chkWBRebootIfXd.TabIndex = 11
+        Me.chkWBRebootIfXd.Text = "Reboot Ants with Xs"
+        Me.chkWBRebootIfXd.UseVisualStyleBackColor = True
+        Me.chkWBRebootIfXd.Visible = False
         '
-        'txtPassword
+        'txtWBPassword
         '
-        Me.txtPassword.Location = New System.Drawing.Point(624, 230)
-        Me.txtPassword.Name = "txtPassword"
-        Me.txtPassword.Size = New System.Drawing.Size(100, 27)
-        Me.txtPassword.TabIndex = 10
+        Me.txtWBPassword.Location = New System.Drawing.Point(905, 225)
+        Me.txtWBPassword.Name = "txtWBPassword"
+        Me.txtWBPassword.Size = New System.Drawing.Size(100, 27)
+        Me.txtWBPassword.TabIndex = 10
+        Me.txtWBPassword.Visible = False
         '
-        'Label2
+        'lblWBPassword
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(534, 233)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(88, 20)
-        Me.Label2.TabIndex = 9
-        Me.Label2.Text = "Password:"
+        Me.lblWBPassword.AutoSize = True
+        Me.lblWBPassword.Location = New System.Drawing.Point(815, 228)
+        Me.lblWBPassword.Name = "lblWBPassword"
+        Me.lblWBPassword.Size = New System.Drawing.Size(88, 20)
+        Me.lblWBPassword.TabIndex = 9
+        Me.lblWBPassword.Text = "Password:"
+        Me.lblWBPassword.Visible = False
         '
-        'txtUserName
+        'txtWBUserName
         '
-        Me.txtUserName.Location = New System.Drawing.Point(428, 230)
-        Me.txtUserName.Name = "txtUserName"
-        Me.txtUserName.Size = New System.Drawing.Size(100, 27)
-        Me.txtUserName.TabIndex = 8
+        Me.txtWBUserName.Location = New System.Drawing.Point(709, 225)
+        Me.txtWBUserName.Name = "txtWBUserName"
+        Me.txtWBUserName.Size = New System.Drawing.Size(100, 27)
+        Me.txtWBUserName.TabIndex = 8
+        Me.txtWBUserName.Visible = False
         '
-        'Label1
+        'lblWBUserName
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(340, 233)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(91, 20)
-        Me.Label1.TabIndex = 7
-        Me.Label1.Text = "Username:"
+        Me.lblWBUserName.AutoSize = True
+        Me.lblWBUserName.Location = New System.Drawing.Point(621, 228)
+        Me.lblWBUserName.Name = "lblWBUserName"
+        Me.lblWBUserName.Size = New System.Drawing.Size(91, 20)
+        Me.lblWBUserName.TabIndex = 7
+        Me.lblWBUserName.Text = "Username:"
+        Me.lblWBUserName.Visible = False
         '
         'cmdDelAnt
         '
@@ -534,7 +608,7 @@ Partial Class frmAntMonitor
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ProgressBar1.Location = New System.Drawing.Point(345, 46)
         Me.ProgressBar1.Name = "ProgressBar1"
-        Me.ProgressBar1.Size = New System.Drawing.Size(514, 23)
+        Me.ProgressBar1.Size = New System.Drawing.Size(382, 23)
         Me.ProgressBar1.TabIndex = 3
         Me.ProgressBar1.Visible = False
         '
@@ -563,7 +637,7 @@ Partial Class frmAntMonitor
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(1153, 298)
+        Me.tabLog.Size = New System.Drawing.Size(1021, 298)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -605,107 +679,11 @@ Partial Class frmAntMonitor
         Me.txtPleaseSupport.TabStop = False
         Me.txtPleaseSupport.Text = "Please support this app: 1PA1sji28iztspKxDquwFrNjp5SksjkCHE"
         '
-        'TabPage1
-        '
-        Me.TabPage1.Controls.Add(Me.lblBrowser1)
-        Me.TabPage1.Controls.Add(Me.WebBrowser1)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 4)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(1153, 298)
-        Me.TabPage1.TabIndex = 3
-        Me.TabPage1.Text = "Browser1"
-        Me.TabPage1.UseVisualStyleBackColor = True
-        '
-        'TabPage2
-        '
-        Me.TabPage2.Controls.Add(Me.lblBrowser2)
-        Me.TabPage2.Controls.Add(Me.WebBrowser2)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 4)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(1153, 298)
-        Me.TabPage2.TabIndex = 4
-        Me.TabPage2.Text = "Browser2"
-        Me.TabPage2.UseVisualStyleBackColor = True
-        '
-        'TabPage3
-        '
-        Me.TabPage3.Controls.Add(Me.lblBrowser3)
-        Me.TabPage3.Controls.Add(Me.WebBrowser3)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 4)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(1153, 298)
-        Me.TabPage3.TabIndex = 5
-        Me.TabPage3.Text = "Browser3"
-        Me.TabPage3.UseVisualStyleBackColor = True
-        '
-        'WebBrowser3
-        '
-        Me.WebBrowser3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.WebBrowser3.Location = New System.Drawing.Point(3, 3)
-        Me.WebBrowser3.MinimumSize = New System.Drawing.Size(20, 20)
-        Me.WebBrowser3.Name = "WebBrowser3"
-        Me.WebBrowser3.Size = New System.Drawing.Size(1147, 267)
-        Me.WebBrowser3.TabIndex = 0
-        '
-        'WebBrowser2
-        '
-        Me.WebBrowser2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.WebBrowser2.Location = New System.Drawing.Point(3, 3)
-        Me.WebBrowser2.MinimumSize = New System.Drawing.Size(20, 20)
-        Me.WebBrowser2.Name = "WebBrowser2"
-        Me.WebBrowser2.Size = New System.Drawing.Size(1147, 267)
-        Me.WebBrowser2.TabIndex = 1
-        '
-        'WebBrowser1
-        '
-        Me.WebBrowser1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.WebBrowser1.Location = New System.Drawing.Point(3, 3)
-        Me.WebBrowser1.MinimumSize = New System.Drawing.Size(20, 20)
-        Me.WebBrowser1.Name = "WebBrowser1"
-        Me.WebBrowser1.Size = New System.Drawing.Size(1147, 267)
-        Me.WebBrowser1.TabIndex = 1
-        '
-        'lblBrowser1
-        '
-        Me.lblBrowser1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblBrowser1.AutoSize = True
-        Me.lblBrowser1.Location = New System.Drawing.Point(6, 273)
-        Me.lblBrowser1.Name = "lblBrowser1"
-        Me.lblBrowser1.Size = New System.Drawing.Size(81, 20)
-        Me.lblBrowser1.TabIndex = 2
-        Me.lblBrowser1.Text = "Browser1"
-        '
-        'lblBrowser2
-        '
-        Me.lblBrowser2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblBrowser2.AutoSize = True
-        Me.lblBrowser2.Location = New System.Drawing.Point(6, 273)
-        Me.lblBrowser2.Name = "lblBrowser2"
-        Me.lblBrowser2.Size = New System.Drawing.Size(81, 20)
-        Me.lblBrowser2.TabIndex = 3
-        Me.lblBrowser2.Text = "Browser2"
-        '
-        'lblBrowser3
-        '
-        Me.lblBrowser3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblBrowser3.AutoSize = True
-        Me.lblBrowser3.Location = New System.Drawing.Point(6, 273)
-        Me.lblBrowser3.Name = "lblBrowser3"
-        Me.lblBrowser3.Size = New System.Drawing.Size(81, 20)
-        Me.lblBrowser3.TabIndex = 3
-        Me.lblBrowser3.Text = "Browser3"
-        '
         'frmAntMonitor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1175, 375)
+        Me.ClientSize = New System.Drawing.Size(1043, 375)
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
         Me.Controls.Add(Me.TabControl1)
@@ -715,7 +693,7 @@ Partial Class frmAntMonitor
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmAntMonitor"
-        Me.Text = "M's Ant Monitor v1.5"
+        Me.Text = "M's Ant Monitor v1.6"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControl1.ResumeLayout(False)
         Me.tabAnts.ResumeLayout(False)
@@ -725,12 +703,6 @@ Partial Class frmAntMonitor
         Me.GroupBox1.PerformLayout()
         Me.tabLog.ResumeLayout(False)
         Me.tabLog.PerformLayout()
-        Me.TabPage1.ResumeLayout(False)
-        Me.TabPage1.PerformLayout()
-        Me.TabPage2.ResumeLayout(False)
-        Me.TabPage2.PerformLayout()
-        Me.TabPage3.ResumeLayout(False)
-        Me.TabPage3.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -750,12 +722,12 @@ Partial Class frmAntMonitor
     Friend WithEvents cmdPause As System.Windows.Forms.Button
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents cmbLocalIPs As System.Windows.Forms.ComboBox
-    Friend WithEvents chkRebootIfXd As System.Windows.Forms.CheckBox
-    Friend WithEvents txtPassword As System.Windows.Forms.TextBox
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents txtUserName As System.Windows.Forms.TextBox
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents chkSavePassword As System.Windows.Forms.CheckBox
+    Friend WithEvents chkWBRebootIfXd As System.Windows.Forms.CheckBox
+    Friend WithEvents txtWBPassword As System.Windows.Forms.TextBox
+    Friend WithEvents lblWBPassword As System.Windows.Forms.Label
+    Friend WithEvents txtWBUserName As System.Windows.Forms.TextBox
+    Friend WithEvents lblWBUserName As System.Windows.Forms.Label
+    Friend WithEvents chkWBSavePassword As System.Windows.Forms.CheckBox
     Friend WithEvents cmdSaveConfig As System.Windows.Forms.Button
     Friend WithEvents TimerWatchdog As System.Windows.Forms.Timer
     Friend WithEvents Label5 As System.Windows.Forms.Label
@@ -782,14 +754,11 @@ Partial Class frmAntMonitor
     Friend WithEvents chkShowFreqs As System.Windows.Forms.CheckBox
     Friend WithEvents optAddS2 As System.Windows.Forms.RadioButton
     Friend WithEvents optAddS1 As System.Windows.Forms.RadioButton
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
-    Friend WithEvents lblBrowser1 As System.Windows.Forms.Label
-    Friend WithEvents WebBrowser1 As System.Windows.Forms.WebBrowser
-    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
-    Friend WithEvents lblBrowser2 As System.Windows.Forms.Label
-    Friend WithEvents WebBrowser2 As System.Windows.Forms.WebBrowser
-    Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
-    Friend WithEvents lblBrowser3 As System.Windows.Forms.Label
-    Friend WithEvents WebBrowser3 As System.Windows.Forms.WebBrowser
+    Friend WithEvents chkShowHighTemp As System.Windows.Forms.CheckBox
+    Friend WithEvents chkShowHighFan As System.Windows.Forms.CheckBox
+    Friend WithEvents chkShowXCount As System.Windows.Forms.CheckBox
+    Friend WithEvents chkShowStale As System.Windows.Forms.CheckBox
+    Friend WithEvents chkShowRej As System.Windows.Forms.CheckBox
+    Friend WithEvents chkUseAPI As System.Windows.Forms.CheckBox
 
 End Class

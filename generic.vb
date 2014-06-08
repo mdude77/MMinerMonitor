@@ -37,6 +37,14 @@ Public Class ControlsByRegistry
 
     End Sub
 
+    Public Sub SetControlByRegKey(ByRef optAny As RadioButton, Optional bDefault As Boolean = False)
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey)
+            Call SetControlByRegKey(key, optAny, bDefault)
+        End Using
+
+    End Sub
+
     Public Sub SetControlByRegKey(ByRef regKey As Microsoft.Win32.RegistryKey, ByRef chkAny As CheckBox, Optional bDefault As Boolean = False)
 
         Dim sKey As String
@@ -56,6 +64,29 @@ Public Class ControlsByRegistry
             End If
         Else
             Throw New Exception("Internal error: " & chkAny.Name & " not found in regKey dictionary.")
+        End If
+
+    End Sub
+
+    Public Sub SetControlByRegKey(ByRef regKey As Microsoft.Win32.RegistryKey, ByRef optAny As RadioButton, Optional bDefault As Boolean = False)
+
+        Dim sKey As String
+        Dim sTemp As String
+
+        If dictRegkeyNames.TryGetValue(optAny.Name, sKey) = True Then
+            sTemp = regKey.GetValue(sKey)
+
+            If sTemp = "Y" Then
+                optAny.Checked = True
+            Else
+                If String.IsNullOrEmpty(sTemp) = True Then
+                    optAny.Checked = bDefault
+                Else
+                    optAny.Checked = False
+                End If
+            End If
+        Else
+            Throw New Exception("Internal error: " & optAny.Name & " not found in regKey dictionary.")
         End If
 
     End Sub
@@ -110,6 +141,12 @@ Public Class ControlsByRegistry
     Public Sub SetRegKeyByControl(ByRef txtAny As TextBox)
 
         _SetRegKeyByControl(txtAny)
+
+    End Sub
+
+    Public Sub SetRegKeyByControl(ByRef optAny As RadioButton)
+
+        _SetRegKeyByControl(optAny)
 
     End Sub
 
@@ -195,6 +232,22 @@ Public Module Extensions
     <Extension()> Public Function IsNullOrEmpty(ByVal sString As String) As Boolean
 
         Return String.IsNullOrEmpty(sString)
+
+    End Function
+
+    <Extension()> Public Function InstrRev(ByVal sString As String, ByVal sSearch As String, Optional ByVal iStart As Integer = -1) As String
+
+        Return sString.Substring(Microsoft.VisualBasic.InStrRev(sString, sSearch, iStart))
+
+    End Function
+
+    <Extension()> Public Function LeftMost(ByVal sString As String, ByVal iMinusValue As Integer) As String
+
+        If sString.Length < iMinusValue Then
+            Return sString
+        Else
+            Return sString.Substring(0, sString.Length - iMinusValue)
+        End If
 
     End Function
 

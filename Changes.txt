@@ -1,3 +1,18 @@
+v1.6
+- Added the ability to use the cgminer API instead of the webbrowser control.  Notes:
+	- This option is now default for new users.  
+	- By default this will only work if your Ants are on the same subnet (eg 192.168.0.x) as your machine, or if you're reconfigured your 	  Ants to allow API access outside of your subnet.
+	- Rebooting your Ants doesn't work when using the API.  At some point in the future I may add SSH support to be able to reboot via 	  	  SSH.
+	- Web browser fuctionality is still there and can be used if desired.  At the moment the only reason why I see you'd want to do this 		  is to access Ants outside of your internal network.
+	- Scanning for Ants still uses browser logic.  I intend to change that in a future version.
+- Added a Reject % and Stale % column.  This is only visible when using the API.
+- Added a HFan (high fan) column.  Shows only the highest fan speed.
+- Added a HTemp (high temp) column.  Shows only the highest temp.
+- Added an XCount column.  This is the total number of Xs or dashes you have across all your chains.
+- Removed the browser tabs.
+- Added the ability to abort the scan for Ants.
+
+
 v1.5
 - Added support for S2s
 - Added logic to prevent auto rebooting more than once every 15 minutes
