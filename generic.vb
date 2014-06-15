@@ -235,12 +235,27 @@ Public Module Extensions
 
     End Function
 
+    ''' <summary>
+    ''' Returns the string located at the In String Reverse position
+    ''' </summary>
+    ''' <param name="sString"></param>
+    ''' <param name="sSearch">String to search for</param>
+    ''' <param name="iStart">Where to start searching</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     <Extension()> Public Function InstrRev(ByVal sString As String, ByVal sSearch As String, Optional ByVal iStart As Integer = -1) As String
 
         Return sString.Substring(Microsoft.VisualBasic.InStrRev(sString, sSearch, iStart))
 
     End Function
 
+    ''' <summary>
+    ''' Returns the leftmost part of the string minus the value passed
+    ''' </summary>
+    ''' <param name="sString"></param>
+    ''' <param name="iMinusValue">How many chars from the end to omit</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     <Extension()> Public Function LeftMost(ByVal sString As String, ByVal iMinusValue As Integer) As String
 
         If sString.Length < iMinusValue Then

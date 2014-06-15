@@ -2,6 +2,8 @@
 
 Public Class frmAntMonitor
 
+    Private ToldUserRunningInNotificationTray As Boolean
+
     Private wb(0 To 2) As WebBrowser
 
     Private RebootInfo As System.Collections.Generic.Dictionary(Of String, Date)
@@ -10,7 +12,7 @@ Public Class frmAntMonitor
     
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v1.6"
+    Private Const csVersion As String = "M's Ant Monitor v1.9"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -102,6 +104,8 @@ Public Class frmAntMonitor
 
         Call SetGridSizes("\Columns\dataAnts", Me.dataAnts)
 
+        AddHandler Me.dataAnts.ColumnWidthChanged, AddressOf Me.dataGrid_ColumnWidthChanged
+
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey)
             If key Is Nothing Then
                 My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey)
@@ -115,6 +119,10 @@ Public Class frmAntMonitor
 
             If key.GetValue("Height") > 100 Then
                 Me.Height = key.GetValue("Height")
+            End If
+
+            If key.GetValue("ToldUserAboutNotification") = "Y" Then
+                ToldUserRunningInNotificationTray = True
             End If
         End Using
 
@@ -142,7 +150,35 @@ Public Class frmAntMonitor
             .AddControl(Me.chkShowXCount, "ShowXCount")
             .AddControl(Me.chkShowRej, "ShowReject")
             .AddControl(Me.chkShowStale, "ShowStale")
+
             .AddControl(Me.chkUseAPI, "UseAPI")
+
+            .AddControl(Me.chkAlertIfS1Temp, "AlertIfS1Temp")
+            .AddControl(Me.chkAlertIfS2Temp, "AlertIfS2Temp")
+            .AddControl(Me.txtAlertS1Temp, "AlertValueS1Temp")
+            .AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
+
+            .AddControl(Me.chkAlertIfS1Fan, "AlertIfS1Fan")
+            .AddControl(Me.chkAlertIfS2Fan, "AlertIfS2Fan")
+            .AddControl(Me.txtAlertS1Fan, "AlertValueS1Fan")
+            .AddControl(Me.txtAlertS2Fan, "AlertValueS2Fan")
+
+            .AddControl(Me.chkAlertIfS1Hash, "AlertIfS1Hash")
+            .AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
+            .AddControl(Me.txtAlertS1Hash, "AlertValueS1Hash")
+            .AddControl(Me.txtAlertS2Hash, "AlertValueS2Hash")
+
+            .AddControl(Me.chkAlertIfS1XCount, "AlertIfS1XCount")
+            .AddControl(Me.chkAlertIfS2XCount, "AlertIFS2XCount")
+            .AddControl(Me.txtAlertS1XCount, "AlertValueS1XCount")
+            .AddControl(Me.txtAlertS2XCount, "AlertValueS2XCount")
+
+            .AddControl(Me.chkAlertHighlightField, "AlertHighlightField")
+            .AddControl(Me.chkAlertShowAnnoyingPopup, "AlertShowAnnoyingPopup")
+            .AddControl(Me.chkAlertShowNotifyPopup, "AlertShowNotifyPopup")
+            .AddControl(Me.chkAlertStartProcess, "AlertStartProcess")
+            .AddControl(Me.txtAlertStartProcessName, "AlertProcessName")
+            .AddControl(Me.txtAlertStartProcessParms, "AlertProcessParms")
 
             .SetControlByRegKey(Me.chkWBRebootIfXd, True)
             .SetControlByRegKey(Me.txtWBPassword, "root")
@@ -189,6 +225,33 @@ Public Class frmAntMonitor
             .SetControlByRegKey(Me.chkShowStale, True)
 
             .SetControlByRegKey(Me.chkUseAPI, True)
+
+            .SetControlByRegKey(Me.chkAlertIfS1Temp)
+            .SetControlByRegKey(Me.chkAlertIfS2Temp)
+            .SetControlByRegKey(Me.txtAlertS1Temp)
+            .SetControlByRegKey(Me.txtAlertS2Temp)
+
+            .SetControlByRegKey(Me.chkAlertIfS1Fan)
+            .SetControlByRegKey(Me.chkAlertIfS2Fan)
+            .SetControlByRegKey(Me.txtAlertS1Fan)
+            .SetControlByRegKey(Me.txtAlertS2Fan)
+
+            .SetControlByRegKey(Me.chkAlertIfS1Hash)
+            .SetControlByRegKey(Me.chkAlertIfS2Hash)
+            .SetControlByRegKey(Me.txtAlertS1Hash)
+            .SetControlByRegKey(Me.txtAlertS2Hash)
+
+            .SetControlByRegKey(Me.chkAlertIfS1XCount)
+            .SetControlByRegKey(Me.chkAlertIfS2XCount)
+            .SetControlByRegKey(Me.txtAlertS1XCount)
+            .SetControlByRegKey(Me.txtAlertS2XCount)
+
+            .SetControlByRegKey(Me.chkAlertHighlightField, True)
+            .SetControlByRegKey(Me.chkAlertShowNotifyPopup, True)
+            .SetControlByRegKey(Me.chkAlertShowAnnoyingPopup)
+            .SetControlByRegKey(Me.chkAlertStartProcess)
+            .SetControlByRegKey(Me.txtAlertStartProcessName)
+            .SetControlByRegKey(Me.txtAlertStartProcessParms)
         End With
 
         'check each of the boxes
@@ -665,6 +728,7 @@ Public Class frmAntMonitor
         Dim sResult As String
         Dim dBestShare As Double
         Dim AntType As enAntType
+        Dim x As Integer
 
         If Me.chklstAnts.Items.Count = 0 Then
             MsgBox("Please add some Ant addresses first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
@@ -694,7 +758,7 @@ Public Class frmAntMonitor
 
                 sAntIP = Me.chklstAnts.CheckedItems(bAnt).ToString.Substring(4)
 
-                sAnt = sAntIP.InstrRev(".")
+                sAnt = Me.chklstAnts.CheckedItems(bAnt).ToString.Substring(0, 2) & ":" & sAntIP.InstrRev(".")
 
                 For Each dr In ds.Tables(0).Rows
                     If dr.Item("Name") = sAnt Then
@@ -860,10 +924,19 @@ Public Class frmAntMonitor
             Me.TimerWatchdog.Enabled = False
             bAnt = 0
 
-            Me.Text = csVersion & " - Refreshed " & Now.ToString
+            x = 0
 
-            Exit Sub
+            For Each dg As DataGridViewRow In Me.dataAnts.Rows
+                If dg.Cells("Uptime").Value <> "ERROR" AndAlso dg.Cells("Uptime").Value <> "???" Then
+                    x += 1
+                End If
+            Next
+
+            Me.Text = csVersion & " - Refreshed " & Now.ToString & " - " & x & " of " & Me.chklstAnts.CheckedItems.Count & " responded"
+
+            Call HandleAlerts()
         Else
+            'browser logic
             If bAnt <> Me.chklstAnts.CheckedItems.Count Then
                 sTemp = Me.chklstAnts.CheckedItems(bAnt).ToString
 
@@ -926,12 +999,222 @@ Public Class frmAntMonitor
 
     End Sub
 
+    Private Sub HandleAlerts()
+
+        Dim x As Integer
+        Dim dr As DataGridViewRow
+        Dim sAlertMsg, sAlertTitle As String
+        Dim bAlert As Boolean
+        Dim ap As frmAnnoyingPopup
+        Dim fanColor, tempColor, hashColor, xCountColor As Color
+        Dim iAlertCount As Integer
+
+        'alert logic
+        For Each dr In Me.dataAnts.Rows
+            bAlert = False
+
+            fanColor = New Color
+            tempColor = New Color
+            hashColor = New Color
+            xCountColor = New Color
+
+            Select Case dr.Cells("Name").Value.Substring(0, 2)
+                Case "S1"
+                    If Me.chkAlertIfS1Temp.Checked = True Then
+                        x = Val(Me.txtAlertS1Temp.Text)
+
+                        If x > 0 Then
+                            If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    tempColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " celcius"
+
+                                sAlertTitle = "S1 Temp Alert"
+                            End If
+                        End If
+                    End If
+
+                    If Me.chkAlertIfS1Fan.Checked = True Then
+                        x = Val(Me.txtAlertS1Fan.Text)
+
+                        If x > 0 Then
+                            If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    fanColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " RPM"
+
+                                sAlertTitle = "S1 Fan Alert"
+                            End If
+                        End If
+                    End If
+
+                    If Me.chkAlertIfS1Hash.Checked = True Then
+                        x = Val(Me.txtAlertS1Hash.Text)
+
+                        If x > 0 Then
+                            If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    hashColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " less than " & x & " GH/s"
+
+                                sAlertTitle = "S1 Hash Alert"
+                            End If
+                        End If
+                    End If
+
+                    If Me.chkAlertIfS1XCount.Checked = True Then
+                        x = Val(Me.txtAlertS1XCount.Text)
+
+                        If x > 0 Then
+                            If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    xCountColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " X count"
+
+                                sAlertTitle = "S1 XCount Alert"
+                            End If
+                        End If
+                    End If
+
+                Case "S2"
+                    If Me.chkAlertIfS2Temp.Checked = True Then
+                        x = Val(Me.txtAlertS2Temp.Text)
+
+                        If x > 0 Then
+                            If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    tempColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " celcius"
+
+                                sAlertTitle = "S2 Temp Alert"
+                            End If
+                        End If
+                    End If
+
+                    If Me.chkAlertIfS2Fan.Checked = True Then
+                        x = Val(Me.txtAlertS2Fan.Text)
+
+                        If x > 0 Then
+                            If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    fanColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " RPM"
+
+                                sAlertTitle = "S2 Fan Alert"
+                            End If
+                        End If
+                    End If
+
+                    If Me.chkAlertIfS2Hash.Checked = True Then
+                        x = Val(Me.txtAlertS2Hash.Text)
+
+                        If x > 0 Then
+                            If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    hashColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " less than " & x & " GH/s"
+
+                                sAlertTitle = "S2 Hash Alert"
+                            End If
+                        End If
+                    End If
+
+                    If Me.chkAlertIfS2XCount.Checked = True Then
+                        x = Val(Me.txtAlertS2XCount.Text)
+
+                        If x > 0 Then
+                            If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                                If Me.chkAlertHighlightField.Checked = True Then
+                                    xCountColor = Color.Red
+                                End If
+
+                                bAlert = True
+
+                                sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " X count"
+
+                                sAlertTitle = "S2 XCount Alert"
+                            End If
+                        End If
+                    End If
+            End Select
+
+            dr.Cells("HTemp").Style.BackColor = tempColor
+            dr.Cells("HFan").Style.BackColor = fanColor
+            dr.Cells("GH/s(avg)").Style.BackColor = hashColor
+            dr.Cells("XCount").Style.BackColor = xCountColor
+
+            If bAlert = True Then
+                iAlertCount += 1
+
+                'notify icon
+                If Me.chkAlertShowNotifyPopup.Checked = True Then
+                    Me.NotifyIcon1.ShowBalloonTip(0, sAlertTitle, Now.ToString & vbCrLf & sAlertMsg, ToolTipIcon.Warning)
+                End If
+
+                'annoying popup
+                If Me.chkAlertShowAnnoyingPopup.Checked = True Then
+                    ap = New frmAnnoyingPopup
+                    ap.Text = sAlertTitle
+                    ap.lblAlert.Text = Now.ToString & vbCrLf & sAlertMsg
+                    ap.Show()
+                End If
+
+                'launch process
+                If Me.chkAlertStartProcess.Checked = True Then
+                    If Me.txtAlertStartProcessName.Text.IsNullOrEmpty = False Then
+                        Try
+                            If My.Computer.FileSystem.FileExists(Me.txtAlertStartProcessName.Text) = False Then
+                                Me.NotifyIcon1.ShowBalloonTip(30000, "Error launching alert process!", "Error launching alert process!  The specified file to start does not seem to exist.", ToolTipIcon.Error)
+                            Else
+                                Process.Start(Me.txtAlertStartProcessName.Text, Replace(Me.txtAlertStartProcessParms.Text, "%A", dr.Cells("Name").Value))
+                            End If
+                        Catch ex As Exception
+                            Me.NotifyIcon1.ShowBalloonTip(30000, "Error starting idle worker process!", "Error starting idle worker process!" & vbCrLf & vbCrLf & ex.Message, ToolTipIcon.Error)
+                        End Try
+                    End If
+                End If
+
+                Me.Text = Me.Text & " !!! " & iAlertCount & " ALERTS !!!"
+            End If
+        Next
+
+    End Sub
+
     Private Function GetIPData(ByVal sIP As String, ByVal sCommand As String) As String
 
         Dim socket As System.Net.Sockets.TcpClient
         Dim s As System.IO.Stream
         Dim b() As Byte
         Dim sbTemp As System.Text.StringBuilder
+        Dim d As Date
 
         socket = New System.Net.Sockets.TcpClient
         socket.Connect(sIP, "4028")
@@ -943,7 +1226,9 @@ Public Class frmAntMonitor
 
         sbTemp = New System.Text.StringBuilder
 
-        While sbTemp.Length < 2 OrElse sbTemp.ToString.Substring(sbTemp.Length - 2, 1) <> "}"
+        d = Now
+
+        While (sbTemp.Length < 2 OrElse sbTemp.ToString.Substring(sbTemp.Length - 2, 1) <> "}") AndAlso d.AddMinutes(1) > Now
             My.Application.DoEvents()
             System.Threading.Thread.Sleep(100)
 
@@ -962,7 +1247,7 @@ Public Class frmAntMonitor
 
     End Function
 
-    Private Sub dataGrid_ColumnWidthChanged(sender As Object, e As System.Windows.Forms.DataGridViewColumnEventArgs) Handles dataAnts.ColumnWidthChanged
+    Private Sub dataGrid_ColumnWidthChanged(sender As Object, e As System.Windows.Forms.DataGridViewColumnEventArgs)
 
         Dim dt As DataGridView
 
@@ -1385,4 +1670,187 @@ Public Class frmAntMonitor
         End If
 
     End Sub
+
+    Private Sub NotifyIcon1_DoubleClick(sender As Object, e As System.EventArgs) Handles NotifyIcon1.DoubleClick
+
+        Me.Show()
+        Me.Focus()
+
+    End Sub
+
+    Private Sub frmAntMonitor_FormClosed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+
+        Me.NotifyIcon1.Visible = False
+        My.Application.DoEvents()
+
+    End Sub
+
+    Private Sub frmMain_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+
+        Me.Hide()
+        e.Cancel = True
+
+        If ToldUserRunningInNotificationTray = False Then
+            Me.NotifyIcon1.ShowBalloonTip(30000, "Still running!", "Still running in notification tray!  If you want to close me, right click me and click Exit.", ToolTipIcon.Info)
+            ToldUserRunningInNotificationTray = True
+
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "ToldUserAboutNotification", "Y", Microsoft.Win32.RegistryValueKind.String)
+        End If
+
+    End Sub
+
+    Private Sub txtAlertS1Temp_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtAlertS1Temp.KeyPress, txtAlertS2Temp.KeyPress
+
+        Select Case e.KeyChar
+            Case "0" To "9", vbBack
+                'good
+
+            Case Else
+                e.Handled = True
+
+        End Select
+
+    End Sub
+
+    Private Sub mnuShow_Click(sender As Object, e As System.EventArgs) Handles mnuShow.Click
+
+        Me.Show()
+        Me.Focus()
+
+    End Sub
+
+    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts.Click
+
+        With ctlsByKey
+            .SetRegKeyByControl(Me.chkAlertHighlightField)
+            .SetRegKeyByControl(Me.chkAlertShowAnnoyingPopup)
+            .SetRegKeyByControl(Me.chkAlertShowNotifyPopup)
+
+            If Me.chkAlertStartProcess.Checked = True Then
+                If Me.txtAlertStartProcessName.Text.IsNullOrEmpty = True Then
+                    MsgBox("Please specify a file to launch.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertStartProcess.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertStartProcess)
+            .SetRegKeyByControl(Me.txtAlertStartProcessName)
+            .SetRegKeyByControl(Me.txtAlertStartProcessParms)
+
+            If Me.chkAlertIfS1Temp.Checked = True Then
+                If Me.txtAlertS1Temp.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS1Temp.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS1Temp)
+            .SetRegKeyByControl(Me.txtAlertS1Temp)
+
+            If Me.chkAlertIfS2Temp.Checked = True Then
+                If Me.txtAlertS2Temp.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S2 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS2Temp.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS2Temp)
+            .SetRegKeyByControl(Me.txtAlertS2Temp)
+
+            If Me.chkAlertIfS1Fan.Checked = True Then
+                If Me.txtAlertS1Fan.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S1 fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS1Fan.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS1Fan)
+            .SetRegKeyByControl(Me.txtAlertS1Fan)
+
+            If Me.chkAlertIfS1Fan.Checked = True Then
+                If Me.txtAlertS2Fan.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S2 fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS2Fan.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS2Fan)
+            .SetRegKeyByControl(Me.txtAlertS2Fan)
+
+            If Me.chkAlertIfS1Hash.Checked = True Then
+                If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS1Hash.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS1Hash)
+            .SetRegKeyByControl(Me.txtAlertS1Hash)
+
+            If Me.chkAlertIfS2Hash.Checked = True Then
+                If Me.txtAlertS2Hash.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S2 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS2Hash.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS2Hash)
+            .SetRegKeyByControl(Me.txtAlertS2Hash)
+
+            If Me.chkAlertIfS1XCount.Checked = True Then
+                If Me.txtAlertS1XCount.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS1XCount.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS1XCount)
+            .SetRegKeyByControl(Me.txtAlertS1XCount)
+
+            If Me.chkAlertIfS2XCount.Checked = True Then
+                If Me.txtAlertS2XCount.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S2 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS2XCount.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS2XCount)
+            .SetRegKeyByControl(Me.txtAlertS2XCount)
+        End With
+
+    End Sub
+
+    Private Sub mnuMainExit_Click(sender As System.Object, e As System.EventArgs) Handles mnuMainExit.Click, mnuExit.Click
+
+        Me.NotifyIcon1.Visible = False
+        My.Application.DoEvents()
+
+        End
+
+    End Sub
+
+    Private Sub cmdAlertStartFileFinder_Click(sender As System.Object, e As System.EventArgs) Handles cmdAlertProcessFileFinder.Click
+
+        Dim dlg As OpenFileDialog
+
+        dlg = New OpenFileDialog
+
+        dlg.InitialDirectory = "c:\"
+        dlg.ShowDialog()
+
+        If String.IsNullOrEmpty(dlg.FileName) = True Then Exit Sub
+
+        Me.txtAlertStartProcessName.Text = dlg.FileName
+
+    End Sub
+
 End Class

@@ -1,3 +1,21 @@
+v1.9
+- Added basic alert functionality:
+	- You can trigger alerts on Fan speed being too high, Hash speed being too low, Temperature being too high, or XCount too High.
+	- There are separate thresholds for S1s and S2s.
+	- Alerts can show a notification popup from the notification bar (on by default), an annoying separate window popup (off by default), highlight the field that triggered the alert (on by default), and/or start a process (off by default).  
+	- The process can be anything Windows recognizes that you can run from the Start menu, like a sound clip.
+	- Alerts only apply to queries done via the API.  The web (screen scrape) functionality does not have it, and unless someone says they need it, I likely won't be adding it.  
+	- Alerts counts also show in the title bar.
+- This now uses a notification icon and will minimize to your notification bar when you close it.  To exit it, right click it and click Exit.
+- Fixed a problem that could cause an infinite loop if an Ant partially responded to an API request.
+- Added more text to the title bar, indicating how many Ants responded to the poll request.
+
+v1.8
+- Fixed the problem with the vertical scrollbar being off the screen and unusable.
+
+v1.7
+- Fixed it not saving column width sizes.  
+
 v1.6
 - Added the ability to use the cgminer API instead of the webbrowser control.  Notes:
 	- This option is now default for new users.  

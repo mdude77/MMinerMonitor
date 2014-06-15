@@ -73,16 +73,59 @@ Partial Class frmAntMonitor
         Me.chklstAnts = New System.Windows.Forms.CheckedListBox()
         Me.tabLog = New System.Windows.Forms.TabPage()
         Me.txtLog = New System.Windows.Forms.TextBox()
+        Me.tabAlerts = New System.Windows.Forms.TabPage()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.chkAlertIfS2XCount = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS2XCount = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS2Hash = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS2Hash = New System.Windows.Forms.TextBox()
+        Me.txtAlertS2Temp = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS2Fan = New System.Windows.Forms.CheckBox()
+        Me.chkAlertIfS2Temp = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS2Fan = New System.Windows.Forms.TextBox()
+        Me.cmdSaveAlerts = New System.Windows.Forms.Button()
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.chkAlertStartProcess = New System.Windows.Forms.CheckBox()
+        Me.cmdAlertProcessFileFinder = New System.Windows.Forms.Button()
+        Me.Label77 = New System.Windows.Forms.Label()
+        Me.txtAlertStartProcessName = New System.Windows.Forms.TextBox()
+        Me.Label39 = New System.Windows.Forms.Label()
+        Me.txtAlertStartProcessParms = New System.Windows.Forms.TextBox()
+        Me.Label40 = New System.Windows.Forms.Label()
+        Me.chkAlertHighlightField = New System.Windows.Forms.CheckBox()
+        Me.chkAlertShowNotifyPopup = New System.Windows.Forms.CheckBox()
+        Me.chkAlertShowAnnoyingPopup = New System.Windows.Forms.CheckBox()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.chkAlertIfS1XCount = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS1XCount = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS1Hash = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS1Hash = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS1Fan = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS1Fan = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS1Temp = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS1Temp = New System.Windows.Forms.TextBox()
         Me.cmdPause = New System.Windows.Forms.Button()
         Me.TimerWatchdog = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.txtPleaseSupport = New System.Windows.Forms.TextBox()
+        Me.NotifyIcon1 = New System.Windows.Forms.NotifyIcon(Me.components)
+        Me.menuStripNotifyIcon = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.mnuShow = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
+        Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
         Me.tabConfig.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.tabLog.SuspendLayout()
+        Me.tabAlerts.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.menuStripNotifyIcon.SuspendLayout()
+        Me.menuStripMain.SuspendLayout()
         Me.SuspendLayout()
         '
         'dataAnts
@@ -100,7 +143,7 @@ Partial Class frmAntMonitor
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1139, 284)
+        Me.dataAnts.Size = New System.Drawing.Size(1007, 284)
         Me.dataAnts.TabIndex = 0
         '
         'TimerRefresh
@@ -126,6 +169,7 @@ Partial Class frmAntMonitor
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.tabAnts)
         Me.TabControl1.Controls.Add(Me.tabConfig)
+        Me.TabControl1.Controls.Add(Me.tabAlerts)
         Me.TabControl1.Controls.Add(Me.tabLog)
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
@@ -654,6 +698,329 @@ Partial Class frmAntMonitor
         Me.txtLog.Size = New System.Drawing.Size(1135, 288)
         Me.txtLog.TabIndex = 0
         '
+        'tabAlerts
+        '
+        Me.tabAlerts.Controls.Add(Me.GroupBox4)
+        Me.tabAlerts.Controls.Add(Me.cmdSaveAlerts)
+        Me.tabAlerts.Controls.Add(Me.GroupBox3)
+        Me.tabAlerts.Controls.Add(Me.GroupBox2)
+        Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
+        Me.tabAlerts.Name = "tabAlerts"
+        Me.tabAlerts.Size = New System.Drawing.Size(1021, 298)
+        Me.tabAlerts.TabIndex = 3
+        Me.tabAlerts.Text = "Alerts"
+        Me.tabAlerts.UseVisualStyleBackColor = True
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Controls.Add(Me.chkAlertIfS2XCount)
+        Me.GroupBox4.Controls.Add(Me.txtAlertS2XCount)
+        Me.GroupBox4.Controls.Add(Me.chkAlertIfS2Hash)
+        Me.GroupBox4.Controls.Add(Me.txtAlertS2Hash)
+        Me.GroupBox4.Controls.Add(Me.txtAlertS2Temp)
+        Me.GroupBox4.Controls.Add(Me.chkAlertIfS2Fan)
+        Me.GroupBox4.Controls.Add(Me.chkAlertIfS2Temp)
+        Me.GroupBox4.Controls.Add(Me.txtAlertS2Fan)
+        Me.GroupBox4.Location = New System.Drawing.Point(212, 7)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(200, 151)
+        Me.GroupBox4.TabIndex = 17
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "S2 Alert On"
+        '
+        'chkAlertIfS2XCount
+        '
+        Me.chkAlertIfS2XCount.AutoSize = True
+        Me.chkAlertIfS2XCount.Location = New System.Drawing.Point(6, 116)
+        Me.chkAlertIfS2XCount.Name = "chkAlertIfS2XCount"
+        Me.chkAlertIfS2XCount.Size = New System.Drawing.Size(129, 24)
+        Me.chkAlertIfS2XCount.TabIndex = 11
+        Me.chkAlertIfS2XCount.Text = "XCount Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2XCount, "Great than or equal to")
+        Me.chkAlertIfS2XCount.UseVisualStyleBackColor = True
+        '
+        'txtAlertS2XCount
+        '
+        Me.txtAlertS2XCount.Location = New System.Drawing.Point(135, 112)
+        Me.txtAlertS2XCount.Name = "txtAlertS2XCount"
+        Me.txtAlertS2XCount.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2XCount.TabIndex = 12
+        Me.txtAlertS2XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS2Hash
+        '
+        Me.chkAlertIfS2Hash.AutoSize = True
+        Me.chkAlertIfS2Hash.Location = New System.Drawing.Point(6, 54)
+        Me.chkAlertIfS2Hash.Name = "chkAlertIfS2Hash"
+        Me.chkAlertIfS2Hash.Size = New System.Drawing.Size(114, 24)
+        Me.chkAlertIfS2Hash.TabIndex = 9
+        Me.chkAlertIfS2Hash.Text = "Hash Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Hash, "Avg Hash is equal to or less than")
+        Me.chkAlertIfS2Hash.UseVisualStyleBackColor = True
+        '
+        'txtAlertS2Hash
+        '
+        Me.txtAlertS2Hash.Location = New System.Drawing.Point(135, 50)
+        Me.txtAlertS2Hash.Name = "txtAlertS2Hash"
+        Me.txtAlertS2Hash.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2Hash.TabIndex = 10
+        Me.txtAlertS2Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtAlertS2Temp
+        '
+        Me.txtAlertS2Temp.Location = New System.Drawing.Point(135, 81)
+        Me.txtAlertS2Temp.Name = "txtAlertS2Temp"
+        Me.txtAlertS2Temp.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2Temp.TabIndex = 3
+        Me.txtAlertS2Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS2Fan
+        '
+        Me.chkAlertIfS2Fan.AutoSize = True
+        Me.chkAlertIfS2Fan.Location = New System.Drawing.Point(6, 23)
+        Me.chkAlertIfS2Fan.Name = "chkAlertIfS2Fan"
+        Me.chkAlertIfS2Fan.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS2Fan.TabIndex = 5
+        Me.chkAlertIfS2Fan.Text = "Fan Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Fan, "Equal to or greater than")
+        Me.chkAlertIfS2Fan.UseVisualStyleBackColor = True
+        '
+        'chkAlertIfS2Temp
+        '
+        Me.chkAlertIfS2Temp.AutoSize = True
+        Me.chkAlertIfS2Temp.Location = New System.Drawing.Point(6, 85)
+        Me.chkAlertIfS2Temp.Name = "chkAlertIfS2Temp"
+        Me.chkAlertIfS2Temp.Size = New System.Drawing.Size(116, 24)
+        Me.chkAlertIfS2Temp.TabIndex = 1
+        Me.chkAlertIfS2Temp.Text = "Temp Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Temp, "Equal to or greater than")
+        Me.chkAlertIfS2Temp.UseVisualStyleBackColor = True
+        '
+        'txtAlertS2Fan
+        '
+        Me.txtAlertS2Fan.Location = New System.Drawing.Point(135, 19)
+        Me.txtAlertS2Fan.Name = "txtAlertS2Fan"
+        Me.txtAlertS2Fan.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2Fan.TabIndex = 7
+        Me.txtAlertS2Fan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'cmdSaveAlerts
+        '
+        Me.cmdSaveAlerts.Location = New System.Drawing.Point(141, 199)
+        Me.cmdSaveAlerts.Name = "cmdSaveAlerts"
+        Me.cmdSaveAlerts.Size = New System.Drawing.Size(121, 32)
+        Me.cmdSaveAlerts.TabIndex = 16
+        Me.cmdSaveAlerts.Text = "Save Config"
+        Me.cmdSaveAlerts.UseVisualStyleBackColor = True
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.chkAlertStartProcess)
+        Me.GroupBox3.Controls.Add(Me.cmdAlertProcessFileFinder)
+        Me.GroupBox3.Controls.Add(Me.Label77)
+        Me.GroupBox3.Controls.Add(Me.txtAlertStartProcessName)
+        Me.GroupBox3.Controls.Add(Me.Label39)
+        Me.GroupBox3.Controls.Add(Me.txtAlertStartProcessParms)
+        Me.GroupBox3.Controls.Add(Me.Label40)
+        Me.GroupBox3.Controls.Add(Me.chkAlertHighlightField)
+        Me.GroupBox3.Controls.Add(Me.chkAlertShowNotifyPopup)
+        Me.GroupBox3.Controls.Add(Me.chkAlertShowAnnoyingPopup)
+        Me.GroupBox3.Location = New System.Drawing.Point(426, 7)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(465, 237)
+        Me.GroupBox3.TabIndex = 7
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Alert Types"
+        '
+        'chkAlertStartProcess
+        '
+        Me.chkAlertStartProcess.AutoSize = True
+        Me.chkAlertStartProcess.Location = New System.Drawing.Point(6, 116)
+        Me.chkAlertStartProcess.Name = "chkAlertStartProcess"
+        Me.chkAlertStartProcess.Size = New System.Drawing.Size(132, 24)
+        Me.chkAlertStartProcess.TabIndex = 21
+        Me.chkAlertStartProcess.Text = "Start process"
+        Me.ToolTip1.SetToolTip(Me.chkAlertStartProcess, "Could be any valid file or app, such as a sound byte or program")
+        Me.chkAlertStartProcess.UseVisualStyleBackColor = True
+        '
+        'cmdAlertProcessFileFinder
+        '
+        Me.cmdAlertProcessFileFinder.Location = New System.Drawing.Point(427, 145)
+        Me.cmdAlertProcessFileFinder.Name = "cmdAlertProcessFileFinder"
+        Me.cmdAlertProcessFileFinder.Size = New System.Drawing.Size(26, 27)
+        Me.cmdAlertProcessFileFinder.TabIndex = 20
+        Me.cmdAlertProcessFileFinder.Text = "?"
+        Me.cmdAlertProcessFileFinder.UseVisualStyleBackColor = True
+        '
+        'Label77
+        '
+        Me.Label77.AutoSize = True
+        Me.Label77.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label77.Location = New System.Drawing.Point(85, 204)
+        Me.Label77.Name = "Label77"
+        Me.Label77.Size = New System.Drawing.Size(171, 20)
+        Me.Label77.TabIndex = 19
+        Me.Label77.Text = "Use %A for Ant name"
+        '
+        'txtAlertStartProcessName
+        '
+        Me.txtAlertStartProcessName.Location = New System.Drawing.Point(89, 145)
+        Me.txtAlertStartProcessName.Name = "txtAlertStartProcessName"
+        Me.txtAlertStartProcessName.Size = New System.Drawing.Size(332, 27)
+        Me.txtAlertStartProcessName.TabIndex = 15
+        '
+        'Label39
+        '
+        Me.Label39.AutoSize = True
+        Me.Label39.Location = New System.Drawing.Point(6, 148)
+        Me.Label39.Name = "Label39"
+        Me.Label39.Size = New System.Drawing.Size(78, 20)
+        Me.Label39.TabIndex = 17
+        Me.Label39.Text = "Location:"
+        '
+        'txtAlertStartProcessParms
+        '
+        Me.txtAlertStartProcessParms.Location = New System.Drawing.Point(89, 174)
+        Me.txtAlertStartProcessParms.Name = "txtAlertStartProcessParms"
+        Me.txtAlertStartProcessParms.Size = New System.Drawing.Size(332, 27)
+        Me.txtAlertStartProcessParms.TabIndex = 16
+        '
+        'Label40
+        '
+        Me.Label40.AutoSize = True
+        Me.Label40.Location = New System.Drawing.Point(6, 177)
+        Me.Label40.Name = "Label40"
+        Me.Label40.Size = New System.Drawing.Size(63, 20)
+        Me.Label40.TabIndex = 18
+        Me.Label40.Text = "Parms:"
+        '
+        'chkAlertHighlightField
+        '
+        Me.chkAlertHighlightField.AutoSize = True
+        Me.chkAlertHighlightField.Checked = True
+        Me.chkAlertHighlightField.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertHighlightField.Location = New System.Drawing.Point(6, 85)
+        Me.chkAlertHighlightField.Name = "chkAlertHighlightField"
+        Me.chkAlertHighlightField.Size = New System.Drawing.Size(178, 24)
+        Me.chkAlertHighlightField.TabIndex = 6
+        Me.chkAlertHighlightField.Text = "Highlight Alert Field"
+        Me.chkAlertHighlightField.UseVisualStyleBackColor = True
+        '
+        'chkAlertShowNotifyPopup
+        '
+        Me.chkAlertShowNotifyPopup.AutoSize = True
+        Me.chkAlertShowNotifyPopup.Checked = True
+        Me.chkAlertShowNotifyPopup.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertShowNotifyPopup.Location = New System.Drawing.Point(6, 23)
+        Me.chkAlertShowNotifyPopup.Name = "chkAlertShowNotifyPopup"
+        Me.chkAlertShowNotifyPopup.Size = New System.Drawing.Size(213, 24)
+        Me.chkAlertShowNotifyPopup.TabIndex = 4
+        Me.chkAlertShowNotifyPopup.Text = "Show Notification Popup"
+        Me.chkAlertShowNotifyPopup.UseVisualStyleBackColor = True
+        '
+        'chkAlertShowAnnoyingPopup
+        '
+        Me.chkAlertShowAnnoyingPopup.AutoSize = True
+        Me.chkAlertShowAnnoyingPopup.Location = New System.Drawing.Point(6, 54)
+        Me.chkAlertShowAnnoyingPopup.Name = "chkAlertShowAnnoyingPopup"
+        Me.chkAlertShowAnnoyingPopup.Size = New System.Drawing.Size(197, 24)
+        Me.chkAlertShowAnnoyingPopup.TabIndex = 5
+        Me.chkAlertShowAnnoyingPopup.Text = "Show Annoying Popup"
+        Me.chkAlertShowAnnoyingPopup.UseVisualStyleBackColor = True
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.chkAlertIfS1XCount)
+        Me.GroupBox2.Controls.Add(Me.txtAlertS1XCount)
+        Me.GroupBox2.Controls.Add(Me.chkAlertIfS1Hash)
+        Me.GroupBox2.Controls.Add(Me.txtAlertS1Hash)
+        Me.GroupBox2.Controls.Add(Me.chkAlertIfS1Fan)
+        Me.GroupBox2.Controls.Add(Me.txtAlertS1Fan)
+        Me.GroupBox2.Controls.Add(Me.chkAlertIfS1Temp)
+        Me.GroupBox2.Controls.Add(Me.txtAlertS1Temp)
+        Me.GroupBox2.Location = New System.Drawing.Point(6, 7)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(200, 151)
+        Me.GroupBox2.TabIndex = 6
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "S1 Alert On"
+        '
+        'chkAlertIfS1XCount
+        '
+        Me.chkAlertIfS1XCount.AutoSize = True
+        Me.chkAlertIfS1XCount.Location = New System.Drawing.Point(6, 116)
+        Me.chkAlertIfS1XCount.Name = "chkAlertIfS1XCount"
+        Me.chkAlertIfS1XCount.Size = New System.Drawing.Size(129, 24)
+        Me.chkAlertIfS1XCount.TabIndex = 9
+        Me.chkAlertIfS1XCount.Text = "XCount Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1XCount, "Great than or equal to")
+        Me.chkAlertIfS1XCount.UseVisualStyleBackColor = True
+        '
+        'txtAlertS1XCount
+        '
+        Me.txtAlertS1XCount.Location = New System.Drawing.Point(135, 112)
+        Me.txtAlertS1XCount.Name = "txtAlertS1XCount"
+        Me.txtAlertS1XCount.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1XCount.TabIndex = 10
+        Me.txtAlertS1XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS1Hash
+        '
+        Me.chkAlertIfS1Hash.AutoSize = True
+        Me.chkAlertIfS1Hash.Location = New System.Drawing.Point(6, 54)
+        Me.chkAlertIfS1Hash.Name = "chkAlertIfS1Hash"
+        Me.chkAlertIfS1Hash.Size = New System.Drawing.Size(114, 24)
+        Me.chkAlertIfS1Hash.TabIndex = 7
+        Me.chkAlertIfS1Hash.Text = "Hash Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Hash, "Avg Hash is equal to or less than")
+        Me.chkAlertIfS1Hash.UseVisualStyleBackColor = True
+        '
+        'txtAlertS1Hash
+        '
+        Me.txtAlertS1Hash.Location = New System.Drawing.Point(135, 50)
+        Me.txtAlertS1Hash.Name = "txtAlertS1Hash"
+        Me.txtAlertS1Hash.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1Hash.TabIndex = 8
+        Me.txtAlertS1Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS1Fan
+        '
+        Me.chkAlertIfS1Fan.AutoSize = True
+        Me.chkAlertIfS1Fan.Location = New System.Drawing.Point(6, 23)
+        Me.chkAlertIfS1Fan.Name = "chkAlertIfS1Fan"
+        Me.chkAlertIfS1Fan.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS1Fan.TabIndex = 4
+        Me.chkAlertIfS1Fan.Text = "Fan Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Fan, "Equal to or greater than")
+        Me.chkAlertIfS1Fan.UseVisualStyleBackColor = True
+        '
+        'txtAlertS1Fan
+        '
+        Me.txtAlertS1Fan.Location = New System.Drawing.Point(135, 19)
+        Me.txtAlertS1Fan.Name = "txtAlertS1Fan"
+        Me.txtAlertS1Fan.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1Fan.TabIndex = 6
+        Me.txtAlertS1Fan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS1Temp
+        '
+        Me.chkAlertIfS1Temp.AutoSize = True
+        Me.chkAlertIfS1Temp.Location = New System.Drawing.Point(6, 85)
+        Me.chkAlertIfS1Temp.Name = "chkAlertIfS1Temp"
+        Me.chkAlertIfS1Temp.Size = New System.Drawing.Size(116, 24)
+        Me.chkAlertIfS1Temp.TabIndex = 0
+        Me.chkAlertIfS1Temp.Text = "Temp Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Temp, "Equal to or greater than")
+        Me.chkAlertIfS1Temp.UseVisualStyleBackColor = True
+        '
+        'txtAlertS1Temp
+        '
+        Me.txtAlertS1Temp.Location = New System.Drawing.Point(135, 81)
+        Me.txtAlertS1Temp.Name = "txtAlertS1Temp"
+        Me.txtAlertS1Temp.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1Temp.TabIndex = 2
+        Me.txtAlertS1Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
         'cmdPause
         '
         Me.cmdPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -679,11 +1046,49 @@ Partial Class frmAntMonitor
         Me.txtPleaseSupport.TabStop = False
         Me.txtPleaseSupport.Text = "Please support this app: 1PA1sji28iztspKxDquwFrNjp5SksjkCHE"
         '
+        'NotifyIcon1
+        '
+        Me.NotifyIcon1.ContextMenuStrip = Me.menuStripNotifyIcon
+        Me.NotifyIcon1.Icon = CType(resources.GetObject("NotifyIcon1.Icon"), System.Drawing.Icon)
+        Me.NotifyIcon1.Text = "NotifyIcon1"
+        Me.NotifyIcon1.Visible = True
+        '
+        'menuStripNotifyIcon
+        '
+        Me.menuStripNotifyIcon.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuShow, Me.mnuExit})
+        Me.menuStripNotifyIcon.Name = "ContextMenuStrip1"
+        Me.menuStripNotifyIcon.Size = New System.Drawing.Size(115, 52)
+        '
+        'mnuShow
+        '
+        Me.mnuShow.Name = "mnuShow"
+        Me.mnuShow.Size = New System.Drawing.Size(114, 24)
+        Me.mnuShow.Text = "Show"
+        '
+        'mnuExit
+        '
+        Me.mnuExit.Name = "mnuExit"
+        Me.mnuExit.Size = New System.Drawing.Size(114, 24)
+        Me.mnuExit.Text = "Exit"
+        '
+        'menuStripMain
+        '
+        Me.menuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuMainExit})
+        Me.menuStripMain.Name = "menuStripMain"
+        Me.menuStripMain.Size = New System.Drawing.Size(103, 28)
+        '
+        'mnuMainExit
+        '
+        Me.mnuMainExit.Name = "mnuMainExit"
+        Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
+        Me.mnuMainExit.Text = "E&xit"
+        '
         'frmAntMonitor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1043, 375)
+        Me.ContextMenuStrip = Me.menuStripMain
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
         Me.Controls.Add(Me.TabControl1)
@@ -693,7 +1098,7 @@ Partial Class frmAntMonitor
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmAntMonitor"
-        Me.Text = "M's Ant Monitor v1.6"
+        Me.Text = "M's Ant Monitor v1.9"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControl1.ResumeLayout(False)
         Me.tabAnts.ResumeLayout(False)
@@ -703,6 +1108,15 @@ Partial Class frmAntMonitor
         Me.GroupBox1.PerformLayout()
         Me.tabLog.ResumeLayout(False)
         Me.tabLog.PerformLayout()
+        Me.tabAlerts.ResumeLayout(False)
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        Me.menuStripNotifyIcon.ResumeLayout(False)
+        Me.menuStripMain.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -760,5 +1174,42 @@ Partial Class frmAntMonitor
     Friend WithEvents chkShowStale As System.Windows.Forms.CheckBox
     Friend WithEvents chkShowRej As System.Windows.Forms.CheckBox
     Friend WithEvents chkUseAPI As System.Windows.Forms.CheckBox
+    Friend WithEvents tabAlerts As System.Windows.Forms.TabPage
+    Friend WithEvents NotifyIcon1 As System.Windows.Forms.NotifyIcon
+    Friend WithEvents menuStripNotifyIcon As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents mnuShow As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuExit As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents menuStripMain As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents mnuMainExit As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents txtAlertS2Temp As System.Windows.Forms.TextBox
+    Friend WithEvents txtAlertS1Temp As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS2Temp As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertIfS1Temp As System.Windows.Forms.CheckBox
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents chkAlertHighlightField As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertShowNotifyPopup As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertShowAnnoyingPopup As System.Windows.Forms.CheckBox
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents cmdSaveAlerts As System.Windows.Forms.Button
+    Friend WithEvents chkAlertIfS1Fan As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertIfS2Fan As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS1Fan As System.Windows.Forms.TextBox
+    Friend WithEvents txtAlertS2Fan As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
+    Friend WithEvents chkAlertIfS2Hash As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS2Hash As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS1Hash As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS1Hash As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS2XCount As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS2XCount As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS1XCount As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS1XCount As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertStartProcess As System.Windows.Forms.CheckBox
+    Friend WithEvents cmdAlertProcessFileFinder As System.Windows.Forms.Button
+    Friend WithEvents Label77 As System.Windows.Forms.Label
+    Friend WithEvents txtAlertStartProcessName As System.Windows.Forms.TextBox
+    Friend WithEvents Label39 As System.Windows.Forms.Label
+    Friend WithEvents txtAlertStartProcessParms As System.Windows.Forms.TextBox
+    Friend WithEvents Label40 As System.Windows.Forms.Label
 
 End Class

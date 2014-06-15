@@ -123,10 +123,78 @@
   <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>321, 17</value>
   </metadata>
+  <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>321, 17</value>
+  </metadata>
   <metadata name="TimerWatchdog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>159, 17</value>
   </metadata>
+  <metadata name="NotifyIcon1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>433, 17</value>
+  </metadata>
+  <metadata name="menuStripNotifyIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>741, 22</value>
+  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="NotifyIcon1.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAIhsAAAEAGAD4CwAAFgAAACgAAAAiAAAANgAAAAEAGAAAAAAAAAAAAHgAAAB4AAAAAAAAAAAA
+        AAD89vD58+718Ov28ez8+PP99/P68/D89vP79PH48u/48u379fD18u3z7ej17+v68/H68/H79PH58u/4
+        8u/48e789fL++PX79fH69fD28Ov39O///Pf99/T89vP99/T89fL89vP79PEAAPv28fr18fn18Pr18fr2
+        8fr08fv18vv08fz28////P///P//+////v///////v///f339P338/z18v339P339Pz28/z18v/8+P//
+        /////f769fr08Pz18vz28/z18v328/739P339AAA+/Tw/PXx+/Px+/Tx+vPw/Pbz+/Tx/ff07ejlm5SR
+        l46Kl46KlY2Jl46KkoqGnpeS9O7p+/fy+vbx/Pf0+vTx+/Tx/fn31M/LjYeDmJKN6uTf/fr1/PXy/fbz
+        /fbz/fbz/vf0/ff0AAD89fH79PD79PH79PH79PH79PH69PH++vfu6OU2LisJAAAVDAgTCgYTCgYSCwYM
+        BgHJxL/////38u368/D58/D38e7///90bmoAAAAsJiHq497/+vX79fH99vP99vP+9/T99vP99vMAAPv0
+        8Pz18Pz08fv08fv08fz28/z28/nz8P/+/XNsaRMKBigfGyQbFyMZFSYeGhgTDk5IQ+rn4//////++///
+        /v///7y1sicgHBQOCGVgWv/79/z38v338/z18v738/328/739P739AAA+/Xx+/Xx+/Ty+/Tx+/Tx+/Tx
+        /PXy+vPw/v37ycK/HBQPIhkVIRkVHxcTIBgUIRsWFg8LQjs2mpWQvLWyt7CsfnZzJB0ZHRcTFA4JurWw
+        //79+vPv/fbz/fbz/fbz/vf0/fbz/fbzAAD89fH89fH78/L79PH68/D79PH68/D79PH78/D++/h/eXQJ
+        AwAiHBccFxIiGxYiGRUiGRUaEQ0VDAgfFREcEw8VDAckGxcNBQFvaGX//Pr79fL99vP99vP+9/T/9/T/
+        +PX+9/T99vMAAPv08Pv18Pz08vv18Pv08fv08fz18vv08frz8P359vr28m1nYhIMByIcFyMbFyceGiMa
+        FiMaFiYdGSQbFyMaFiEYFREHA2FZVvPv7Pz49fr08f328/328/328/738/739P328/z18gAA+/Xw+/Xw
+        +/Ty+/Xx+/Tx+/Tx/vf0/fbz/PXy/fXy+vby//77gHp1DggDFw8LEwoGHhQQHxYSGhENFg0JEgkFKyIf
+        jYWB+vTx/fn3/Pbz+fPw/ff0/fbz/fbz/PXy/PXy/PXy/PXyAAD89fH89fH79PL89fL68/D89fL89fL7
+        9PH99vP99vP69/L59vNWT0uBe3aup6NnXlo1LCkoIBxKQT1jWleYkIzh2dX///799vP58/D9+PX79vP9
+        9vP99vP+9/T99vP89fL89fL99vMAAPv08vv18vz18vz18fv08fv08fv08f328/328/v08f///5+YlTcw
+        Lfz39f///////3x1cmNcWfn39f749f/////7+Pv08fz18v318v328/328/328/z18v739P739P328/73
+        9P/49QAA/PXx/PXx/PXy/PXy+/Tx/PXy/PXy/fbz/fbz/fbz/Pj2Rj88m5WS/v//8+zp/f39dW9sdG1q
+        ////+vTx+fLv+vPw/PXy+/Tx/Pbz/ff0/PXy/fbz/fbz/vf0/fbz/fbz/fbz/vf0AAD89fL89fL79PH8
+        9fL68/D89fL79PH89fL79PH//vvVzss1Livg2db++/j59PH+/v11bmtrZGH+/v758u/+9/T99vP79PH9
+        9vP99fL+9/T99vP89fL89fL99vP89fL+9/T+9/T99vMAAPz18vz18vz18vz18vv08fv08fz18v328/rz
+        8P7//6afnEU+O/318v328/rz8P7+/paPjFBJRv38+fv08fv08f328/z18v328/z18v328/z18v328/32
+        8/739P328/328/328/328wAA/PXy/PXy/fbz/PXy/fbz/PXy/PXy/fbz+vPw//7+g3x5U0tI/vz6/Pbz
+        +fLv///+x8C9Ni8s5d7b/vr3/Pbz/fbz+/Tx/vbz/fbz/PXy/fbz/vf0/vj1//j1/vf0+/Tx/PXy/vf0
+        AAD89fL89fL99vP89fL89fL89fL89fL89fL58u///v5/eHVZUU7+/vz68/D79PH9+PT18e9BOzimn5z/
+        ///48e789vP99vP+9/T+9/T99vP+9/T/+PX++PX+9/T99vP99vP89fL99vMAAPz18vz18vz18vz18vv0
+        8fv08fz18vrz8Pjx7v7+/5SNikhBPv/69v318vz18vjx7v///pSOi0M8OfXw7v///f/7+Pz28/328/33
+        9P328/328/739P739P328/z18v739P328/v08QAA/PXy/PXy+/Tx/PXy+vPw/PXy/PXy+vTx+fLv///+
+        wby5PTYz8ern/vn2+vTx+/Tx+/Tx9fDtS0RBPTYyd3Ft6OPf/vr3/PXx/fbz/PXy/PXy/fbz/ff0/fbz
+        /vf0/vf0/fbz/PXyAAD89fL89fL89fL89fL79PH89fL99vP89fL79PH++fXu5uM3MC29trP9/vz48u/7
+        9PH9+PXs5uNBOjcVEAsGAAB7dXD///r79PD99vP99vP99vP+9/T99/T+9/T+9/T99vP99vP+9/QAAPz1
+        8vz18vz18vz18vv08fz18vz18vv08fz18vrz8P///nJraGRdWv////v08fjz8Pz28/Dr6VdQTQ4IAxQN
+        CJyXkv/++/r08P328/328/z18v328/739P739P328/328/328/328wAA/PXy/PXy/PXy/PXy+/Tx/PXy
+        /fbz/PXy/fbz+vPw/vv52dLPKyMhw7u4+fXz/vj1/Pbz/vv56OPgmZOOtK6p/fn0/Pjz+/by/vbz/fbz
+        /fbz/vf0/fbz/fbz/PXy/PXy/PXy/vf0AAD89fL89fL89fL89fL79PH89fL99vP89fL89fL89fL69PD/
+        //+Ri4glHho/ODWIgX779/T68/D99/T///////v79fH89vH99vL99vP99vP99vP99vP89fL99vP99vP8
+        9fL99vP99vMAAPz18vz18vz18vz18vv08fz18v328/z18vz18vz18vn07/7//qCblQ4IAhgRDREKB8jB
+        vv/++/jx7vry8Pry8Pz18v328/z18vz18vz18vz18vz18v328/z18v328/328/328/z18gAA/PXy/PXy
+        /PXy/PXy+/Tx/PXy/fbz/PXy/fbz+/Xy+vPv/fv4z8rFODItEw0JVU5L6uXi+vXy+/Tx/fby/PXy/PXy
+        /Pby/fbz/fbz/fbz/fbz/fbz/PXy/fbz/PXy/PXy/PXy/fbzAAD89fL89fL89fL89fL79PH89fL99vP8
+        9fL89fL89fL89vH79fD///ra1M+wq6fn4N7//Pn68/D99vP89fL89fL89fL89fL89fL99vP89fL99vP8
+        9fL99vP89fL99vP99vP99vP89fIAAPz18vz18vz18vz18vv08fz18v328/z18vz18vz18vz28vz28vv1
+        8f/79v///v339fv08Pz18vz18vz18v328/z18v328/328/z18v328/z18v328/z18vz18vz18vz18vz1
+        8vz18gAA/PXy/PXy/PXy/PXy+/Tx/PXy/fbz/PXy/fbz/fbz/fXz/PXy/fXz+/Tx+vPw/PTx/PXy/PXy
+        /PXy/PXy/PXy/PXy/PXy/PXy/PXy/PXy/fbz/PXy+/Tx/fbz+/Tx+vPw+/Tx/PXyAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+</value>
+  </data>
+  <metadata name="menuStripMain.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>576, 19</value>
+  </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAIhsAAAEAGAD4CwAAFgAAACgAAAAiAAAANgAAAAEAGAAAAAAAAAAAAHgAAAB4AAAAAAAAAAAA
