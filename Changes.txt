@@ -1,3 +1,20 @@
+v2.1
+- Added some more error handling and debug code around the API logic.
+- Enabled alerts for the web screenscraping logic (non API).
+- Fixed a typo that would complain about an S2 temp alert not being set when it was S1 turned on not S2.
+- Visual change to make it clear how to add Ant addresses, and the local IP address is for scanning, nothing else.
+- Added an email governor to prevent email alert spam.  Set to this minimum time between EMail alerts.  Note this runs by Ant, and defaults to 10 minutes.
+- Added a difficulty columns to the Ant output grid.  It assumes the last difficulty for the first "Alive" pool is the right one.
+- Added the ability for it to remember column positions.
+- Added single instance logic, to prevent you from accidentally running more than one at a time.
+
+v2.0a
+- Enabled the email support.  The code was there, just not plugged in.
+
+v2.0
+- Added more errorhandling and logging, especially around the new alert logic.  
+- Added email support.  This is untested, but working code that came M's Pool Monitor.
+
 v1.9
 - Added basic alert functionality:
 	- You can trigger alerts on Fan speed being too high, Hash speed being too low, Temperature being too high, or XCount too High.
