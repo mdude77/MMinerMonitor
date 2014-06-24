@@ -15,7 +15,7 @@ Public Class frmAntMonitor
     
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.1"
+    Private Const csVersion As String = "M's Ant Monitor v2.2b"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -70,24 +70,27 @@ Public Class frmAntMonitor
             With .Tables(0).Columns
                 .Add("Name")
                 .Add("Uptime")
-                .Add("GH/s(5s)")
-                .Add("GH/s(avg)")
+                .Add("GH/s(5s)", GetType(Double))
+                .Add("GH/s(avg)", GetType(Double))
                 .Add("Blocks")
                 .Add("HWE%")
                 .Add("BestShare")
                 .Add("Diff")
                 .Add("Pools")
+                .Add("PoolData")
                 .Add("Rej%")
                 .Add("Stale%")
-                .Add("HFan")
+                .Add("HFan", GetType(Integer))
                 .Add("Fans")
-                .Add("HTemp")
+                .Add("HTemp", GetType(Integer))
                 .Add("Temps")
-                .Add("Freq")
+                .Add("Freq", GetType(Integer))
                 .Add("XCount")
                 .Add("Status")
             End With
         End With
+
+        Me.dataAnts.Columns("PoolData").Visible = False
 
         bSortingColumns = False
 
@@ -142,9 +145,6 @@ Public Class frmAntMonitor
         With ctlsByKey
             'options
             .AddControl(Me.chkWBRebootIfXd, "RebootAntIfXd")
-            .AddControl(Me.txtWBPassword, "Password")
-            .AddControl(Me.txtWBUserName, "Username")
-            .AddControl(Me.chkWBSavePassword, "SavePassword")
             .AddControl(Me.chklstAnts, "AntList")
             .AddControl(Me.txtRefreshRate, "RefreshRateValue")
             .AddControl(Me.cmbRefreshRate, "RefreshRateVolume")
@@ -213,10 +213,7 @@ Public Class frmAntMonitor
             .AddControl(Me.chkSMTPSSL, "SMTPUseSSL")
 
             .SetControlByRegKey(Me.chkWBRebootIfXd, True)
-            .SetControlByRegKey(Me.txtWBPassword, "root")
-            .SetControlByRegKey(Me.txtWBUserName, "root")
-            .SetControlByRegKey(Me.chkWBSavePassword, True)
-
+            
             'change unmarked S1s to S1s
             Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\" & Me.chklstAnts.Name)
                 If key Is Nothing Then
@@ -302,6 +299,29 @@ Public Class frmAntMonitor
 
             Call ctlsByKey.SetControlByRegKey(Me.txtAlertEMailGovernor, "10")
             Call ctlsByKey.SetControlByRegKey(Me.cmbAlertEMailGovernor, "Minutes")
+
+            'establish credentials for existing Ants when they aren't already there (upgrade code)
+            For Each sAnt As String In Me.chklstAnts.Items
+                Dim sDefaultUN, sDefaultPW As String
+
+                sDefaultUN = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Username", "root")
+                sDefaultPW = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Password", "root")
+
+                If sAnt.Substring(0, 2) = "S1" Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
+                End If
+
+                If sAnt.Substring(0, 2) = "S2" Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
+                End If
+            Next
+
         End With
 
         'check each of the boxes
@@ -335,6 +355,7 @@ Public Class frmAntMonitor
         Dim count(0 To 9) As Integer
         Dim dReboot As Date
         Dim bRebooting As Boolean
+        Dim sWebUN, sWebPW As String
 
         wb = sender
 
@@ -379,8 +400,10 @@ Public Class frmAntMonitor
         If wb.Document.All(1).OuterHtml.ToLower.Contains("authorization") Then
             AddToLog(sAnt & " responded with login page")
 
-            wb.Document.All("username").SetAttribute("value", Me.txtWBUserName.Text)
-            wb.Document.All("password").SetAttribute("value", Me.txtWBPassword.Text)
+            Call GetWebCredentials("S1: " & wb.Url.AbsoluteUri.Substring(7, InStr(8, wb.Url.AbsoluteUri, "/") - 8), sWebUN, sWebPW)
+
+            wb.Document.All("username").SetAttribute("value", sWebUN)
+            wb.Document.All("password").SetAttribute("value", sWebPW)
             wb.Document.All(48).InvokeMember("click")
         Else
 #If DEBUG Then
@@ -453,9 +476,10 @@ Public Class frmAntMonitor
 
                     dr.Item("Fans") = wb.Document.All(530).OuterText & " " & wb.Document.All(531).OuterText & " " & wb.Document.All(532).OuterText & " " & wb.Document.All(533).OuterText
 
-                    dr.Item("Freq") = wb.Document.All(366).OuterText & " " & wb.Document.All(382).OuterText & " " & wb.Document.All(398).OuterText & " " & wb.Document.All(414).OuterText & " " & _
-                                       wb.Document.All(430).OuterText & " " & wb.Document.All(446).OuterText & " " & wb.Document.All(462).OuterText & " " & wb.Document.All(478).OuterText & " " & _
-                                       wb.Document.All(494).OuterText & " " & wb.Document.All(510).OuterText
+                    'dr.Item("Freq") = wb.Document.All(366).OuterText & " " & wb.Document.All(382).OuterText & " " & wb.Document.All(398).OuterText & " " & wb.Document.All(414).OuterText & " " & _
+                    '                   wb.Document.All(430).OuterText & " " & wb.Document.All(446).OuterText & " " & wb.Document.All(462).OuterText & " " & wb.Document.All(478).OuterText & " " & _
+                    '                   wb.Document.All(494).OuterText & " " & wb.Document.All(510).OuterText
+                    dr.Item("Freq") = Val(wb.Document.All(366).OuterText)
 
                     dr.Item("HTemp") = GetHighValue(wb.Document.All(369).OuterText, wb.Document.All(385).OuterText, wb.Document.All(401).OuterText, wb.Document.All(417).OuterText, _
                                                     wb.Document.All(433).OuterText, wb.Document.All(449).OuterText, wb.Document.All(465).OuterText, wb.Document.All(481).OuterText, _
@@ -609,7 +633,8 @@ Public Class frmAntMonitor
                         dr.Item("Temps") = wb.Document.All(x + 37).OuterText.TrimEnd & " " & _
                                            wb.Document.All(x + 62).OuterText.TrimEnd
 
-                        dr.Item("Freq") = wb.Document.All(x + 29).OuterText.TrimEnd & " " & wb.Document.All(x + 54).OuterText.TrimEnd
+                        'dr.Item("Freq") = wb.Document.All(x + 29).OuterText.TrimEnd & " " & wb.Document.All(x + 54).OuterText.TrimEnd
+                        dr.Item("Freq") = Val(wb.Document.All(x + 29).OuterText.TrimEnd)
 
                         count(0) = HowManyInString(wb.Document.All(x + 41).OuterText.TrimEnd, "x")
                         count(1) = HowManyInString(wb.Document.All(x + 66).OuterText.TrimEnd, "x")
@@ -787,7 +812,7 @@ Public Class frmAntMonitor
 
     Private Function GetHeader() As String
 
-        Return "Authorization: Basic " & Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(Me.txtWBUserName.Text & ":" & Me.txtWBPassword.Text)) & System.Environment.NewLine
+        Return "Authorization: Basic " & Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(Me.txtWebUsername.Text & ":" & Me.txtWebPassword.Text)) & System.Environment.NewLine
 
     End Function
 
@@ -799,13 +824,14 @@ Public Class frmAntMonitor
         Dim j, jp1 As Newtonsoft.Json.Linq.JObject
         Dim ja As Newtonsoft.Json.Linq.JArray
         Dim ts As TimeSpan
-        Dim sbTemp As System.Text.StringBuilder
+        Dim sbTemp, sbTemp2 As System.Text.StringBuilder
         Dim count(0 To 9), iTemp As Integer
         Dim sResult As String
         Dim dBestShare As Double
         Dim AntType As enAntType
         Dim x As Integer
         Dim bStep As Byte
+        Dim sWebUN, sWebPW As String
 
         If Me.chklstAnts.Items.Count = 0 Then
             MsgBox("Please add some Ant addresses first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
@@ -899,7 +925,7 @@ Public Class frmAntMonitor
 
                             dr.Item("Temps") = sbTemp.ToString
 
-                            dr.Item("Freq") = jp1.Value(Of String)("frequency")
+                            dr.Item("Freq") = Val(jp1.Value(Of String)("frequency"))
 
                             count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
                             count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
@@ -947,8 +973,8 @@ Public Class frmAntMonitor
 
                     For Each ja In j.Property("SUMMARY")
                         For Each jp1 In ja
-                            dr.Item("GH/s(5s)") = jp1.Value(Of String)("GHS 5s")
-                            dr.Item("GH/s(avg)") = jp1.Value(Of String)("GHS av")
+                            dr.Item("GH/s(5s)") = Val(jp1.Value(Of String)("GHS 5s"))
+                            dr.Item("GH/s(avg)") = Val(jp1.Value(Of String)("GHS av"))
 
                             dr.Item("Rej%") = jp1.Value(Of String)("Pool Rejected%")
                             dr.Item("Stale%") = jp1.Value(Of String)("Pool Stale%")
@@ -966,6 +992,8 @@ Public Class frmAntMonitor
                     dBestShare = 0
 
                     sbTemp.Clear()
+
+                    sbTemp2 = New System.Text.StringBuilder
 
                     For Each ja In j.Property("POOLS")
                         For Each jp1 In ja
@@ -988,6 +1016,12 @@ Public Class frmAntMonitor
                                     sbTemp.Append("U")
 
                             End Select
+
+                            If sbTemp2.Length <> 0 Then
+                                sbTemp2.Append(vbCrLf)
+                            End If
+
+                            sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
                         Next
 
                         Exit For
@@ -995,6 +1029,7 @@ Public Class frmAntMonitor
 
                     dr.Item("BestShare") = Format(dBestShare, "###,###,###,###,###,##0")
                     dr.Item("Pools") = sbTemp.ToString
+                    dr.Item("PoolData") = sbTemp2.ToString
                 Catch ex As Exception
                     dr.Item("Uptime") = "ERROR"
                     AddToLog("ERROR when querying " & sAnt & " (step " & bStep & "): " & ex.Message)
@@ -1027,6 +1062,8 @@ Public Class frmAntMonitor
             Call HandleAlerts()
         Else
             'browser logic
+            Call GetWebCredentials(Me.chklstAnts.CheckedItems(bAnt).ToString, sWebUN, sWebPW)
+
             If bAnt <> Me.chklstAnts.CheckedItems.Count Then
                 sTemp = Me.chklstAnts.CheckedItems(bAnt).ToString
 
@@ -1036,7 +1073,7 @@ Public Class frmAntMonitor
                     'sock.Connect("192.168.0.91", 4028)
 
                     If sTemp.Substring(0, 2) = "S2" Then
-                        wb(0).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", Me.txtWBUserName.Text, Me.txtWBPassword.Text), Nothing, Nothing, GetHeader)
+                        wb(0).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
                     Else
                         wb(0).Navigate("http://" & sTemp.Substring(4) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
                     End If
@@ -1047,6 +1084,8 @@ Public Class frmAntMonitor
                 End If
             End If
 
+            Call GetWebCredentials(Me.chklstAnts.CheckedItems(bAnt).ToString, sWebUN, sWebPW)
+
             If bAnt <> Me.chklstAnts.CheckedItems.Count Then
                 sTemp = Me.chklstAnts.CheckedItems(bAnt).ToString
 
@@ -1054,7 +1093,7 @@ Public Class frmAntMonitor
                     AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 1")
 
                     If sTemp.Substring(0, 2) = "S2" Then
-                        wb(1).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", Me.txtWBUserName.Text, Me.txtWBPassword.Text), Nothing, Nothing, GetHeader)
+                        wb(1).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
                     Else
                         wb(1).Navigate("http://" & sTemp.Substring(4) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
                     End If
@@ -1065,6 +1104,8 @@ Public Class frmAntMonitor
                 End If
             End If
 
+            Call GetWebCredentials(Me.chklstAnts.CheckedItems(bAnt).ToString, sWebUN, sWebPW)
+
             If bAnt <> Me.chklstAnts.CheckedItems.Count Then
                 sTemp = Me.chklstAnts.CheckedItems(bAnt).ToString
 
@@ -1072,7 +1113,7 @@ Public Class frmAntMonitor
                     AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 2")
 
                     If sTemp.Substring(0, 2) = "S2" Then
-                        wb(2).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", Me.txtWBUserName.Text, Me.txtWBPassword.Text), Nothing, Nothing, GetHeader)
+                        wb(2).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
                     Else
                         wb(2).Navigate("http://" & sTemp.Substring(4) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
                     End If
@@ -1095,18 +1136,23 @@ Public Class frmAntMonitor
 
     End Sub
 
+    Private Sub GetWebCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
+            sUsername = key.GetValue("WebUsername")
+            sPassword = key.GetValue("WebPassword")
+        End Using
+
+    End Sub
+
     Private Sub HandleAlerts()
 
         Dim x As Integer
         Dim dr As DataGridViewRow
-        Dim sAlertMsg, sAlertTitle As String
-        Dim bAlert As Boolean
-        Dim ap As frmAnnoyingPopup
         Dim fanColor, tempColor, hashColor, xCountColor As Color
         Dim iAlertCount As Integer
         Dim bStep As Byte
-        Dim iEMailGovernor As Integer
-
+        
         If dLastEMailAlert.Length <> Me.dataAnts.Rows.Count Then
             Array.Resize(dLastEMailAlert, Me.dataAnts.Rows.Count)
         End If
@@ -1115,8 +1161,6 @@ Public Class frmAntMonitor
         For Each dr In Me.dataAnts.Rows
             Try
                 If dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
-                    bAlert = False
-
                     fanColor = New Color
                     tempColor = New Color
                     hashColor = New Color
@@ -1135,11 +1179,7 @@ Public Class frmAntMonitor
                                             tempColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " celcius"
-
-                                        sAlertTitle = "S1 Temp Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S1 Temp Alert")
                                     End If
                                 End If
                             End If
@@ -1155,11 +1195,7 @@ Public Class frmAntMonitor
                                             fanColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " RPM"
-
-                                        sAlertTitle = "S1 Fan Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S1 Fan Alert")
                                     End If
                                 End If
                             End If
@@ -1175,11 +1211,7 @@ Public Class frmAntMonitor
                                             hashColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " less than " & x & " GH/s"
-
-                                        sAlertTitle = "S1 Hash Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S1 Hash Alert")
                                     End If
                                 End If
                             End If
@@ -1195,11 +1227,7 @@ Public Class frmAntMonitor
                                             xCountColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " X count"
-
-                                        sAlertTitle = "S1 XCount Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S1 XCount Alert")
                                     End If
                                 End If
                             End If
@@ -1216,11 +1244,7 @@ Public Class frmAntMonitor
                                             tempColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " celcius"
-
-                                        sAlertTitle = "S2 Temp Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S2 Temp Alert")
                                     End If
                                 End If
                             End If
@@ -1236,11 +1260,7 @@ Public Class frmAntMonitor
                                             fanColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " RPM"
-
-                                        sAlertTitle = "S2 Fan Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S2 Fan Alert")
                                     End If
                                 End If
                             End If
@@ -1256,11 +1276,7 @@ Public Class frmAntMonitor
                                             hashColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " less than " & x & " GH/s"
-
-                                        sAlertTitle = "S2 Hash Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S2 Hash Alert")
                                     End If
                                 End If
                             End If
@@ -1276,11 +1292,7 @@ Public Class frmAntMonitor
                                             xCountColor = Color.Red
                                         End If
 
-                                        bAlert = True
-
-                                        sAlertMsg = dr.Cells("Name").Value & " exceeded " & x & " X count"
-
-                                        sAlertTitle = "S2 XCount Alert"
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S2 XCount Alert")
                                     End If
                                 End If
                             End If
@@ -1291,71 +1303,6 @@ Public Class frmAntMonitor
                     dr.Cells("HFan").Style.BackColor = fanColor
                     dr.Cells("GH/s(avg)").Style.BackColor = hashColor
                     dr.Cells("XCount").Style.BackColor = xCountColor
-
-                    If bAlert = True Then
-                        bStep = 9
-
-                        iAlertCount += 1
-
-                        'notify icon
-                        If Me.chkAlertShowNotifyPopup.Checked = True Then
-                            Me.NotifyIcon1.ShowBalloonTip(0, sAlertTitle, Now.ToString & vbCrLf & sAlertMsg, ToolTipIcon.Warning)
-                        End If
-
-                        'annoying popup
-                        If Me.chkAlertShowAnnoyingPopup.Checked = True Then
-                            ap = New frmAnnoyingPopup
-                            ap.Text = sAlertTitle
-                            ap.lblAlert.Text = Now.ToString & vbCrLf & sAlertMsg
-                            ap.Show()
-                        End If
-
-                        'launch process
-                        If Me.chkAlertStartProcess.Checked = True Then
-                            bStep = 10
-
-                            If Me.txtAlertStartProcessName.Text.IsNullOrEmpty = False Then
-                                Try
-                                    If My.Computer.FileSystem.FileExists(Me.txtAlertStartProcessName.Text) = False Then
-                                        Me.NotifyIcon1.ShowBalloonTip(30000, "Error launching alert process!", "Error launching alert process!  The specified file to start does not seem to exist.", ToolTipIcon.Error)
-                                    Else
-                                        Process.Start(Me.txtAlertStartProcessName.Text, Replace(Me.txtAlertStartProcessParms.Text, "%A", dr.Cells("Name").Value))
-                                    End If
-                                Catch ex As Exception
-                                    Me.NotifyIcon1.ShowBalloonTip(30000, "Error starting idle worker process!", "Error starting idle worker process!" & vbCrLf & vbCrLf & ex.Message, ToolTipIcon.Error)
-                                End Try
-                            End If
-                        End If
-
-                        'email
-                        If Me.chkAlertSendEMail.Checked = True Then
-                            bStep = 11
-
-                            Select Case Me.cmbAlertEMailGovernor.Text
-                                Case "Seconds"
-                                    iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text)
-
-                                Case "Minutes"
-                                    iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text) * 60
-
-                                Case "Hours"
-                                    iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text) * 60 * 60
-
-                            End Select
-
-                            If dLastEMailAlert(dr.Index).AddSeconds(iEMailGovernor) < Now Then
-                                If Me.txtSMTPAlertSubject.Text.IsNullOrEmpty = True Then
-                                    Call SendEMail(sAlertMsg, sAlertTitle)
-                                Else
-                                    Call SendEMail(sAlertMsg, Me.txtSMTPAlertSubject.Text)
-                                End If
-
-                                dLastEMailAlert(dr.Index) = Now
-                            End If
-                        End If
-
-                        Call AddToLog("ALERT: " & sAlertMsg)
-                    End If
                 End If
             Catch ex As Exception
                 AddToLog("ERROR when checking alerts on " & dr.Cells("Name").Value & " (step " & bStep & "): " & ex.Message)
@@ -1365,6 +1312,79 @@ Public Class frmAntMonitor
         If iAlertCount <> 0 Then
             Me.Text = Me.Text & " !!! " & iAlertCount & " ALERTS !!!"
         End If
+
+    End Sub
+
+    Private Sub ProcessAlerts(ByRef dr As DataGridViewRow, ByVal sAlertMsg As String, ByVal sAlertTitle As String)
+
+        Dim iEMailGovernor As Integer
+        Dim ap As frmAnnoyingPopup
+        Dim bStep As Byte
+
+        Try
+            bStep = 9
+
+            'notify icon
+            If Me.chkAlertShowNotifyPopup.Checked = True Then
+                Me.NotifyIcon1.ShowBalloonTip(0, sAlertTitle, Now.ToString & vbCrLf & sAlertMsg, ToolTipIcon.Warning)
+            End If
+
+            'annoying popup
+            If Me.chkAlertShowAnnoyingPopup.Checked = True Then
+                ap = New frmAnnoyingPopup
+                ap.Text = sAlertTitle
+                ap.lblAlert.Text = Now.ToString & vbCrLf & sAlertMsg
+                ap.Show()
+            End If
+
+            'launch process
+            If Me.chkAlertStartProcess.Checked = True Then
+                bStep = 10
+
+                If Me.txtAlertStartProcessName.Text.IsNullOrEmpty = False Then
+                    Try
+                        If My.Computer.FileSystem.FileExists(Me.txtAlertStartProcessName.Text) = False Then
+                            Me.NotifyIcon1.ShowBalloonTip(30000, "Error launching alert process!", "Error launching alert process!  The specified file to start does not seem to exist.", ToolTipIcon.Error)
+                        Else
+                            Process.Start(Me.txtAlertStartProcessName.Text, Replace(Me.txtAlertStartProcessParms.Text, "%A", dr.Cells("Name").Value))
+                        End If
+                    Catch ex As Exception
+                        Me.NotifyIcon1.ShowBalloonTip(30000, "Error starting idle worker process!", "Error starting idle worker process!" & vbCrLf & vbCrLf & ex.Message, ToolTipIcon.Error)
+                    End Try
+                End If
+            End If
+
+            'email
+            If Me.chkAlertSendEMail.Checked = True Then
+                bStep = 11
+
+                Select Case Me.cmbAlertEMailGovernor.Text
+                    Case "Seconds"
+                        iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text)
+
+                    Case "Minutes"
+                        iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text) * 60
+
+                    Case "Hours"
+                        iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text) * 60 * 60
+
+                End Select
+
+                If dLastEMailAlert(dr.Index).AddSeconds(iEMailGovernor) < Now Then
+                    If Me.txtSMTPAlertSubject.Text.IsNullOrEmpty = True Then
+                        Call SendEMail(sAlertMsg, sAlertTitle)
+                    Else
+                        Call SendEMail(sAlertMsg, Me.txtSMTPAlertSubject.Text)
+                    End If
+
+                    dLastEMailAlert(dr.Index) = Now
+                End If
+            End If
+
+            Call AddToLog("ALERT: " & sAlertMsg)
+        Catch ex As Exception When bErrorHandle = True
+            AddToLog("ERROR when processing alerts on " & dr.Cells("Name").Value & " (step " & bStep & "): " & ex.Message)
+        End Try
 
     End Sub
 
@@ -1484,10 +1504,10 @@ Public Class frmAntMonitor
                     Exit Sub
                 End If
 
-                If Me.txtWBUserName.Text.IsNullOrEmpty = True OrElse Me.txtWBPassword.Text.IsNullOrEmpty = True Then
-                    MsgBox("Please enter your Ant credentials first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+                If Me.txtWebUsername.Text.IsNullOrEmpty = True OrElse Me.txtWebPassword.Text.IsNullOrEmpty = True Then
+                    MsgBox("Please enter your Ant credentials (web) first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
-                    Me.txtWBUserName.Focus()
+                    Me.txtWebUsername.Focus()
 
                     Exit Sub
                 End If
@@ -1495,7 +1515,7 @@ Public Class frmAntMonitor
                 sLocalNet = Me.cmbLocalIPs.Text.Substring(0, Microsoft.VisualBasic.InStrRev(Me.cmbLocalIPs.Text, "."))
 
                 wc = New eWebClient
-                wc.Credentials = New System.Net.NetworkCredential(Me.txtWBUserName.Text, Me.txtWBPassword.Text)
+                wc.Credentials = New System.Net.NetworkCredential(Me.txtWebUsername.Text, Me.txtWebPassword.Text)
 
                 Me.cmdScan.Text = "STOP!"
 
@@ -1599,15 +1619,7 @@ Public Class frmAntMonitor
 
         With ctlsByKey
             .SetRegKeyByControl(Me.chkWBRebootIfXd)
-            .SetRegKeyByControl(Me.chkWBSavePassword)
 
-            If Me.chkWBSavePassword.Checked = True Then
-                .SetRegKeyByControl(Me.txtWBPassword)
-            Else
-                .SetRegKeyByControl(Me.txtWBPassword, "")
-            End If
-
-            .SetRegKeyByControl(Me.txtWBUserName)
             .SetRegKeyByControl(Me.chklstAnts)
 
             .SetRegKeyByControl(Me.txtRefreshRate)
@@ -1654,6 +1666,7 @@ Public Class frmAntMonitor
     Private Sub cmdAddAnt_Click(sender As Object, e As System.EventArgs) Handles cmdAddAnt.Click
 
         Dim sTemp As String
+        Dim sCredential As String
 
         If Me.optAddS1.Checked = False AndAlso Me.optAddS2.Checked = False Then
             MsgBox("Please specify if this is an S1 or an S2.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
@@ -1671,6 +1684,42 @@ Public Class frmAntMonitor
             If Me.chklstAnts.Items.Contains(Me.txtAntAddress.Text) = False Then
                 Me.chklstAnts.SetItemChecked(Me.chklstAnts.Items.Add(sTemp & Me.txtAntAddress.Text), True)
                 Me.txtAntAddress.Text = ""
+
+                If sTemp.Substring(0, 2) = "S1" Then
+                    If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
+                    Else
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", Me.txtWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", Me.txtWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+                    End If
+
+                    If Me.txtSSHUsername.Text.IsNullOrEmpty = True Then
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", "root", Microsoft.Win32.RegistryValueKind.String)
+                    Else
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", Me.txtSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", Me.txtSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+                    End If
+                End If
+
+                If sTemp.Substring(0, 2) = "S2" Then
+                    If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
+                    Else
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", Me.txtWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", Me.txtWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+                    End If
+
+                    If Me.txtSSHUsername.Text.IsNullOrEmpty = True Then
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
+                    Else
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", Me.txtSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", Me.txtSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+                    End If
+                End If
             Else
                 MsgBox("This address appears to already be in the list.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
             End If
@@ -1835,25 +1884,23 @@ Public Class frmAntMonitor
 
     End Sub
 
-    Private Sub chkUseAPI_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkUseAPI.CheckedChanged
+    'Private Sub chkUseAPI_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkUseAPI.CheckedChanged
 
-        If chkUseAPI.Checked = True Then
-            Me.chkWBRebootIfXd.Visible = False
-            Me.chkWBSavePassword.Visible = False
-            Me.lblWBPassword.Visible = False
-            Me.lblWBUserName.Visible = False
-            Me.txtWBPassword.Visible = False
-            Me.txtWBUserName.Visible = False
-        Else
-            Me.chkWBRebootIfXd.Visible = True
-            Me.chkWBSavePassword.Visible = True
-            Me.lblWBPassword.Visible = True
-            Me.lblWBUserName.Visible = True
-            Me.txtWBPassword.Visible = True
-            Me.txtWBUserName.Visible = True
-        End If
+    '    If chkUseAPI.Checked = True Then
+    '        Me.chkWBRebootIfXd.Visible = False
+    '        Me.lblWBPassword.Visible = False
+    '        Me.lblWBUserName.Visible = False
+    '        Me.txtWBPassword.Visible = False
+    '        Me.txtWBUserName.Visible = False
+    '    Else
+    '        Me.chkWBRebootIfXd.Visible = True
+    '        Me.lblWBPassword.Visible = True
+    '        Me.lblWBUserName.Visible = True
+    '        Me.txtWBPassword.Visible = True
+    '        Me.txtWBUserName.Visible = True
+    '    End If
 
-    End Sub
+    'End Sub
 
     Private Sub NotifyIcon1_DoubleClick(sender As Object, e As System.EventArgs) Handles NotifyIcon1.DoubleClick
 
@@ -2149,6 +2196,14 @@ Public Class frmAntMonitor
             .CurrentUser.CreateSubKey(csRegKey & "\Columns\" & Me.dataAnts.Name & "_DisplayIndex")
             .SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Columns\" & Me.dataAnts.Name & "_DisplayIndex", e.Column.Name, e.Column.DisplayIndex, Microsoft.Win32.RegistryValueKind.DWord)
         End With
-        
+
+    End Sub
+
+    Private Sub dataAnts_CellToolTipTextNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellToolTipTextNeededEventArgs) Handles dataAnts.CellToolTipTextNeeded
+
+        If e.ColumnIndex = Me.dataAnts.Columns("Pools").Index AndAlso e.RowIndex <> -1 Then
+            e.ToolTipText = Me.dataAnts.Rows(e.RowIndex).Cells("PoolData").Value
+        End If
+
     End Sub
 End Class
