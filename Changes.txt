@@ -1,9 +1,14 @@
+v2.21b
+- Added the ability to change Ant credentials w/o having to delete/readd them.
+- Added an option to show the selection column on the Ant display grid.
+- Added a new column ACount, showing the number of alerts for that Ant.  Sort by that column to have those with alerts bubble to the top.
+
 v2.2b
 - Changed the hash rates, HFan, HTemp, and freq columns to be numeric fields so that they sort properly.
 - Added a tooltip text for the Pools cell to show more pool info: pool #, URL, User, and status (Alive/Dead).
 - Added the ability to keep separate userid/passwords for each Ant, one set for SSH, and one set for Web.
 	- Note that existing users will have all their web usernames/pws set to what you had stored there when it was just one field.
-	- If you need to change it for existing Ants, you can either remove it, then readd it, or edit the registry entry in HKCU\Software\MAntMonitor\Ants\RespectiveAnt
+\MAntMonitor\Ants\RespectiveAnt
 - Fixed the problem with multiple alerts for one Ant not being properly handled.
 
 v2.1

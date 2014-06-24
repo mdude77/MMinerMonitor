@@ -15,7 +15,7 @@ Public Class frmAntMonitor
     
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.2b"
+    Private Const csVersion As String = "M's Ant Monitor v2.21b"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -87,6 +87,7 @@ Public Class frmAntMonitor
                 .Add("Freq", GetType(Integer))
                 .Add("XCount")
                 .Add("Status")
+                .Add("ACount", GetType(Integer))
             End With
         End With
 
@@ -165,6 +166,9 @@ Public Class frmAntMonitor
             .AddControl(Me.chkShowRej, "ShowReject")
             .AddControl(Me.chkShowStale, "ShowStale")
             .AddControl(Me.chkShowDifficulty, "ShowDifficulty")
+            .AddControl(Me.chkShowACount, "ShowACount")
+
+            .AddControl(Me.chkShowSelectionColumn, "ShowSelectionColumn")
 
             .AddControl(Me.chkUseAPI, "UseAPI")
 
@@ -253,6 +257,9 @@ Public Class frmAntMonitor
             .SetControlByRegKey(Me.chkShowRej, True)
             .SetControlByRegKey(Me.chkShowStale, True)
             .SetControlByRegKey(Me.chkShowDifficulty, True)
+            .SetControlByRegKey(Me.chkShowACount, True)
+
+            .SetControlByRegKey(Me.chkShowSelectionColumn)
 
             .SetControlByRegKey(Me.chkUseAPI, True)
 
@@ -1145,13 +1152,25 @@ Public Class frmAntMonitor
 
     End Sub
 
+    Private Sub GetSSHCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
+            sUsername = key.GetValue("SSHUsername")
+            sPassword = key.GetValue("SSHPassword")
+        End Using
+
+    End Sub
+
+
     Private Sub HandleAlerts()
 
         Dim x As Integer
+        Dim d As Double
         Dim dr As DataGridViewRow
-        Dim fanColor, tempColor, hashColor, xCountColor As Color
-        Dim iAlertCount As Integer
+        'Dim fanColor, tempColor, hashColor, xCountColor As Color
+        Dim iAlertCount, iAntAlertCount As Integer
         Dim bStep As Byte
+        Dim colHighlightColumns As System.Collections.Generic.List(Of Integer)
         
         If dLastEMailAlert.Length <> Me.dataAnts.Rows.Count Then
             Array.Resize(dLastEMailAlert, Me.dataAnts.Rows.Count)
@@ -1161,10 +1180,19 @@ Public Class frmAntMonitor
         For Each dr In Me.dataAnts.Rows
             Try
                 If dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
-                    fanColor = New Color
-                    tempColor = New Color
-                    hashColor = New Color
-                    xCountColor = New Color
+                    'fanColor = New Color
+                    'tempColor = New Color
+                    'hashColor = New Color
+                    'xCountColor = New Color
+
+                    iAntAlertCount = 0
+
+                    If dr.Tag Is Nothing Then
+                        dr.Tag = New System.Collections.Generic.List(Of Integer)
+                    End If
+
+                    colHighlightColumns = dr.Tag
+                    colHighlightColumns.Clear()
 
                     Select Case dr.Cells("Name").Value.Substring(0, 2)
                         Case "S1"
@@ -1175,9 +1203,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            tempColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    tempColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S1 Temp Alert")
                                     End If
@@ -1191,9 +1223,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            fanColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    fanColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S1 Fan Alert")
                                     End If
@@ -1207,9 +1243,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            hashColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    hashColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S1 Hash Alert")
                                     End If
@@ -1223,9 +1263,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            xCountColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    xCountColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S1 XCount Alert")
                                     End If
@@ -1240,9 +1284,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            tempColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    tempColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S2 Temp Alert")
                                     End If
@@ -1256,9 +1304,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            fanColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    fanColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S2 Fan Alert")
                                     End If
@@ -1272,9 +1324,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            hashColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    hashColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S2 Hash Alert")
                                     End If
@@ -1288,9 +1344,13 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                        If Me.chkAlertHighlightField.Checked = True Then
-                                            xCountColor = Color.Red
-                                        End If
+                                        'If Me.chkAlertHighlightField.Checked = True Then
+                                        '    xCountColor = Color.Red
+                                        'End If
+
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S2 XCount Alert")
                                     End If
@@ -1299,14 +1359,29 @@ Public Class frmAntMonitor
 
                     End Select
 
-                    dr.Cells("HTemp").Style.BackColor = tempColor
-                    dr.Cells("HFan").Style.BackColor = fanColor
-                    dr.Cells("GH/s(avg)").Style.BackColor = hashColor
-                    dr.Cells("XCount").Style.BackColor = xCountColor
+                    'dr.Cells("HTemp").Style.BackColor = tempColor
+                    'dr.Cells("HFan").Style.BackColor = fanColor
+                    'dr.Cells("GH/s(avg)").Style.BackColor = hashColor
+                    'dr.Cells("XCount").Style.BackColor = xCountColor
+
+                    dr.Cells("ACount").Value = iAntAlertCount
                 End If
             Catch ex As Exception
                 AddToLog("ERROR when checking alerts on " & dr.Cells("Name").Value & " (step " & bStep & "): " & ex.Message)
             End Try
+        Next
+
+        For Each dr In Me.dataAnts.Rows
+            colHighlightColumns = dr.Tag
+
+            dr.Cells("HTemp").Style.BackColor = New Color
+            dr.Cells("HFan").Style.BackColor = New Color
+            dr.Cells("GH/s(avg)").Style.BackColor = New Color
+            dr.Cells("XCount").Style.BackColor = New Color
+
+            For Each x In colHighlightColumns
+                dr.Cells(x).Style.BackColor = Color.Red
+            Next
         Next
 
         If iAlertCount <> 0 Then
@@ -1642,6 +1717,9 @@ Public Class frmAntMonitor
             .SetRegKeyByControl(Me.chkShowRej)
             .SetRegKeyByControl(Me.chkShowStale)
             .SetRegKeyByControl(Me.chkShowDifficulty)
+            .SetRegKeyByControl(Me.chkShowACount)
+
+            .SetRegKeyByControl(Me.chkShowSelectionColumn)
 
             .SetRegKeyByControl(Me.chkUseAPI)
         End With
@@ -1666,8 +1744,7 @@ Public Class frmAntMonitor
     Private Sub cmdAddAnt_Click(sender As Object, e As System.EventArgs) Handles cmdAddAnt.Click
 
         Dim sTemp As String
-        Dim sCredential As String
-
+        
         If Me.optAddS1.Checked = False AndAlso Me.optAddS2.Checked = False Then
             MsgBox("Please specify if this is an S1 or an S2.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
@@ -1799,7 +1876,8 @@ Public Class frmAntMonitor
     Private Sub chkShow_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkShowBestShare.CheckedChanged, chkShowBlocks.CheckedChanged, _
         chkShowFans.CheckedChanged, chkShowGHs5s.CheckedChanged, chkShowGHsAvg.CheckedChanged, chkShowHWE.CheckedChanged, chkShowPools.CheckedChanged, _
         chkShowStatus.CheckedChanged, chkShowTemps.CheckedChanged, chkShowUptime.CheckedChanged, chkShowFreqs.CheckedChanged, chkShowHighFan.CheckedChanged, _
-        chkShowHighTemp.CheckedChanged, chkShowXCount.CheckedChanged, chkShowRej.CheckedChanged, chkShowStale.CheckedChanged, chkShowDifficulty.CheckedChanged
+        chkShowHighTemp.CheckedChanged, chkShowXCount.CheckedChanged, chkShowRej.CheckedChanged, chkShowStale.CheckedChanged, chkShowDifficulty.CheckedChanged, _
+        chkShowACount.CheckedChanged
 
         Dim chkAny As CheckBox
 
@@ -1858,6 +1936,9 @@ Public Class frmAntMonitor
 
             Case "chkShowDifficulty"
                 Me.dataAnts.Columns("Diff").Visible = chkAny.Checked
+
+            Case "chkShowACount"
+                Me.dataAnts.Columns("ACount").Visible = chkAny.Checked
 
             Case Else
                 MsgBox(chkAny.Name & " not found!", MsgBoxStyle.Critical Or MsgBoxStyle.OkOnly)
@@ -2203,6 +2284,69 @@ Public Class frmAntMonitor
 
         If e.ColumnIndex = Me.dataAnts.Columns("Pools").Index AndAlso e.RowIndex <> -1 Then
             e.ToolTipText = Me.dataAnts.Rows(e.RowIndex).Cells("PoolData").Value
+        End If
+
+    End Sub
+
+    Private Sub chkShowSelectionColumn_Click(sender As Object, e As System.EventArgs) Handles chkShowSelectionColumn.Click
+
+        Me.dataAnts.RowHeadersVisible = Me.chkShowSelectionColumn.Checked
+
+    End Sub
+
+    Private Sub chklstAnts_SelectedValueChanged(sender As Object, e As System.EventArgs) Handles chklstAnts.SelectedValueChanged
+
+        If Me.chklstAnts.SelectedItems.Count <> 1 Then
+            Me.cmdSaveAnt.Enabled = False
+        Else
+            Me.cmdSaveAnt.Enabled = True
+
+            Call GetWebCredentials(Me.chklstAnts.SelectedItem.ToString, Me.txtWebUsername.Text, Me.txtWebPassword.Text)
+            Call GetSSHCredentials(Me.chklstAnts.SelectedItem.ToString, Me.txtSSHUsername.Text, Me.txtSSHPassword.Text)
+        End If
+
+    End Sub
+
+    Private Sub cmdSaveAnt_Click(sender As Object, e As System.EventArgs) Handles cmdSaveAnt.Click
+
+        Dim sTemp As String
+
+        sTemp = Me.chklstAnts.SelectedItem
+
+        If sTemp.Substring(0, 2) = "S1" Then
+            If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
+            Else
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", Me.txtWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", Me.txtWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+            End If
+
+            If Me.txtSSHUsername.Text.IsNullOrEmpty = True Then
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", "root", Microsoft.Win32.RegistryValueKind.String)
+            Else
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", Me.txtSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", Me.txtSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+            End If
+        End If
+
+        If sTemp.Substring(0, 2) = "S2" Then
+            If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
+            Else
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", Me.txtWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", Me.txtWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+            End If
+
+            If Me.txtSSHUsername.Text.IsNullOrEmpty = True Then
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
+            Else
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", Me.txtSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", Me.txtSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+            End If
         End If
 
     End Sub

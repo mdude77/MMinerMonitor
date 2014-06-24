@@ -30,11 +30,18 @@ Partial Class frmAntMonitor
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tabAnts = New System.Windows.Forms.TabPage()
         Me.tabConfig = New System.Windows.Forms.TabPage()
+        Me.chkShowSelectionColumn = New System.Windows.Forms.CheckBox()
+        Me.cmdSaveAnt = New System.Windows.Forms.Button()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.txtWebPassword = New System.Windows.Forms.TextBox()
+        Me.txtWebUsername = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.optAddS2 = New System.Windows.Forms.RadioButton()
         Me.optAddS1 = New System.Windows.Forms.RadioButton()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.chkUseAPI = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.chkShowACount = New System.Windows.Forms.CheckBox()
         Me.chkShowDifficulty = New System.Windows.Forms.CheckBox()
         Me.chkShowStale = New System.Windows.Forms.CheckBox()
         Me.chkShowRej = New System.Windows.Forms.CheckBox()
@@ -151,10 +158,6 @@ Partial Class frmAntMonitor
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.txtWebPassword = New System.Windows.Forms.TextBox()
-        Me.txtWebUsername = New System.Windows.Forms.TextBox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
@@ -186,7 +189,7 @@ Partial Class frmAntMonitor
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1089, 284)
+        Me.dataAnts.Size = New System.Drawing.Size(1181, 284)
         Me.dataAnts.TabIndex = 0
         '
         'TimerRefresh
@@ -226,13 +229,15 @@ Partial Class frmAntMonitor
         Me.tabAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabAnts.Name = "tabAnts"
         Me.tabAnts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAnts.Size = New System.Drawing.Size(1103, 298)
+        Me.tabAnts.Size = New System.Drawing.Size(1195, 298)
         Me.tabAnts.TabIndex = 0
         Me.tabAnts.Text = "Ants"
         Me.tabAnts.UseVisualStyleBackColor = True
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.chkShowSelectionColumn)
+        Me.tabConfig.Controls.Add(Me.cmdSaveAnt)
         Me.tabConfig.Controls.Add(Me.Label7)
         Me.tabConfig.Controls.Add(Me.txtWebPassword)
         Me.tabConfig.Controls.Add(Me.txtWebUsername)
@@ -268,6 +273,59 @@ Partial Class frmAntMonitor
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
+        '
+        'chkShowSelectionColumn
+        '
+        Me.chkShowSelectionColumn.AutoSize = True
+        Me.chkShowSelectionColumn.Location = New System.Drawing.Point(953, 262)
+        Me.chkShowSelectionColumn.Name = "chkShowSelectionColumn"
+        Me.chkShowSelectionColumn.Size = New System.Drawing.Size(176, 24)
+        Me.chkShowSelectionColumn.TabIndex = 64
+        Me.chkShowSelectionColumn.Text = "Show Selection Col"
+        Me.chkShowSelectionColumn.UseVisualStyleBackColor = True
+        '
+        'cmdSaveAnt
+        '
+        Me.cmdSaveAnt.Enabled = False
+        Me.cmdSaveAnt.Location = New System.Drawing.Point(545, 244)
+        Me.cmdSaveAnt.Name = "cmdSaveAnt"
+        Me.cmdSaveAnt.Size = New System.Drawing.Size(74, 32)
+        Me.cmdSaveAnt.TabIndex = 63
+        Me.cmdSaveAnt.Text = "&Save"
+        Me.cmdSaveAnt.UseVisualStyleBackColor = True
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(516, 128)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(138, 20)
+        Me.Label7.TabIndex = 62
+        Me.Label7.Text = "Web Credentials:"
+        '
+        'txtWebPassword
+        '
+        Me.txtWebPassword.Location = New System.Drawing.Point(519, 182)
+        Me.txtWebPassword.Name = "txtWebPassword"
+        Me.txtWebPassword.Size = New System.Drawing.Size(100, 27)
+        Me.txtWebPassword.TabIndex = 61
+        '
+        'txtWebUsername
+        '
+        Me.txtWebUsername.Location = New System.Drawing.Point(519, 153)
+        Me.txtWebUsername.Name = "txtWebUsername"
+        Me.txtWebUsername.Size = New System.Drawing.Size(100, 27)
+        Me.txtWebUsername.TabIndex = 59
+        Me.ToolTip1.SetToolTip(Me.txtWebUsername, "If left empty, default is used")
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(348, 128)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(139, 20)
+        Me.Label6.TabIndex = 57
+        Me.Label6.Text = "SSH Credentials:"
         '
         'optAddS2
         '
@@ -315,6 +373,7 @@ Partial Class frmAntMonitor
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.chkShowACount)
         Me.GroupBox1.Controls.Add(Me.chkShowDifficulty)
         Me.GroupBox1.Controls.Add(Me.chkShowStale)
         Me.GroupBox1.Controls.Add(Me.chkShowRej)
@@ -339,6 +398,18 @@ Partial Class frmAntMonitor
         Me.GroupBox1.TabIndex = 48
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Output options"
+        '
+        'chkShowACount
+        '
+        Me.chkShowACount.AutoSize = True
+        Me.chkShowACount.Checked = True
+        Me.chkShowACount.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowACount.Location = New System.Drawing.Point(347, 68)
+        Me.chkShowACount.Name = "chkShowACount"
+        Me.chkShowACount.Size = New System.Drawing.Size(86, 24)
+        Me.chkShowACount.TabIndex = 32
+        Me.chkShowACount.Text = "ACount"
+        Me.chkShowACount.UseVisualStyleBackColor = True
         '
         'chkShowDifficulty
         '
@@ -635,7 +706,7 @@ Partial Class frmAntMonitor
         Me.chkWBRebootIfXd.AutoSize = True
         Me.chkWBRebootIfXd.Checked = True
         Me.chkWBRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkWBRebootIfXd.Location = New System.Drawing.Point(795, 263)
+        Me.chkWBRebootIfXd.Location = New System.Drawing.Point(761, 263)
         Me.chkWBRebootIfXd.Name = "chkWBRebootIfXd"
         Me.chkWBRebootIfXd.Size = New System.Drawing.Size(183, 24)
         Me.chkWBRebootIfXd.TabIndex = 11
@@ -677,7 +748,7 @@ Partial Class frmAntMonitor
         '
         'cmdDelAnt
         '
-        Me.cmdDelAnt.Location = New System.Drawing.Point(439, 244)
+        Me.cmdDelAnt.Location = New System.Drawing.Point(445, 244)
         Me.cmdDelAnt.Name = "cmdDelAnt"
         Me.cmdDelAnt.Size = New System.Drawing.Size(74, 32)
         Me.cmdDelAnt.TabIndex = 2
@@ -733,7 +804,7 @@ Partial Class frmAntMonitor
         Me.tabAlerts.Controls.Add(Me.TabControl2)
         Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
         Me.tabAlerts.Name = "tabAlerts"
-        Me.tabAlerts.Size = New System.Drawing.Size(1103, 298)
+        Me.tabAlerts.Size = New System.Drawing.Size(1195, 298)
         Me.tabAlerts.TabIndex = 3
         Me.tabAlerts.Text = "Alerts"
         Me.tabAlerts.UseVisualStyleBackColor = True
@@ -1412,7 +1483,7 @@ Partial Class frmAntMonitor
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(1103, 298)
+        Me.tabLog.Size = New System.Drawing.Size(1195, 298)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -1426,7 +1497,7 @@ Partial Class frmAntMonitor
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtLog.Size = New System.Drawing.Size(1135, 288)
+        Me.txtLog.Size = New System.Drawing.Size(1175, 288)
         Me.txtLog.TabIndex = 0
         '
         'cmdPause
@@ -1491,39 +1562,6 @@ Partial Class frmAntMonitor
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(348, 128)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(139, 20)
-        Me.Label6.TabIndex = 57
-        Me.Label6.Text = "SSH Credentials:"
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(516, 128)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(138, 20)
-        Me.Label7.TabIndex = 62
-        Me.Label7.Text = "Web Credentials:"
-        '
-        'txtWebPassword
-        '
-        Me.txtWebPassword.Location = New System.Drawing.Point(519, 182)
-        Me.txtWebPassword.Name = "txtWebPassword"
-        Me.txtWebPassword.Size = New System.Drawing.Size(100, 27)
-        Me.txtWebPassword.TabIndex = 61
-        '
-        'txtWebUsername
-        '
-        Me.txtWebUsername.Location = New System.Drawing.Point(519, 153)
-        Me.txtWebUsername.Name = "txtWebUsername"
-        Me.txtWebUsername.Size = New System.Drawing.Size(100, 27)
-        Me.txtWebUsername.TabIndex = 59
-        Me.ToolTip1.SetToolTip(Me.txtWebUsername, "If left empty, default is used")
-        '
         'frmAntMonitor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
@@ -1539,7 +1577,7 @@ Partial Class frmAntMonitor
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmAntMonitor"
-        Me.Text = "M's Ant Monitor v2.2b"
+        Me.Text = "M's Ant Monitor v2.21b"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControl1.ResumeLayout(False)
         Me.tabAnts.ResumeLayout(False)
@@ -1696,5 +1734,8 @@ Partial Class frmAntMonitor
     Friend WithEvents txtWebPassword As System.Windows.Forms.TextBox
     Friend WithEvents txtWebUsername As System.Windows.Forms.TextBox
     Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents cmdSaveAnt As System.Windows.Forms.Button
+    Friend WithEvents chkShowACount As System.Windows.Forms.CheckBox
+    Friend WithEvents chkShowSelectionColumn As System.Windows.Forms.CheckBox
 
 End Class
