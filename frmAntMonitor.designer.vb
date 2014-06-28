@@ -25,6 +25,8 @@ Partial Class frmAntMonitor
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAntMonitor))
         Me.dataAnts = New System.Windows.Forms.DataGridView()
+        Me.mnuAntMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.mnuRebootAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerRefresh = New System.Windows.Forms.Timer(Me.components)
         Me.cmdRefresh = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
@@ -68,7 +70,6 @@ Partial Class frmAntMonitor
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.cmbLocalIPs = New System.Windows.Forms.ComboBox()
-        Me.chkWBRebootIfXd = New System.Windows.Forms.CheckBox()
         Me.txtSSHPassword = New System.Windows.Forms.TextBox()
         Me.lblWBPassword = New System.Windows.Forms.Label()
         Me.txtSSHUsername = New System.Windows.Forms.TextBox()
@@ -102,6 +103,10 @@ Partial Class frmAntMonitor
         Me.chkAlertIfS2Fan = New System.Windows.Forms.CheckBox()
         Me.txtAlertS2Temp = New System.Windows.Forms.TextBox()
         Me.tabAlertTypes = New System.Windows.Forms.TabPage()
+        Me.cmbAlertRebootGovernor = New System.Windows.Forms.ComboBox()
+        Me.txtAlertRebootGovernor = New System.Windows.Forms.TextBox()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.chkAlertRebootIfXd = New System.Windows.Forms.CheckBox()
         Me.cmbAlertEMailGovernor = New System.Windows.Forms.ComboBox()
         Me.txtAlertEMailGovernor = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -158,7 +163,9 @@ Partial Class frmAntMonitor
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuRebootMultiple = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
         Me.tabConfig.SuspendLayout()
@@ -191,6 +198,18 @@ Partial Class frmAntMonitor
         Me.dataAnts.RowTemplate.Height = 24
         Me.dataAnts.Size = New System.Drawing.Size(1181, 284)
         Me.dataAnts.TabIndex = 0
+        '
+        'mnuAntMenu
+        '
+        Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple})
+        Me.mnuAntMenu.Name = "menuAntMenu"
+        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 74)
+        '
+        'mnuRebootAnt
+        '
+        Me.mnuRebootAnt.Name = "mnuRebootAnt"
+        Me.mnuRebootAnt.Size = New System.Drawing.Size(186, 24)
+        Me.mnuRebootAnt.Text = "Reboot"
         '
         'TimerRefresh
         '
@@ -255,7 +274,6 @@ Partial Class frmAntMonitor
         Me.tabConfig.Controls.Add(Me.Label4)
         Me.tabConfig.Controls.Add(Me.Label3)
         Me.tabConfig.Controls.Add(Me.cmbLocalIPs)
-        Me.tabConfig.Controls.Add(Me.chkWBRebootIfXd)
         Me.tabConfig.Controls.Add(Me.txtSSHPassword)
         Me.tabConfig.Controls.Add(Me.lblWBPassword)
         Me.tabConfig.Controls.Add(Me.txtSSHUsername)
@@ -279,9 +297,9 @@ Partial Class frmAntMonitor
         Me.chkShowSelectionColumn.AutoSize = True
         Me.chkShowSelectionColumn.Location = New System.Drawing.Point(953, 262)
         Me.chkShowSelectionColumn.Name = "chkShowSelectionColumn"
-        Me.chkShowSelectionColumn.Size = New System.Drawing.Size(176, 24)
+        Me.chkShowSelectionColumn.Size = New System.Drawing.Size(208, 24)
         Me.chkShowSelectionColumn.TabIndex = 64
-        Me.chkShowSelectionColumn.Text = "Show Selection Col"
+        Me.chkShowSelectionColumn.Text = "Show Selection Column"
         Me.chkShowSelectionColumn.UseVisualStyleBackColor = True
         '
         'cmdSaveAnt
@@ -701,18 +719,6 @@ Partial Class frmAntMonitor
         Me.cmbLocalIPs.Size = New System.Drawing.Size(183, 28)
         Me.cmbLocalIPs.TabIndex = 12
         '
-        'chkWBRebootIfXd
-        '
-        Me.chkWBRebootIfXd.AutoSize = True
-        Me.chkWBRebootIfXd.Checked = True
-        Me.chkWBRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkWBRebootIfXd.Location = New System.Drawing.Point(761, 263)
-        Me.chkWBRebootIfXd.Name = "chkWBRebootIfXd"
-        Me.chkWBRebootIfXd.Size = New System.Drawing.Size(183, 24)
-        Me.chkWBRebootIfXd.TabIndex = 11
-        Me.chkWBRebootIfXd.Text = "Reboot Ants with Xs"
-        Me.chkWBRebootIfXd.UseVisualStyleBackColor = True
-        '
         'txtSSHPassword
         '
         Me.txtSSHPassword.Location = New System.Drawing.Point(413, 182)
@@ -823,7 +829,7 @@ Partial Class frmAntMonitor
         Me.TabControl2.Multiline = True
         Me.TabControl2.Name = "TabControl2"
         Me.TabControl2.SelectedIndex = 0
-        Me.TabControl2.Size = New System.Drawing.Size(1357, 288)
+        Me.TabControl2.Size = New System.Drawing.Size(1186, 288)
         Me.TabControl2.TabIndex = 18
         '
         'tabS1Alerts
@@ -840,7 +846,7 @@ Partial Class frmAntMonitor
         Me.tabS1Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS1Alerts.Name = "tabS1Alerts"
         Me.tabS1Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS1Alerts.Size = New System.Drawing.Size(1349, 255)
+        Me.tabS1Alerts.Size = New System.Drawing.Size(1178, 255)
         Me.tabS1Alerts.TabIndex = 0
         Me.tabS1Alerts.Text = "S1 Alerts"
         Me.tabS1Alerts.UseVisualStyleBackColor = True
@@ -944,7 +950,7 @@ Partial Class frmAntMonitor
         Me.tabS2Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS2Alerts.Name = "tabS2Alerts"
         Me.tabS2Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS2Alerts.Size = New System.Drawing.Size(1349, 255)
+        Me.tabS2Alerts.Size = New System.Drawing.Size(1178, 255)
         Me.tabS2Alerts.TabIndex = 1
         Me.tabS2Alerts.Text = "S2 Alerts"
         Me.tabS2Alerts.UseVisualStyleBackColor = True
@@ -1036,6 +1042,10 @@ Partial Class frmAntMonitor
         '
         'tabAlertTypes
         '
+        Me.tabAlertTypes.Controls.Add(Me.cmbAlertRebootGovernor)
+        Me.tabAlertTypes.Controls.Add(Me.txtAlertRebootGovernor)
+        Me.tabAlertTypes.Controls.Add(Me.Label8)
+        Me.tabAlertTypes.Controls.Add(Me.chkAlertRebootIfXd)
         Me.tabAlertTypes.Controls.Add(Me.cmbAlertEMailGovernor)
         Me.tabAlertTypes.Controls.Add(Me.txtAlertEMailGovernor)
         Me.tabAlertTypes.Controls.Add(Me.Label2)
@@ -1053,15 +1063,53 @@ Partial Class frmAntMonitor
         Me.tabAlertTypes.Controls.Add(Me.txtAlertStartProcessParms)
         Me.tabAlertTypes.Location = New System.Drawing.Point(4, 4)
         Me.tabAlertTypes.Name = "tabAlertTypes"
-        Me.tabAlertTypes.Size = New System.Drawing.Size(1349, 255)
+        Me.tabAlertTypes.Size = New System.Drawing.Size(1178, 255)
         Me.tabAlertTypes.TabIndex = 2
         Me.tabAlertTypes.Text = "Alert Types"
         Me.tabAlertTypes.UseVisualStyleBackColor = True
         '
+        'cmbAlertRebootGovernor
+        '
+        Me.cmbAlertRebootGovernor.FormattingEnabled = True
+        Me.cmbAlertRebootGovernor.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours", "Days"})
+        Me.cmbAlertRebootGovernor.Location = New System.Drawing.Point(582, 63)
+        Me.cmbAlertRebootGovernor.Name = "cmbAlertRebootGovernor"
+        Me.cmbAlertRebootGovernor.Size = New System.Drawing.Size(94, 28)
+        Me.cmbAlertRebootGovernor.TabIndex = 26
+        Me.cmbAlertRebootGovernor.Text = "Minutes"
+        '
+        'txtAlertRebootGovernor
+        '
+        Me.txtAlertRebootGovernor.Location = New System.Drawing.Point(520, 64)
+        Me.txtAlertRebootGovernor.Name = "txtAlertRebootGovernor"
+        Me.txtAlertRebootGovernor.Size = New System.Drawing.Size(55, 27)
+        Me.txtAlertRebootGovernor.TabIndex = 25
+        Me.txtAlertRebootGovernor.Text = "30"
+        '
+        'Label8
+        '
+        Me.Label8.Location = New System.Drawing.Point(518, 39)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(320, 28)
+        Me.Label8.TabIndex = 24
+        Me.Label8.Text = "Don't reboot more than once every"
+        '
+        'chkAlertRebootIfXd
+        '
+        Me.chkAlertRebootIfXd.AutoSize = True
+        Me.chkAlertRebootIfXd.Checked = True
+        Me.chkAlertRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertRebootIfXd.Location = New System.Drawing.Point(522, 12)
+        Me.chkAlertRebootIfXd.Name = "chkAlertRebootIfXd"
+        Me.chkAlertRebootIfXd.Size = New System.Drawing.Size(316, 24)
+        Me.chkAlertRebootIfXd.TabIndex = 23
+        Me.chkAlertRebootIfXd.Text = "Reboot Ants that trigger XCount alerts"
+        Me.chkAlertRebootIfXd.UseVisualStyleBackColor = True
+        '
         'cmbAlertEMailGovernor
         '
         Me.cmbAlertEMailGovernor.FormattingEnabled = True
-        Me.cmbAlertEMailGovernor.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
+        Me.cmbAlertEMailGovernor.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours", "Days"})
         Me.cmbAlertEMailGovernor.Location = New System.Drawing.Point(306, 86)
         Me.cmbAlertEMailGovernor.Name = "cmbAlertEMailGovernor"
         Me.cmbAlertEMailGovernor.Size = New System.Drawing.Size(94, 28)
@@ -1231,7 +1279,7 @@ Partial Class frmAntMonitor
         Me.tabEmail.Controls.Add(Me.Label97)
         Me.tabEmail.Location = New System.Drawing.Point(4, 4)
         Me.tabEmail.Name = "tabEmail"
-        Me.tabEmail.Size = New System.Drawing.Size(1349, 255)
+        Me.tabEmail.Size = New System.Drawing.Size(1178, 255)
         Me.tabEmail.TabIndex = 3
         Me.tabEmail.Text = "EMail Config"
         Me.tabEmail.UseVisualStyleBackColor = True
@@ -1529,7 +1577,7 @@ Partial Class frmAntMonitor
         '
         Me.NotifyIcon1.ContextMenuStrip = Me.menuStripNotifyIcon
         Me.NotifyIcon1.Icon = CType(resources.GetObject("NotifyIcon1.Icon"), System.Drawing.Icon)
-        Me.NotifyIcon1.Text = "NotifyIcon1"
+        Me.NotifyIcon1.Text = "M's Pool Monitor"
         Me.NotifyIcon1.Visible = True
         '
         'menuStripNotifyIcon
@@ -1562,6 +1610,12 @@ Partial Class frmAntMonitor
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
+        'mnuRebootMultiple
+        '
+        Me.mnuRebootMultiple.Name = "mnuRebootMultiple"
+        Me.mnuRebootMultiple.Size = New System.Drawing.Size(186, 24)
+        Me.mnuRebootMultiple.Text = "Reboot Multiple"
+        '
         'frmAntMonitor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
@@ -1577,8 +1631,9 @@ Partial Class frmAntMonitor
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmAntMonitor"
-        Me.Text = "M's Ant Monitor v2.21b"
+        Me.Text = "M's Ant Monitor"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.mnuAntMenu.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.tabAnts.ResumeLayout(False)
         Me.tabConfig.ResumeLayout(False)
@@ -1618,7 +1673,6 @@ Partial Class frmAntMonitor
     Friend WithEvents cmdPause As System.Windows.Forms.Button
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents cmbLocalIPs As System.Windows.Forms.ComboBox
-    Friend WithEvents chkWBRebootIfXd As System.Windows.Forms.CheckBox
     Friend WithEvents txtSSHPassword As System.Windows.Forms.TextBox
     Friend WithEvents lblWBPassword As System.Windows.Forms.Label
     Friend WithEvents txtSSHUsername As System.Windows.Forms.TextBox
@@ -1737,5 +1791,12 @@ Partial Class frmAntMonitor
     Friend WithEvents cmdSaveAnt As System.Windows.Forms.Button
     Friend WithEvents chkShowACount As System.Windows.Forms.CheckBox
     Friend WithEvents chkShowSelectionColumn As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertRebootIfXd As System.Windows.Forms.CheckBox
+    Friend WithEvents cmbAlertRebootGovernor As System.Windows.Forms.ComboBox
+    Friend WithEvents txtAlertRebootGovernor As System.Windows.Forms.TextBox
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents mnuAntMenu As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents mnuRebootAnt As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents mnuRebootMultiple As System.Windows.Forms.ToolStripMenuItem
 
 End Class

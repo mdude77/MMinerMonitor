@@ -1,15 +1,22 @@
-v2.21b
-- Added the ability to change Ant credentials w/o having to delete/readd them.
-- Added an option to show the selection column on the Ant display grid.
-- Added a new column ACount, showing the number of alerts for that Ant.  Sort by that column to have those with alerts bubble to the top.
+v2.3
+- Added a hashrate total to the title bar
+- Added the ability to reboot multiple ants at once, by using the selection bar
 
-v2.2b
+v2.2
 - Changed the hash rates, HFan, HTemp, and freq columns to be numeric fields so that they sort properly.
-- Added a tooltip text for the Pools cell to show more pool info: pool #, URL, User, and status (Alive/Dead).
+- Added a new column ACount, showing the number of alerts for that Ant.  Sort by that column to have those with alerts bubble to the top.
+	- Note that the glyph that shows which column is sorting, and which way it's sorting, only shows if the column header is wide enough.
+- Added a tooltip text for the Pools cell to show more pool info: pool #, URL, User, and status (Alive/Dead).  Put the cursor over the Pools column for the tooltip for that Ant.  
 - Added the ability to keep separate userid/passwords for each Ant, one set for SSH, and one set for Web.
 	- Note that existing users will have all their web usernames/pws set to what you had stored there when it was just one field.
-\MAntMonitor\Ants\RespectiveAnt
 - Fixed the problem with multiple alerts for one Ant not being properly handled.
+- Added an option to show the selection column on the Ant display grid.
+- Added the ability to reboot Ants via SSH.  Notes:
+	- There is a new alert type "Reboot Ants that trigger XCount alerts". 
+	- While auto reboots by XCount alert triggers work for both Web and API, only the API one uses the SSH call.
+	- There is also a reboot governor to prevent ant from being rebooted too often.  It defaults to 30 minutes.
+	- Ants to can be manually rebooted by right clicking the row and choosing the Reboot option.
+	- Reboots are logged in the log tab.
 
 v2.1
 - Added some more error handling and debug code around the API logic.

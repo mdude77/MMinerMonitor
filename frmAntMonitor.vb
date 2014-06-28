@@ -9,13 +9,15 @@ Public Class frmAntMonitor
     Private wb(0 To 2) As WebBrowser
     Private iBrowserSubmitted As Integer
 
-    Private RebootInfo As System.Collections.Generic.Dictionary(Of String, Date)
+    Private RebootInfo, EMailAlertInfo As System.Collections.Generic.Dictionary(Of String, Date)
 
+    Private Shared colResponses As System.Collections.Generic.List(Of String)
+    
     Private ds As DataSet
     
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.21b"
+    Private Const csVersion As String = "M's Ant Monitor v2.3"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -25,8 +27,6 @@ Public Class frmAntMonitor
 
     Private bStarted As Boolean
     Private bSortingColumns As Boolean
-
-    Private dLastEMailAlert(0) As Date
 
     Private Enum enAntType
         S1
@@ -45,6 +45,8 @@ Public Class frmAntMonitor
 
         bStarted = True
 
+        Me.Text = csVersion
+
         AddToLog(csVersion & " starting")
 
         host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName)
@@ -58,6 +60,7 @@ Public Class frmAntMonitor
         Me.cmbLocalIPs.Text = Me.cmbLocalIPs.Items(0)
 
         RebootInfo = New System.Collections.Generic.Dictionary(Of String, Date)
+        EMailAlertInfo = New System.Collections.Generic.Dictionary(Of String, Date)
 
         ds = New DataSet
 
@@ -88,10 +91,12 @@ Public Class frmAntMonitor
                 .Add("XCount")
                 .Add("Status")
                 .Add("ACount", GetType(Integer))
+                .Add("IPAddress")
             End With
         End With
 
         Me.dataAnts.Columns("PoolData").Visible = False
+        Me.dataAnts.Columns("IPAddress").Visible = False
 
         bSortingColumns = False
 
@@ -145,7 +150,6 @@ Public Class frmAntMonitor
 
         With ctlsByKey
             'options
-            .AddControl(Me.chkWBRebootIfXd, "RebootAntIfXd")
             .AddControl(Me.chklstAnts, "AntList")
             .AddControl(Me.txtRefreshRate, "RefreshRateValue")
             .AddControl(Me.cmbRefreshRate, "RefreshRateVolume")
@@ -216,8 +220,10 @@ Public Class frmAntMonitor
             .AddControl(Me.txtSMTPFromAddress, "SMTPFromAddress")
             .AddControl(Me.chkSMTPSSL, "SMTPUseSSL")
 
-            .SetControlByRegKey(Me.chkWBRebootIfXd, True)
-            
+            .AddControl(Me.chkAlertRebootIfXd, "RebootAntIfXd")
+            .AddControl(Me.txtAlertRebootGovernor, "AlertRebootGovernor")
+            .AddControl(Me.cmbAlertRebootGovernor, "AlertRebootGovernorValue")
+
             'change unmarked S1s to S1s
             Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\" & Me.chklstAnts.Name)
                 If key Is Nothing Then
@@ -292,6 +298,10 @@ Public Class frmAntMonitor
             .SetControlByRegKey(Me.txtAlertStartProcessParms)
             .SetControlByRegKey(Me.chkAlertSendEMail)
 
+            .SetControlByRegKey(Me.chkAlertRebootIfXd, True)
+            .SetControlByRegKey(Me.txtAlertRebootGovernor, 30)
+            .SetControlByRegKey(Me.cmbAlertRebootGovernor, "Minutes")
+
             'email settings
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPServer)
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPPort)
@@ -314,20 +324,24 @@ Public Class frmAntMonitor
                 sDefaultUN = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Username", "root")
                 sDefaultPW = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Password", "root")
 
-                If sAnt.Substring(0, 2) = "S1" Then
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
-                End If
+                If My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", "") Is Nothing Then
+                    If sAnt.Substring(0, 2) = "S1" Then
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
+                    End If
 
-                If sAnt.Substring(0, 2) = "S2" Then
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
+                    If sAnt.Substring(0, 2) = "S2" Then
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
+                    End If
                 End If
             Next
+
+            colResponses = New System.Collections.Generic.List(Of String)
 
         End With
 
@@ -360,9 +374,8 @@ Public Class frmAntMonitor
         Dim wb As WebBrowser
         Dim sbTemp As System.Text.StringBuilder
         Dim count(0 To 9) As Integer
-        Dim dReboot As Date
-        Dim bRebooting As Boolean
         Dim sWebUN, sWebPW As String
+        Dim sIP As String
 
         wb = sender
 
@@ -385,6 +398,8 @@ Public Class frmAntMonitor
 
         'second slash, should be after address
         x = InStr(x + 2, wb.Url.AbsoluteUri, "/")
+
+        sIP = wb.Url.AbsoluteUri.Substring(7, x - 8)
 
         While y < x
             z = InStr(y + 1, wb.Url.AbsoluteUri.Substring(0, x), ".")
@@ -435,6 +450,7 @@ Public Class frmAntMonitor
                 End If
 
                 dr.Item("Name") = sAnt
+                dr.Item("IPAddress") = "S2: " & sIP
 
                 'S2 status code
                 AddToLog(wb.Url.AbsoluteUri & " responded with status page")
@@ -513,26 +529,14 @@ Public Class frmAntMonitor
                                         count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
 
                     If (count(0) <> 0 OrElse count(1) <> 0 OrElse count(2) <> 0 OrElse count(3) <> 0 OrElse count(4) <> 0 OrElse count(5) <> 0 _
-                        OrElse count(6) <> 0 OrElse count(7) <> 0 OrElse count(8) <> 0 OrElse count(9) <> 0) AndAlso Me.chkWBRebootIfXd.Checked = True Then
-                        'only reboot once every 15 minutes
-                        If RebootInfo.TryGetValue(sAnt, dReboot) = True Then
-                            If dReboot.AddMinutes(15) < Now Then
-                                bRebooting = True
-
-                                RebootInfo.Remove(sAnt)
-                            Else
-                                AddToLog("Need to reboot " & dr.Item("Name") & ", but hasn't been 15 minutes")
-                            End If
-                        Else
-                            bRebooting = True
-                        End If
-
-                        If bRebooting = True Then
+                        OrElse count(6) <> 0 OrElse count(7) <> 0 OrElse count(8) <> 0 OrElse count(9) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
+                        'only reboot once every x minutes
+                        If TryGovernor(RebootInfo, sAnt, Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 60 * 30) = True Then
                             AddToLog("REBOOTING " & dr.Item("Name"))
 
-                            RebootInfo.Add(sAnt, Now)
-
                             wb.Navigate("http://192.168.0." & dr.Item("Name") & "/reboot.html")
+                        Else
+                            AddToLog("Need to reboot " & dr.Item("Name") & " but it hasn't been long enough since last reboot")
                         End If
                     Else
                         If Me.TimerRefresh.Enabled = False Then
@@ -564,6 +568,7 @@ Public Class frmAntMonitor
                 End If
 
                 dr.Item("Name") = sAnt
+                dr.Item("IPAddress") = "S1: " & sIP
 
                 If wb.Url.AbsoluteUri.Contains("minerstatus") AndAlso wb.Document.All.Count > 75 Then
                     dr.Item("Uptime") = wb.Document.All(122).OuterText.TrimEnd
@@ -651,25 +656,13 @@ Public Class frmAntMonitor
                         dr.Item("Status") = count(0) & "X " & count(1) & "X"
                     End If
 
-                    If (count(0) <> 0 OrElse count(1) <> 0) AndAlso Me.chkWBRebootIfXd.Checked = True Then
-                        If RebootInfo.TryGetValue(sAnt, dReboot) = True Then
-                            If dReboot.AddMinutes(15) < Now Then
-                                bRebooting = True
-
-                                RebootInfo.Remove(sAnt)
-                            Else
-                                AddToLog("Need to reboot " & dr.Item("Name") & ", but hasn't been 15 minutes")
-                            End If
-                        Else
-                            bRebooting = True
-                        End If
-
-                        If bRebooting = True Then
+                    If (count(0) <> 0 OrElse count(1) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
+                        If TryGovernor(RebootInfo, sAnt, Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 60 * 30) = True Then
                             AddToLog("REBOOTING " & dr.Item("Name"))
 
-                            RebootInfo.Add(sAnt, Now)
-
                             wb.Navigate("http://192.168.0." & dr.Item("Name") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
+                        Else
+                            AddToLog("Need to reboot " & dr.Item("Name") & " but it hasn't been long enough since last reboot")
                         End If
                     Else
                         If Me.TimerRefresh.Enabled = False Then
@@ -775,11 +768,19 @@ Public Class frmAntMonitor
 
     Private Sub TimerRefresh_Tick(sender As Object, e As System.EventArgs) Handles TimerRefresh.Tick
 
+        Dim x As Integer
+
         iCountDown -= 1
 
         If iCountDown < 0 Then
             iCountDown = iRefreshRate
         End If
+
+        For x = 0 To colResponses.Count - 1
+            AddToLog(colResponses(x))
+
+            colResponses.RemoveAt(x)
+        Next
 
         If iCountDown = 0 Then
             Me.TimerRefresh.Enabled = False
@@ -839,6 +840,7 @@ Public Class frmAntMonitor
         Dim x As Integer
         Dim bStep As Byte
         Dim sWebUN, sWebPW As String
+        Dim dbTemp As Double
 
         If Me.chklstAnts.Items.Count = 0 Then
             MsgBox("Please add some Ant addresses first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
@@ -884,6 +886,7 @@ Public Class frmAntMonitor
                     End If
 
                     dr.Item("Name") = sAnt
+                    dr.Item("IPAddress") = Me.chklstAnts.CheckedItems(bAnt).ToString
 
                     bStep = 1
 
@@ -1062,9 +1065,11 @@ Public Class frmAntMonitor
                 If dg.Cells("Uptime").Value <> "ERROR" AndAlso dg.Cells("Uptime").Value <> "???" Then
                     x += 1
                 End If
+
+                dbTemp += dg.Cells("GH/s(avg)").Value
             Next
 
-            Me.Text = csVersion & " - Refreshed " & Now.ToString & " - " & x & " of " & Me.chklstAnts.CheckedItems.Count & " responded"
+            Me.Text = csVersion & " - " & Now.ToString & " - " & x & " of " & Me.chklstAnts.CheckedItems.Count & " responded - " & FormatHashRate(dbTemp * 1000)
 
             Call HandleAlerts()
         Else
@@ -1161,30 +1166,18 @@ Public Class frmAntMonitor
 
     End Sub
 
-
     Private Sub HandleAlerts()
 
         Dim x As Integer
-        Dim d As Double
         Dim dr As DataGridViewRow
-        'Dim fanColor, tempColor, hashColor, xCountColor As Color
         Dim iAlertCount, iAntAlertCount As Integer
         Dim bStep As Byte
         Dim colHighlightColumns As System.Collections.Generic.List(Of Integer)
-        
-        If dLastEMailAlert.Length <> Me.dataAnts.Rows.Count Then
-            Array.Resize(dLastEMailAlert, Me.dataAnts.Rows.Count)
-        End If
 
         'alert logic
         For Each dr In Me.dataAnts.Rows
             Try
                 If dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
-                    'fanColor = New Color
-                    'tempColor = New Color
-                    'hashColor = New Color
-                    'xCountColor = New Color
-
                     iAntAlertCount = 0
 
                     If dr.Tag Is Nothing Then
@@ -1203,10 +1196,6 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    tempColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
@@ -1223,10 +1212,6 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    fanColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
@@ -1243,10 +1228,6 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    hashColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
@@ -1263,15 +1244,16 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    xCountColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S1 XCount Alert")
+
+                                        'use SSH only if using the API, as the web code has its own reboot logic
+                                        If Me.chkAlertRebootIfXd.Checked = True AndAlso Me.chkUseAPI.Checked = True Then
+                                            Call RebootAnt(dr.Cells("IPAddress").Value, False)
+                                        End If
                                     End If
                                 End If
                             End If
@@ -1284,10 +1266,6 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    tempColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
@@ -1304,10 +1282,6 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    fanColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
@@ -1324,10 +1298,6 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    hashColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
@@ -1344,25 +1314,21 @@ Public Class frmAntMonitor
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                        'If Me.chkAlertHighlightField.Checked = True Then
-                                        '    xCountColor = Color.Red
-                                        'End If
-
                                         iAntAlertCount += 1
 
                                         colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S2 XCount Alert")
+
+                                        'use SSH only if using the API, as the web code has its own reboot logic
+                                        If Me.chkAlertRebootIfXd.Checked = True AndAlso Me.chkUseAPI.Checked = True Then
+                                            Call RebootAnt(dr.Cells("IPAddress").Value, False)
+                                        End If
                                     End If
                                 End If
                             End If
 
                     End Select
-
-                    'dr.Cells("HTemp").Style.BackColor = tempColor
-                    'dr.Cells("HFan").Style.BackColor = fanColor
-                    'dr.Cells("GH/s(avg)").Style.BackColor = hashColor
-                    'dr.Cells("XCount").Style.BackColor = xCountColor
 
                     dr.Cells("ACount").Value = iAntAlertCount
                 End If
@@ -1390,9 +1356,105 @@ Public Class frmAntMonitor
 
     End Sub
 
+    ''' <summary>
+    ''' Returns the seconds value of a drop down/text box combo for a governor rate
+    ''' </summary>
+    ''' <param name="dictList">The dictionary the data is in</param>
+    ''' <param name="sKey">The key to search for in the dictionary</param>
+    ''' <param name="cmbValueType">Seconds, Minutes, Hours, Days</param>
+    ''' <param name="txtValue">Actual value, ie, 60</param>
+    ''' <param name="iDefault">Which value to use if the end result is zero</param>
+    ''' <returns>True if the action needs to be performed</returns>
+    ''' <remarks>Will update the dictionary as necessary</remarks>
+    Private Function TryGovernor(ByRef dictList As Dictionary(Of String, Date), ByVal sKey As String, ByVal cmbValueType As ComboBox, ByVal txtValue As TextBox, ByVal iDefault As Integer) As Boolean
+
+        Dim iResult As Integer
+        Dim dLastDate As Date
+
+        If dictList.TryGetValue(sKey, dLastDate) = True Then
+            Select Case cmbValueType.Text
+                Case "Seconds"
+                    iResult = Val(txtValue.Text)
+
+                Case "Minutes"
+                    iResult = Val(txtValue.Text) * 60
+
+                Case "Hours"
+                    iResult = Val(txtValue.Text) * 60 * 60
+
+                Case "Days"
+                    iResult = Val(txtValue.Text) * 60 * 60 * 24
+
+            End Select
+
+            If iResult = 0 Then
+                iResult = iDefault
+            End If
+
+            If dLastDate.AddSeconds(iResult) < Now Then
+                dictList(sKey) = Now
+
+                Return True
+            Else
+                Return False
+            End If
+        Else
+            dictList.Add(sKey, Now)
+
+            Return True
+        End If
+
+    End Function
+
+    Private Sub RebootAnt(ByVal sAnt As String, ByVal bRebootNow As Boolean)
+
+        Dim t As Threading.Thread
+
+        If TryGovernor(RebootInfo, sAnt, Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 30 * 60) = True Then
+            bRebootNow = True
+        Else
+            If bRebootNow = False Then
+                AddToLog("Need to reboot " & sAnt & " but it hasn't been long enough since last reboot")
+            End If
+        End If
+
+        If bRebootNow = True Then
+            t = New Threading.Thread(AddressOf Me._RebootAnt)
+
+            AddToLog("REBOOTING " & sAnt)
+
+            t.Start(sAnt)
+        End If
+
+    End Sub
+
+    Private Sub _RebootAnt(ByVal sAnt As String)
+
+        Dim ssh As Renci.SshNet.SshClient
+        Dim sshCommand As Renci.SshNet.SshCommand
+        Dim sUN, sPW As String
+
+        Try
+            Call GetSSHCredentials(sAnt, sUN, sPW)
+
+            ssh = New Renci.SshNet.SshClient(sAnt.Substring(4), sUN, sPW)
+            ssh.Connect()
+
+            sshCommand = ssh.CreateCommand("reboot")
+            sshCommand.Execute()
+            ssh.Disconnect()
+
+            ssh.Dispose()
+
+            colResponses.Add("Reboot of " & sAnt & " appears to have succeeded")
+        Catch ex As Exception
+            colResponses.Add("Reboot of " & sAnt & " FAILED: " & ex.Message)
+        End Try
+
+    End Sub
+
     Private Sub ProcessAlerts(ByRef dr As DataGridViewRow, ByVal sAlertMsg As String, ByVal sAlertTitle As String)
 
-        Dim iEMailGovernor As Integer
         Dim ap As frmAnnoyingPopup
         Dim bStep As Byte
 
@@ -1433,26 +1495,12 @@ Public Class frmAntMonitor
             If Me.chkAlertSendEMail.Checked = True Then
                 bStep = 11
 
-                Select Case Me.cmbAlertEMailGovernor.Text
-                    Case "Seconds"
-                        iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text)
-
-                    Case "Minutes"
-                        iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text) * 60
-
-                    Case "Hours"
-                        iEMailGovernor = Val(Me.txtAlertEMailGovernor.Text) * 60 * 60
-
-                End Select
-
-                If dLastEMailAlert(dr.Index).AddSeconds(iEMailGovernor) < Now Then
+                If TryGovernor(EMailAlertInfo, dr.Cells("IPAddress").Value, Me.cmbAlertEMailGovernor, Me.txtAlertEMailGovernor, 10 * 30) = True Then
                     If Me.txtSMTPAlertSubject.Text.IsNullOrEmpty = True Then
                         Call SendEMail(sAlertMsg, sAlertTitle)
                     Else
                         Call SendEMail(sAlertMsg, Me.txtSMTPAlertSubject.Text)
                     End If
-
-                    dLastEMailAlert(dr.Index) = Now
                 End If
             End If
 
@@ -1693,8 +1741,6 @@ Public Class frmAntMonitor
     Private Sub cmdSaveConfig_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveConfig.Click
 
         With ctlsByKey
-            .SetRegKeyByControl(Me.chkWBRebootIfXd)
-
             .SetRegKeyByControl(Me.chklstAnts)
 
             .SetRegKeyByControl(Me.txtRefreshRate)
@@ -1744,7 +1790,7 @@ Public Class frmAntMonitor
     Private Sub cmdAddAnt_Click(sender As Object, e As System.EventArgs) Handles cmdAddAnt.Click
 
         Dim sTemp As String
-        
+
         If Me.optAddS1.Checked = False AndAlso Me.optAddS2.Checked = False Then
             MsgBox("Please specify if this is an S1 or an S2.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
@@ -2171,6 +2217,18 @@ Public Class frmAntMonitor
             End If
 
             Call ctlsByKey.SetRegKeyByControl(Me.chkAlertSendEMail)
+
+            If Me.chkAlertRebootIfXd.Checked = True Then
+                If Val(Me.txtAlertRebootGovernor.Text) = 0 Then
+                    MsgBox("Reboot if XCount is enabled, but the reboot governor field appears to be zero.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertRebootIfXd.Checked = False
+                End If
+            End If
+
+            Call .SetRegKeyByControl(Me.chkAlertRebootIfXd)
+            Call .SetRegKeyByControl(Me.txtAlertRebootGovernor)
+            Call .SetRegKeyByControl(Me.cmbAlertRebootGovernor)
         End With
 
     End Sub
@@ -2280,6 +2338,35 @@ Public Class frmAntMonitor
 
     End Sub
 
+    Private Sub dataAnts_CellContextMenuStripNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventArgs) Handles dataAnts.CellContextMenuStripNeeded
+
+        Dim colAntReboot As System.Collections.Generic.List(Of String)
+        Dim x As Integer
+
+        mnuAntMenu.Items(0).Text = "Reboot " & Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value
+        mnuAntMenu.Items(0).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value
+
+        If Me.dataAnts.SelectedRows.Count = 0 Then
+            mnuAntMenu.Items(1).Visible = False
+        Else
+            mnuAntMenu.Items(1).Visible = True
+
+            mnuAntMenu.Items(1).Tag = New System.Collections.Generic.List(Of String)
+            colAntReboot = mnuAntMenu.Items(1).Tag
+
+            For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
+                colAntReboot.Add(dr.Cells("IPAddress").Value)
+
+                x += 1
+            Next
+
+            mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & ")"
+        End If
+
+        e.ContextMenuStrip = mnuAntMenu
+
+    End Sub
+
     Private Sub dataAnts_CellToolTipTextNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellToolTipTextNeededEventArgs) Handles dataAnts.CellToolTipTextNeeded
 
         If e.ColumnIndex = Me.dataAnts.Columns("Pools").Index AndAlso e.RowIndex <> -1 Then
@@ -2349,5 +2436,74 @@ Public Class frmAntMonitor
             End If
         End If
 
+    End Sub
+
+    Private Sub mnuRebootAnt_Click(sender As Object, e As System.EventArgs) Handles mnuRebootAnt.Click
+
+        Dim t As ToolStripMenuItem
+
+        t = sender
+
+        Call AddToLog("Reboot of " & t.Tag.ToString & " requested")
+        Call RebootAnt(t.Tag.ToString, True)
+
+    End Sub
+
+    Private Function FormatHashRate(ByVal dHashRate As Double) As String
+
+        Dim sTemp As String
+
+        Select Case dHashRate
+            Case 0
+                sTemp = "ZERO"
+
+            Case Is < 0.001
+                sTemp = Format(dHashRate * 1000000, "###.##") & " H/s"
+
+            Case Is < 1
+                sTemp = Format(dHashRate * 1000, "###.##") & " KH/s"
+
+            Case Is < 1000
+                sTemp = Format(dHashRate, "###.##") & " MH/s"
+
+            Case Is < 1000000
+                sTemp = Format(dHashRate / 1000, "###.##") & " GH/s"
+
+            Case Is < 1000000000
+                sTemp = Format(dHashRate / 1000000, "###.##") & " TH/s"
+
+            Case Is < 1000000000000
+                sTemp = Format(dHashRate / 1000000000, "###.##") & " PH/s"
+
+            Case Is < 1000000000000000
+                sTemp = Format(dHashRate / 1000000000000, "###.##") & " EH/s"
+
+            Case Is < 1000000000000000000
+                sTemp = Format(dHashRate / 1000000000000000, "###.##") & " ZH/s"
+
+            Case Else
+                sTemp = "UNKNOWN (BFH?)"
+
+        End Select
+
+        'Debug.Print(dHashRate & ": " & sTemp)
+
+        Return sTemp
+
+    End Function
+
+    Private Sub mnuRebootMultiple_Click(sender As Object, e As System.EventArgs) Handles mnuRebootMultiple.Click
+
+        Dim t As ToolStripMenuItem
+        Dim c As System.Collections.Generic.List(Of String)
+
+        t = sender
+        c = t.Tag
+
+        For Each sAnt As String In c
+            Call AddToLog("Reboot of " & sAnt & " requested")
+            Call RebootAnt(sAnt, True)
+        Next
+        
     End Sub
 End Class
