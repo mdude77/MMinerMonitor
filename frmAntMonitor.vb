@@ -17,7 +17,7 @@ Public Class frmAntMonitor
     
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.3"
+    Private Const csVersion As String = "M's Ant Monitor v2.4"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -182,10 +182,15 @@ Public Class frmAntMonitor
             .AddControl(Me.txtAlertS1Temp, "AlertValueS1Temp")
             .AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
 
-            .AddControl(Me.chkAlertIfS1Fan, "AlertIfS1Fan")
-            .AddControl(Me.chkAlertIfS2Fan, "AlertIfS2Fan")
-            .AddControl(Me.txtAlertS1Fan, "AlertValueS1Fan")
-            .AddControl(Me.txtAlertS2Fan, "AlertValueS2Fan")
+            .AddControl(Me.chkAlertIfS1FanHigh, "AlertIfS1Fan")
+            .AddControl(Me.chkAlertIfS2FanHigh, "AlertIfS2Fan")
+            .AddControl(Me.txtAlertS1FanHigh, "AlertValueS1Fan")
+            .AddControl(Me.txtAlertS2FanHigh, "AlertValueS2Fan")
+
+            .AddControl(Me.chkAlertIfS1FanLow, "AlertIfS1FanLow")
+            .AddControl(Me.chkAlertIfS2FanLow, "AlertIfS2FanLow")
+            .AddControl(Me.txtAlertS1FanLow, "AlertValueS1FanLow")
+            .AddControl(Me.txtAlertS2FanLow, "AlertValueS2FanLow")
 
             .AddControl(Me.chkAlertIfS1Hash, "AlertIfS1Hash")
             .AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
@@ -275,10 +280,15 @@ Public Class frmAntMonitor
             .SetControlByRegKey(Me.txtAlertS1Temp)
             .SetControlByRegKey(Me.txtAlertS2Temp)
 
-            .SetControlByRegKey(Me.chkAlertIfS1Fan)
-            .SetControlByRegKey(Me.chkAlertIfS2Fan)
-            .SetControlByRegKey(Me.txtAlertS1Fan)
-            .SetControlByRegKey(Me.txtAlertS2Fan)
+            .SetControlByRegKey(Me.chkAlertIfS1FanHigh)
+            .SetControlByRegKey(Me.chkAlertIfS2FanHigh)
+            .SetControlByRegKey(Me.txtAlertS1FanHigh)
+            .SetControlByRegKey(Me.txtAlertS2FanHigh)
+
+            .SetControlByRegKey(Me.chkAlertIfS1FanLow)
+            .SetControlByRegKey(Me.chkAlertIfS2FanLow)
+            .SetControlByRegKey(Me.txtAlertS1FanLow)
+            .SetControlByRegKey(Me.txtAlertS2FanLow)
 
             .SetControlByRegKey(Me.chkAlertIfS1Hash)
             .SetControlByRegKey(Me.chkAlertIfS2Hash)
@@ -1205,10 +1215,10 @@ Public Class frmAntMonitor
                                 End If
                             End If
 
-                            If Me.chkAlertIfS1Fan.Checked = True Then
+                            If Me.chkAlertIfS1FanHigh.Checked = True Then
                                 bStep = 2
 
-                                x = Val(Me.txtAlertS1Fan.Text)
+                                x = Val(Me.txtAlertS1FanHigh.Text)
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HFan").Value) >= x Then
@@ -1221,8 +1231,22 @@ Public Class frmAntMonitor
                                 End If
                             End If
 
-                            If Me.chkAlertIfS1Hash.Checked = True Then
+                            If Me.chkAlertIfS1FanLow.Checked = True Then
                                 bStep = 3
+
+                                x = Val(Me.txtAlertS1FanLow.Text)
+
+                                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S1 Fan Alert")
+                                End If
+                            End If
+
+                            If Me.chkAlertIfS1Hash.Checked = True Then
+                                bStep = 4
 
                                 x = Val(Me.txtAlertS1Hash.Text)
 
@@ -1238,7 +1262,7 @@ Public Class frmAntMonitor
                             End If
 
                             If Me.chkAlertIfS1XCount.Checked = True Then
-                                bStep = 4
+                                bStep = 5
 
                                 x = Val(Me.txtAlertS1XCount.Text)
 
@@ -1260,7 +1284,7 @@ Public Class frmAntMonitor
 
                         Case "S2"
                             If Me.chkAlertIfS2Temp.Checked = True Then
-                                bStep = 5
+                                bStep = 6
 
                                 x = Val(Me.txtAlertS2Temp.Text)
 
@@ -1275,10 +1299,10 @@ Public Class frmAntMonitor
                                 End If
                             End If
 
-                            If Me.chkAlertIfS2Fan.Checked = True Then
-                                bStep = 6
+                            If Me.chkAlertIfS2FanHigh.Checked = True Then
+                                bStep = 7
 
-                                x = Val(Me.txtAlertS2Fan.Text)
+                                x = Val(Me.txtAlertS2FanHigh.Text)
 
                                 If x > 0 Then
                                     If Integer.Parse(dr.Cells("HFan").Value) >= x Then
@@ -1291,8 +1315,23 @@ Public Class frmAntMonitor
                                 End If
                             End If
 
+                            If Me.chkAlertIfS2FanLow.Checked = True Then
+                                bStep = 8
+
+                                x = Val(Me.txtAlertS2FanLow.Text)
+
+                                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S2 Fan Alert")
+                                End If
+
+                            End If
+
                             If Me.chkAlertIfS2Hash.Checked = True Then
-                                bStep = 7
+                                bStep = 9
 
                                 x = Val(Me.txtAlertS2Hash.Text)
 
@@ -1308,7 +1347,7 @@ Public Class frmAntMonitor
                             End If
 
                             If Me.chkAlertIfS2XCount.Checked = True Then
-                                bStep = 8
+                                bStep = 10
 
                                 x = Val(Me.txtAlertS2XCount.Text)
 
@@ -1440,8 +1479,9 @@ Public Class frmAntMonitor
             ssh = New Renci.SshNet.SshClient(sAnt.Substring(4), sUN, sPW)
             ssh.Connect()
 
-            sshCommand = ssh.CreateCommand("reboot")
+            sshCommand = ssh.CreateCommand("/sbin/reboot")
             sshCommand.Execute()
+
             ssh.Disconnect()
 
             ssh.Dispose()
@@ -2118,27 +2158,49 @@ Public Class frmAntMonitor
             .SetRegKeyByControl(Me.chkAlertIfS2Temp)
             .SetRegKeyByControl(Me.txtAlertS2Temp)
 
-            If Me.chkAlertIfS1Fan.Checked = True Then
-                If Me.txtAlertS1Fan.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S1 fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+            If Me.chkAlertIfS1FanHigh.Checked = True Then
+                If Me.txtAlertS1FanHigh.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
 
-                    Me.chkAlertIfS1Fan.Checked = False
+                    Me.chkAlertIfS1FanHigh.Checked = False
                 End If
             End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS1Fan)
-            .SetRegKeyByControl(Me.txtAlertS1Fan)
+            .SetRegKeyByControl(Me.chkAlertIfS1FanHigh)
+            .SetRegKeyByControl(Me.txtAlertS1FanHigh)
 
-            If Me.chkAlertIfS2Fan.Checked = True Then
-                If Me.txtAlertS2Fan.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S2 fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+            If Me.chkAlertIfS2FanHigh.Checked = True Then
+                If Me.txtAlertS2FanHigh.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S2 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
 
-                    Me.chkAlertIfS2Fan.Checked = False
+                    Me.chkAlertIfS2FanHigh.Checked = False
                 End If
             End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS2Fan)
-            .SetRegKeyByControl(Me.txtAlertS2Fan)
+            .SetRegKeyByControl(Me.chkAlertIfS2FanHigh)
+            .SetRegKeyByControl(Me.txtAlertS2FanHigh)
+
+            If Me.chkAlertIfS1FanLow.Checked = True Then
+                If Me.txtAlertS1FanLow.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS1FanLow.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS1FanLow)
+            .SetRegKeyByControl(Me.txtAlertS1FanLow)
+
+            If Me.chkAlertIfS2FanLow.Checked = True Then
+                If Me.txtAlertS2FanLow.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S2 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS2FanLow.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS2FanLow)
+            .SetRegKeyByControl(Me.txtAlertS2FanLow)
 
             If Me.chkAlertIfS1Hash.Checked = True Then
                 If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then

@@ -27,6 +27,7 @@ Partial Class frmAntMonitor
         Me.dataAnts = New System.Windows.Forms.DataGridView()
         Me.mnuAntMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuRebootAnt = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuRebootMultiple = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerRefresh = New System.Windows.Forms.Timer(Me.components)
         Me.cmdRefresh = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
@@ -86,21 +87,21 @@ Partial Class frmAntMonitor
         Me.cmdSaveAlerts1 = New System.Windows.Forms.Button()
         Me.chkAlertIfS1XCount = New System.Windows.Forms.CheckBox()
         Me.txtAlertS1XCount = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS1Fan = New System.Windows.Forms.CheckBox()
+        Me.chkAlertIfS1FanHigh = New System.Windows.Forms.CheckBox()
         Me.chkAlertIfS1Hash = New System.Windows.Forms.CheckBox()
         Me.txtAlertS1Temp = New System.Windows.Forms.TextBox()
         Me.txtAlertS1Hash = New System.Windows.Forms.TextBox()
         Me.chkAlertIfS1Temp = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS1Fan = New System.Windows.Forms.TextBox()
+        Me.txtAlertS1FanHigh = New System.Windows.Forms.TextBox()
         Me.tabS2Alerts = New System.Windows.Forms.TabPage()
         Me.cmdSaveAlerts2 = New System.Windows.Forms.Button()
         Me.chkAlertIfS2XCount = New System.Windows.Forms.CheckBox()
         Me.txtAlertS2XCount = New System.Windows.Forms.TextBox()
         Me.chkAlertIfS2Temp = New System.Windows.Forms.CheckBox()
         Me.chkAlertIfS2Hash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS2Fan = New System.Windows.Forms.TextBox()
+        Me.txtAlertS2FanHigh = New System.Windows.Forms.TextBox()
         Me.txtAlertS2Hash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS2Fan = New System.Windows.Forms.CheckBox()
+        Me.chkAlertIfS2FanHigh = New System.Windows.Forms.CheckBox()
         Me.txtAlertS2Temp = New System.Windows.Forms.TextBox()
         Me.tabAlertTypes = New System.Windows.Forms.TabPage()
         Me.cmbAlertRebootGovernor = New System.Windows.Forms.ComboBox()
@@ -163,7 +164,10 @@ Partial Class frmAntMonitor
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.mnuRebootMultiple = New System.Windows.Forms.ToolStripMenuItem()
+        Me.chkAlertIfS1FanLow = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS1FanLow = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS2FanLow = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS2FanLow = New System.Windows.Forms.TextBox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -203,13 +207,19 @@ Partial Class frmAntMonitor
         '
         Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple})
         Me.mnuAntMenu.Name = "menuAntMenu"
-        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 74)
+        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 52)
         '
         'mnuRebootAnt
         '
         Me.mnuRebootAnt.Name = "mnuRebootAnt"
         Me.mnuRebootAnt.Size = New System.Drawing.Size(186, 24)
         Me.mnuRebootAnt.Text = "Reboot"
+        '
+        'mnuRebootMultiple
+        '
+        Me.mnuRebootMultiple.Name = "mnuRebootMultiple"
+        Me.mnuRebootMultiple.Size = New System.Drawing.Size(186, 24)
+        Me.mnuRebootMultiple.Text = "Reboot Multiple"
         '
         'TimerRefresh
         '
@@ -834,15 +844,17 @@ Partial Class frmAntMonitor
         '
         'tabS1Alerts
         '
+        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1FanLow)
+        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1FanLow)
         Me.tabS1Alerts.Controls.Add(Me.cmdSaveAlerts1)
         Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1XCount)
         Me.tabS1Alerts.Controls.Add(Me.txtAlertS1XCount)
-        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1Fan)
+        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1FanHigh)
         Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1Hash)
         Me.tabS1Alerts.Controls.Add(Me.txtAlertS1Temp)
         Me.tabS1Alerts.Controls.Add(Me.txtAlertS1Hash)
         Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1Temp)
-        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1Fan)
+        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1FanHigh)
         Me.tabS1Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS1Alerts.Name = "tabS1Alerts"
         Me.tabS1Alerts.Padding = New System.Windows.Forms.Padding(3)
@@ -863,7 +875,7 @@ Partial Class frmAntMonitor
         'chkAlertIfS1XCount
         '
         Me.chkAlertIfS1XCount.AutoSize = True
-        Me.chkAlertIfS1XCount.Location = New System.Drawing.Point(12, 105)
+        Me.chkAlertIfS1XCount.Location = New System.Drawing.Point(12, 136)
         Me.chkAlertIfS1XCount.Name = "chkAlertIfS1XCount"
         Me.chkAlertIfS1XCount.Size = New System.Drawing.Size(129, 24)
         Me.chkAlertIfS1XCount.TabIndex = 9
@@ -873,27 +885,27 @@ Partial Class frmAntMonitor
         '
         'txtAlertS1XCount
         '
-        Me.txtAlertS1XCount.Location = New System.Drawing.Point(141, 101)
+        Me.txtAlertS1XCount.Location = New System.Drawing.Point(141, 132)
         Me.txtAlertS1XCount.Name = "txtAlertS1XCount"
         Me.txtAlertS1XCount.Size = New System.Drawing.Size(54, 27)
         Me.txtAlertS1XCount.TabIndex = 10
         Me.txtAlertS1XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'chkAlertIfS1Fan
+        'chkAlertIfS1FanHigh
         '
-        Me.chkAlertIfS1Fan.AutoSize = True
-        Me.chkAlertIfS1Fan.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfS1Fan.Name = "chkAlertIfS1Fan"
-        Me.chkAlertIfS1Fan.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS1Fan.TabIndex = 4
-        Me.chkAlertIfS1Fan.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Fan, "Equal to or greater than")
-        Me.chkAlertIfS1Fan.UseVisualStyleBackColor = True
+        Me.chkAlertIfS1FanHigh.AutoSize = True
+        Me.chkAlertIfS1FanHigh.Location = New System.Drawing.Point(12, 12)
+        Me.chkAlertIfS1FanHigh.Name = "chkAlertIfS1FanHigh"
+        Me.chkAlertIfS1FanHigh.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS1FanHigh.TabIndex = 4
+        Me.chkAlertIfS1FanHigh.Text = "Fan Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1FanHigh, "Equal to or greater than")
+        Me.chkAlertIfS1FanHigh.UseVisualStyleBackColor = True
         '
         'chkAlertIfS1Hash
         '
         Me.chkAlertIfS1Hash.AutoSize = True
-        Me.chkAlertIfS1Hash.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS1Hash.Location = New System.Drawing.Point(12, 74)
         Me.chkAlertIfS1Hash.Name = "chkAlertIfS1Hash"
         Me.chkAlertIfS1Hash.Size = New System.Drawing.Size(114, 24)
         Me.chkAlertIfS1Hash.TabIndex = 7
@@ -903,7 +915,7 @@ Partial Class frmAntMonitor
         '
         'txtAlertS1Temp
         '
-        Me.txtAlertS1Temp.Location = New System.Drawing.Point(141, 70)
+        Me.txtAlertS1Temp.Location = New System.Drawing.Point(141, 101)
         Me.txtAlertS1Temp.Name = "txtAlertS1Temp"
         Me.txtAlertS1Temp.Size = New System.Drawing.Size(54, 27)
         Me.txtAlertS1Temp.TabIndex = 2
@@ -911,7 +923,7 @@ Partial Class frmAntMonitor
         '
         'txtAlertS1Hash
         '
-        Me.txtAlertS1Hash.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS1Hash.Location = New System.Drawing.Point(141, 70)
         Me.txtAlertS1Hash.Name = "txtAlertS1Hash"
         Me.txtAlertS1Hash.Size = New System.Drawing.Size(54, 27)
         Me.txtAlertS1Hash.TabIndex = 8
@@ -920,7 +932,7 @@ Partial Class frmAntMonitor
         'chkAlertIfS1Temp
         '
         Me.chkAlertIfS1Temp.AutoSize = True
-        Me.chkAlertIfS1Temp.Location = New System.Drawing.Point(12, 74)
+        Me.chkAlertIfS1Temp.Location = New System.Drawing.Point(12, 105)
         Me.chkAlertIfS1Temp.Name = "chkAlertIfS1Temp"
         Me.chkAlertIfS1Temp.Size = New System.Drawing.Size(116, 24)
         Me.chkAlertIfS1Temp.TabIndex = 0
@@ -928,24 +940,26 @@ Partial Class frmAntMonitor
         Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Temp, "Equal to or greater than")
         Me.chkAlertIfS1Temp.UseVisualStyleBackColor = True
         '
-        'txtAlertS1Fan
+        'txtAlertS1FanHigh
         '
-        Me.txtAlertS1Fan.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertS1Fan.Name = "txtAlertS1Fan"
-        Me.txtAlertS1Fan.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1Fan.TabIndex = 6
-        Me.txtAlertS1Fan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtAlertS1FanHigh.Location = New System.Drawing.Point(141, 8)
+        Me.txtAlertS1FanHigh.Name = "txtAlertS1FanHigh"
+        Me.txtAlertS1FanHigh.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1FanHigh.TabIndex = 6
+        Me.txtAlertS1FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'tabS2Alerts
         '
+        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2FanLow)
+        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2FanLow)
         Me.tabS2Alerts.Controls.Add(Me.cmdSaveAlerts2)
         Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2XCount)
         Me.tabS2Alerts.Controls.Add(Me.txtAlertS2XCount)
         Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2Temp)
         Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2Hash)
-        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2Fan)
+        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2FanHigh)
         Me.tabS2Alerts.Controls.Add(Me.txtAlertS2Hash)
-        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2Fan)
+        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2FanHigh)
         Me.tabS2Alerts.Controls.Add(Me.txtAlertS2Temp)
         Me.tabS2Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS2Alerts.Name = "tabS2Alerts"
@@ -967,7 +981,7 @@ Partial Class frmAntMonitor
         'chkAlertIfS2XCount
         '
         Me.chkAlertIfS2XCount.AutoSize = True
-        Me.chkAlertIfS2XCount.Location = New System.Drawing.Point(12, 105)
+        Me.chkAlertIfS2XCount.Location = New System.Drawing.Point(12, 136)
         Me.chkAlertIfS2XCount.Name = "chkAlertIfS2XCount"
         Me.chkAlertIfS2XCount.Size = New System.Drawing.Size(129, 24)
         Me.chkAlertIfS2XCount.TabIndex = 11
@@ -977,7 +991,7 @@ Partial Class frmAntMonitor
         '
         'txtAlertS2XCount
         '
-        Me.txtAlertS2XCount.Location = New System.Drawing.Point(141, 101)
+        Me.txtAlertS2XCount.Location = New System.Drawing.Point(141, 132)
         Me.txtAlertS2XCount.Name = "txtAlertS2XCount"
         Me.txtAlertS2XCount.Size = New System.Drawing.Size(54, 27)
         Me.txtAlertS2XCount.TabIndex = 12
@@ -986,7 +1000,7 @@ Partial Class frmAntMonitor
         'chkAlertIfS2Temp
         '
         Me.chkAlertIfS2Temp.AutoSize = True
-        Me.chkAlertIfS2Temp.Location = New System.Drawing.Point(12, 74)
+        Me.chkAlertIfS2Temp.Location = New System.Drawing.Point(12, 105)
         Me.chkAlertIfS2Temp.Name = "chkAlertIfS2Temp"
         Me.chkAlertIfS2Temp.Size = New System.Drawing.Size(116, 24)
         Me.chkAlertIfS2Temp.TabIndex = 1
@@ -997,7 +1011,7 @@ Partial Class frmAntMonitor
         'chkAlertIfS2Hash
         '
         Me.chkAlertIfS2Hash.AutoSize = True
-        Me.chkAlertIfS2Hash.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS2Hash.Location = New System.Drawing.Point(12, 74)
         Me.chkAlertIfS2Hash.Name = "chkAlertIfS2Hash"
         Me.chkAlertIfS2Hash.Size = New System.Drawing.Size(114, 24)
         Me.chkAlertIfS2Hash.TabIndex = 9
@@ -1005,36 +1019,36 @@ Partial Class frmAntMonitor
         Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Hash, "Avg Hash is equal to or less than")
         Me.chkAlertIfS2Hash.UseVisualStyleBackColor = True
         '
-        'txtAlertS2Fan
+        'txtAlertS2FanHigh
         '
-        Me.txtAlertS2Fan.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertS2Fan.Name = "txtAlertS2Fan"
-        Me.txtAlertS2Fan.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2Fan.TabIndex = 7
-        Me.txtAlertS2Fan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtAlertS2FanHigh.Location = New System.Drawing.Point(141, 8)
+        Me.txtAlertS2FanHigh.Name = "txtAlertS2FanHigh"
+        Me.txtAlertS2FanHigh.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2FanHigh.TabIndex = 7
+        Me.txtAlertS2FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtAlertS2Hash
         '
-        Me.txtAlertS2Hash.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS2Hash.Location = New System.Drawing.Point(141, 70)
         Me.txtAlertS2Hash.Name = "txtAlertS2Hash"
         Me.txtAlertS2Hash.Size = New System.Drawing.Size(54, 27)
         Me.txtAlertS2Hash.TabIndex = 10
         Me.txtAlertS2Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'chkAlertIfS2Fan
+        'chkAlertIfS2FanHigh
         '
-        Me.chkAlertIfS2Fan.AutoSize = True
-        Me.chkAlertIfS2Fan.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfS2Fan.Name = "chkAlertIfS2Fan"
-        Me.chkAlertIfS2Fan.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS2Fan.TabIndex = 5
-        Me.chkAlertIfS2Fan.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Fan, "Equal to or greater than")
-        Me.chkAlertIfS2Fan.UseVisualStyleBackColor = True
+        Me.chkAlertIfS2FanHigh.AutoSize = True
+        Me.chkAlertIfS2FanHigh.Location = New System.Drawing.Point(12, 12)
+        Me.chkAlertIfS2FanHigh.Name = "chkAlertIfS2FanHigh"
+        Me.chkAlertIfS2FanHigh.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS2FanHigh.TabIndex = 5
+        Me.chkAlertIfS2FanHigh.Text = "Fan Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2FanHigh, "Equal to or greater than")
+        Me.chkAlertIfS2FanHigh.UseVisualStyleBackColor = True
         '
         'txtAlertS2Temp
         '
-        Me.txtAlertS2Temp.Location = New System.Drawing.Point(141, 70)
+        Me.txtAlertS2Temp.Location = New System.Drawing.Point(141, 101)
         Me.txtAlertS2Temp.Name = "txtAlertS2Temp"
         Me.txtAlertS2Temp.Size = New System.Drawing.Size(54, 27)
         Me.txtAlertS2Temp.TabIndex = 3
@@ -1610,11 +1624,43 @@ Partial Class frmAntMonitor
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
-        'mnuRebootMultiple
+        'chkAlertIfS1FanLow
         '
-        Me.mnuRebootMultiple.Name = "mnuRebootMultiple"
-        Me.mnuRebootMultiple.Size = New System.Drawing.Size(186, 24)
-        Me.mnuRebootMultiple.Text = "Reboot Multiple"
+        Me.chkAlertIfS1FanLow.AutoSize = True
+        Me.chkAlertIfS1FanLow.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS1FanLow.Name = "chkAlertIfS1FanLow"
+        Me.chkAlertIfS1FanLow.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS1FanLow.TabIndex = 18
+        Me.chkAlertIfS1FanLow.Text = "Fan Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1FanLow, "Equal to or greater than")
+        Me.chkAlertIfS1FanLow.UseVisualStyleBackColor = True
+        '
+        'txtAlertS1FanLow
+        '
+        Me.txtAlertS1FanLow.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS1FanLow.Name = "txtAlertS1FanLow"
+        Me.txtAlertS1FanLow.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1FanLow.TabIndex = 19
+        Me.txtAlertS1FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS2FanLow
+        '
+        Me.chkAlertIfS2FanLow.AutoSize = True
+        Me.chkAlertIfS2FanLow.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS2FanLow.Name = "chkAlertIfS2FanLow"
+        Me.chkAlertIfS2FanLow.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS2FanLow.TabIndex = 20
+        Me.chkAlertIfS2FanLow.Text = "Fan Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2FanLow, "Equal to or greater than")
+        Me.chkAlertIfS2FanLow.UseVisualStyleBackColor = True
+        '
+        'txtAlertS2FanLow
+        '
+        Me.txtAlertS2FanLow.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS2FanLow.Name = "txtAlertS2FanLow"
+        Me.txtAlertS2FanLow.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2FanLow.TabIndex = 21
+        Me.txtAlertS2FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'frmAntMonitor
         '
@@ -1631,6 +1677,7 @@ Partial Class frmAntMonitor
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmAntMonitor"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "M's Ant Monitor"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.mnuAntMenu.ResumeLayout(False)
@@ -1722,10 +1769,10 @@ Partial Class frmAntMonitor
     Friend WithEvents chkAlertShowNotifyPopup As System.Windows.Forms.CheckBox
     Friend WithEvents chkAlertShowAnnoyingPopup As System.Windows.Forms.CheckBox
     Friend WithEvents cmdSaveAlerts4 As System.Windows.Forms.Button
-    Friend WithEvents chkAlertIfS1Fan As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAlertIfS2Fan As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS1Fan As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertS2Fan As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS1FanHigh As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertIfS2FanHigh As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS1FanHigh As System.Windows.Forms.TextBox
+    Friend WithEvents txtAlertS2FanHigh As System.Windows.Forms.TextBox
     Friend WithEvents chkAlertIfS2Hash As System.Windows.Forms.CheckBox
     Friend WithEvents txtAlertS2Hash As System.Windows.Forms.TextBox
     Friend WithEvents chkAlertIfS1Hash As System.Windows.Forms.CheckBox
@@ -1798,5 +1845,9 @@ Partial Class frmAntMonitor
     Friend WithEvents mnuAntMenu As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents mnuRebootAnt As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuRebootMultiple As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents chkAlertIfS1FanLow As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS1FanLow As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS2FanLow As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS2FanLow As System.Windows.Forms.TextBox
 
 End Class

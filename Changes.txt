@@ -1,6 +1,9 @@
 v2.3
 - Added a hashrate total to the title bar
 - Added the ability to reboot multiple ants at once, by using the selection bar
+- Added a new "low fan" alert for both S1 and S2s
+- Fixed the problem with reboots not working for S2s.
+- Changed the default startup position to be center screen.
 
 v2.2
 - Changed the hash rates, HFan, HTemp, and freq columns to be numeric fields so that they sort properly.
