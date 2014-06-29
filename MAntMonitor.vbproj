@@ -92,7 +92,9 @@
     <Compile Include="frmAntMonitor.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="generic.vb" />
+    <Compile Include="generic.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

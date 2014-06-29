@@ -1,3 +1,7 @@
+v2.4
+- Added the ability to shutdown an S2.  Note this is a one way operation, you'll have to manually power cycle it to bring it back.
+- Added the ability to update pool info on one or more Ants.  Note this only works with S2s by default!  You'll need to modify the cgminer config on S1s to allow SSH API access for it to work on S1s.
+
 v2.3
 - Added a hashrate total to the title bar
 - Added the ability to reboot multiple ants at once, by using the selection bar

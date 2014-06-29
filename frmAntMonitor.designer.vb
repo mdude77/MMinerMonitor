@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class frmAntMonitor
+Partial Class frmMain
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,11 +23,13 @@ Partial Class frmAntMonitor
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAntMonitor))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
         Me.dataAnts = New System.Windows.Forms.DataGridView()
         Me.mnuAntMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuRebootAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuRebootMultiple = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuShutdownS2 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuUpdatePools = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerRefresh = New System.Windows.Forms.Timer(Me.components)
         Me.cmdRefresh = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
@@ -81,9 +83,32 @@ Partial Class frmAntMonitor
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.cmdScan = New System.Windows.Forms.Button()
         Me.chklstAnts = New System.Windows.Forms.CheckedListBox()
+        Me.tabPools = New System.Windows.Forms.TabPage()
+        Me.cmdPoolClear3 = New System.Windows.Forms.Button()
+        Me.cmdPoolClear2 = New System.Windows.Forms.Button()
+        Me.cmdPoolMake3 = New System.Windows.Forms.Button()
+        Me.cmdPoolMake2 = New System.Windows.Forms.Button()
+        Me.cmdPoolMake1 = New System.Windows.Forms.Button()
+        Me.lblPools3 = New System.Windows.Forms.Label()
+        Me.lblPools2 = New System.Windows.Forms.Label()
+        Me.lblPools1 = New System.Windows.Forms.Label()
+        Me.cmdPoolsImportFromAnts = New System.Windows.Forms.Button()
+        Me.cmdPoolDelete = New System.Windows.Forms.Button()
+        Me.cmdPoolChange = New System.Windows.Forms.Button()
+        Me.cmdPoolAdd = New System.Windows.Forms.Button()
+        Me.txtPoolPassword = New System.Windows.Forms.TextBox()
+        Me.txtPoolUsername = New System.Windows.Forms.TextBox()
+        Me.txtPoolURL = New System.Windows.Forms.TextBox()
+        Me.txtPoolDesc = New System.Windows.Forms.TextBox()
+        Me.Label12 = New System.Windows.Forms.Label()
+        Me.Label11 = New System.Windows.Forms.Label()
+        Me.Label10 = New System.Windows.Forms.Label()
+        Me.Label9 = New System.Windows.Forms.Label()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.tabS1Alerts = New System.Windows.Forms.TabPage()
+        Me.chkAlertIfS1FanLow = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS1FanLow = New System.Windows.Forms.TextBox()
         Me.cmdSaveAlerts1 = New System.Windows.Forms.Button()
         Me.chkAlertIfS1XCount = New System.Windows.Forms.CheckBox()
         Me.txtAlertS1XCount = New System.Windows.Forms.TextBox()
@@ -94,6 +119,8 @@ Partial Class frmAntMonitor
         Me.chkAlertIfS1Temp = New System.Windows.Forms.CheckBox()
         Me.txtAlertS1FanHigh = New System.Windows.Forms.TextBox()
         Me.tabS2Alerts = New System.Windows.Forms.TabPage()
+        Me.chkAlertIfS2FanLow = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS2FanLow = New System.Windows.Forms.TextBox()
         Me.cmdSaveAlerts2 = New System.Windows.Forms.Button()
         Me.chkAlertIfS2XCount = New System.Windows.Forms.CheckBox()
         Me.txtAlertS2XCount = New System.Windows.Forms.TextBox()
@@ -164,16 +191,14 @@ Partial Class frmAntMonitor
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.chkAlertIfS1FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS1FanLow = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS2FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS2FanLow = New System.Windows.Forms.TextBox()
+        Me.lstPools = New MAntMonitor.enListbox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
         Me.tabConfig.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.tabPools.SuspendLayout()
         Me.tabAlerts.SuspendLayout()
         Me.TabControl2.SuspendLayout()
         Me.tabS1Alerts.SuspendLayout()
@@ -200,14 +225,14 @@ Partial Class frmAntMonitor
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1181, 284)
+        Me.dataAnts.Size = New System.Drawing.Size(803, 271)
         Me.dataAnts.TabIndex = 0
         '
         'mnuAntMenu
         '
-        Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple})
+        Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple, Me.mnuShutdownS2, Me.mnuUpdatePools})
         Me.mnuAntMenu.Name = "menuAntMenu"
-        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 52)
+        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 100)
         '
         'mnuRebootAnt
         '
@@ -220,6 +245,21 @@ Partial Class frmAntMonitor
         Me.mnuRebootMultiple.Name = "mnuRebootMultiple"
         Me.mnuRebootMultiple.Size = New System.Drawing.Size(186, 24)
         Me.mnuRebootMultiple.Text = "Reboot Multiple"
+        Me.mnuRebootMultiple.Visible = False
+        '
+        'mnuShutdownS2
+        '
+        Me.mnuShutdownS2.Name = "mnuShutdownS2"
+        Me.mnuShutdownS2.Size = New System.Drawing.Size(186, 24)
+        Me.mnuShutdownS2.Text = "Shutdown S2"
+        Me.mnuShutdownS2.Visible = False
+        '
+        'mnuUpdatePools
+        '
+        Me.mnuUpdatePools.Name = "mnuUpdatePools"
+        Me.mnuUpdatePools.Size = New System.Drawing.Size(186, 24)
+        Me.mnuUpdatePools.Text = "Update Pools"
+        Me.mnuUpdatePools.Visible = False
         '
         'TimerRefresh
         '
@@ -228,7 +268,7 @@ Partial Class frmAntMonitor
         'cmdRefresh
         '
         Me.cmdRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdRefresh.Location = New System.Drawing.Point(514, 340)
+        Me.cmdRefresh.Location = New System.Drawing.Point(514, 335)
         Me.cmdRefresh.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdRefresh.Name = "cmdRefresh"
         Me.cmdRefresh.Size = New System.Drawing.Size(164, 29)
@@ -244,12 +284,13 @@ Partial Class frmAntMonitor
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.tabAnts)
         Me.TabControl1.Controls.Add(Me.tabConfig)
+        Me.TabControl1.Controls.Add(Me.tabPools)
         Me.TabControl1.Controls.Add(Me.tabAlerts)
         Me.TabControl1.Controls.Add(Me.tabLog)
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1203, 331)
+        Me.TabControl1.Size = New System.Drawing.Size(822, 326)
         Me.TabControl1.TabIndex = 2
         '
         'tabAnts
@@ -258,7 +299,7 @@ Partial Class frmAntMonitor
         Me.tabAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabAnts.Name = "tabAnts"
         Me.tabAnts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAnts.Size = New System.Drawing.Size(1195, 298)
+        Me.tabAnts.Size = New System.Drawing.Size(814, 293)
         Me.tabAnts.TabIndex = 0
         Me.tabAnts.Text = "Ants"
         Me.tabAnts.UseVisualStyleBackColor = True
@@ -297,7 +338,7 @@ Partial Class frmAntMonitor
         Me.tabConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabConfig.Name = "tabConfig"
         Me.tabConfig.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConfig.Size = New System.Drawing.Size(1195, 298)
+        Me.tabConfig.Size = New System.Drawing.Size(814, 293)
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
@@ -815,12 +856,214 @@ Partial Class frmAntMonitor
         Me.chklstAnts.Size = New System.Drawing.Size(333, 224)
         Me.chklstAnts.TabIndex = 0
         '
+        'tabPools
+        '
+        Me.tabPools.Controls.Add(Me.cmdPoolClear3)
+        Me.tabPools.Controls.Add(Me.cmdPoolClear2)
+        Me.tabPools.Controls.Add(Me.cmdPoolMake3)
+        Me.tabPools.Controls.Add(Me.cmdPoolMake2)
+        Me.tabPools.Controls.Add(Me.cmdPoolMake1)
+        Me.tabPools.Controls.Add(Me.lblPools3)
+        Me.tabPools.Controls.Add(Me.lblPools2)
+        Me.tabPools.Controls.Add(Me.lblPools1)
+        Me.tabPools.Controls.Add(Me.cmdPoolsImportFromAnts)
+        Me.tabPools.Controls.Add(Me.cmdPoolDelete)
+        Me.tabPools.Controls.Add(Me.cmdPoolChange)
+        Me.tabPools.Controls.Add(Me.cmdPoolAdd)
+        Me.tabPools.Controls.Add(Me.txtPoolPassword)
+        Me.tabPools.Controls.Add(Me.txtPoolUsername)
+        Me.tabPools.Controls.Add(Me.txtPoolURL)
+        Me.tabPools.Controls.Add(Me.txtPoolDesc)
+        Me.tabPools.Controls.Add(Me.Label12)
+        Me.tabPools.Controls.Add(Me.Label11)
+        Me.tabPools.Controls.Add(Me.Label10)
+        Me.tabPools.Controls.Add(Me.Label9)
+        Me.tabPools.Controls.Add(Me.lstPools)
+        Me.tabPools.Location = New System.Drawing.Point(4, 4)
+        Me.tabPools.Name = "tabPools"
+        Me.tabPools.Size = New System.Drawing.Size(1077, 293)
+        Me.tabPools.TabIndex = 4
+        Me.tabPools.Text = "Pools"
+        Me.tabPools.UseVisualStyleBackColor = True
+        '
+        'cmdPoolClear3
+        '
+        Me.cmdPoolClear3.Location = New System.Drawing.Point(618, 242)
+        Me.cmdPoolClear3.Name = "cmdPoolClear3"
+        Me.cmdPoolClear3.Size = New System.Drawing.Size(129, 32)
+        Me.cmdPoolClear3.TabIndex = 21
+        Me.cmdPoolClear3.Text = "Clear Pool #3"
+        Me.cmdPoolClear3.UseVisualStyleBackColor = True
+        '
+        'cmdPoolClear2
+        '
+        Me.cmdPoolClear2.Location = New System.Drawing.Point(447, 242)
+        Me.cmdPoolClear2.Name = "cmdPoolClear2"
+        Me.cmdPoolClear2.Size = New System.Drawing.Size(129, 32)
+        Me.cmdPoolClear2.TabIndex = 20
+        Me.cmdPoolClear2.Text = "Clear Pool #2"
+        Me.cmdPoolClear2.UseVisualStyleBackColor = True
+        '
+        'cmdPoolMake3
+        '
+        Me.cmdPoolMake3.Location = New System.Drawing.Point(618, 194)
+        Me.cmdPoolMake3.Name = "cmdPoolMake3"
+        Me.cmdPoolMake3.Size = New System.Drawing.Size(129, 32)
+        Me.cmdPoolMake3.TabIndex = 19
+        Me.cmdPoolMake3.Text = "Make Pool #3"
+        Me.cmdPoolMake3.UseVisualStyleBackColor = True
+        '
+        'cmdPoolMake2
+        '
+        Me.cmdPoolMake2.Location = New System.Drawing.Point(447, 194)
+        Me.cmdPoolMake2.Name = "cmdPoolMake2"
+        Me.cmdPoolMake2.Size = New System.Drawing.Size(129, 32)
+        Me.cmdPoolMake2.TabIndex = 18
+        Me.cmdPoolMake2.Text = "Make Pool #2"
+        Me.cmdPoolMake2.UseVisualStyleBackColor = True
+        '
+        'cmdPoolMake1
+        '
+        Me.cmdPoolMake1.Location = New System.Drawing.Point(282, 194)
+        Me.cmdPoolMake1.Name = "cmdPoolMake1"
+        Me.cmdPoolMake1.Size = New System.Drawing.Size(129, 32)
+        Me.cmdPoolMake1.TabIndex = 17
+        Me.cmdPoolMake1.Text = "Make Pool #1"
+        Me.cmdPoolMake1.UseVisualStyleBackColor = True
+        '
+        'lblPools3
+        '
+        Me.lblPools3.AutoSize = True
+        Me.lblPools3.Location = New System.Drawing.Point(766, 70)
+        Me.lblPools3.Name = "lblPools3"
+        Me.lblPools3.Size = New System.Drawing.Size(65, 20)
+        Me.lblPools3.TabIndex = 16
+        Me.lblPools3.Text = "Pool #3"
+        '
+        'lblPools2
+        '
+        Me.lblPools2.AutoSize = True
+        Me.lblPools2.Location = New System.Drawing.Point(766, 42)
+        Me.lblPools2.Name = "lblPools2"
+        Me.lblPools2.Size = New System.Drawing.Size(65, 20)
+        Me.lblPools2.TabIndex = 15
+        Me.lblPools2.Text = "Pool #2"
+        '
+        'lblPools1
+        '
+        Me.lblPools1.AutoSize = True
+        Me.lblPools1.Location = New System.Drawing.Point(766, 14)
+        Me.lblPools1.Name = "lblPools1"
+        Me.lblPools1.Size = New System.Drawing.Size(65, 20)
+        Me.lblPools1.TabIndex = 14
+        Me.lblPools1.Text = "Pool #1"
+        '
+        'cmdPoolsImportFromAnts
+        '
+        Me.cmdPoolsImportFromAnts.Location = New System.Drawing.Point(591, 141)
+        Me.cmdPoolsImportFromAnts.Name = "cmdPoolsImportFromAnts"
+        Me.cmdPoolsImportFromAnts.Size = New System.Drawing.Size(156, 32)
+        Me.cmdPoolsImportFromAnts.TabIndex = 13
+        Me.cmdPoolsImportFromAnts.Text = "Import From Ants"
+        Me.cmdPoolsImportFromAnts.UseVisualStyleBackColor = True
+        '
+        'cmdPoolDelete
+        '
+        Me.cmdPoolDelete.Location = New System.Drawing.Point(470, 141)
+        Me.cmdPoolDelete.Name = "cmdPoolDelete"
+        Me.cmdPoolDelete.Size = New System.Drawing.Size(87, 32)
+        Me.cmdPoolDelete.TabIndex = 11
+        Me.cmdPoolDelete.Text = "Delete"
+        Me.cmdPoolDelete.UseVisualStyleBackColor = True
+        '
+        'cmdPoolChange
+        '
+        Me.cmdPoolChange.Location = New System.Drawing.Point(377, 141)
+        Me.cmdPoolChange.Name = "cmdPoolChange"
+        Me.cmdPoolChange.Size = New System.Drawing.Size(87, 32)
+        Me.cmdPoolChange.TabIndex = 10
+        Me.cmdPoolChange.Text = "Change"
+        Me.cmdPoolChange.UseVisualStyleBackColor = True
+        '
+        'cmdPoolAdd
+        '
+        Me.cmdPoolAdd.Location = New System.Drawing.Point(282, 141)
+        Me.cmdPoolAdd.Name = "cmdPoolAdd"
+        Me.cmdPoolAdd.Size = New System.Drawing.Size(87, 32)
+        Me.cmdPoolAdd.TabIndex = 9
+        Me.cmdPoolAdd.Text = "Add"
+        Me.cmdPoolAdd.UseVisualStyleBackColor = True
+        '
+        'txtPoolPassword
+        '
+        Me.txtPoolPassword.Location = New System.Drawing.Point(377, 92)
+        Me.txtPoolPassword.Name = "txtPoolPassword"
+        Me.txtPoolPassword.Size = New System.Drawing.Size(370, 27)
+        Me.txtPoolPassword.TabIndex = 8
+        '
+        'txtPoolUsername
+        '
+        Me.txtPoolUsername.Location = New System.Drawing.Point(377, 63)
+        Me.txtPoolUsername.Name = "txtPoolUsername"
+        Me.txtPoolUsername.Size = New System.Drawing.Size(370, 27)
+        Me.txtPoolUsername.TabIndex = 7
+        '
+        'txtPoolURL
+        '
+        Me.txtPoolURL.Location = New System.Drawing.Point(377, 35)
+        Me.txtPoolURL.Name = "txtPoolURL"
+        Me.txtPoolURL.Size = New System.Drawing.Size(370, 27)
+        Me.txtPoolURL.TabIndex = 6
+        '
+        'txtPoolDesc
+        '
+        Me.txtPoolDesc.Location = New System.Drawing.Point(377, 7)
+        Me.txtPoolDesc.Name = "txtPoolDesc"
+        Me.txtPoolDesc.Size = New System.Drawing.Size(370, 27)
+        Me.txtPoolDesc.TabIndex = 5
+        '
+        'Label12
+        '
+        Me.Label12.AutoSize = True
+        Me.Label12.Location = New System.Drawing.Point(284, 95)
+        Me.Label12.Name = "Label12"
+        Me.Label12.Size = New System.Drawing.Size(88, 20)
+        Me.Label12.TabIndex = 4
+        Me.Label12.Text = "Password:"
+        '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.Location = New System.Drawing.Point(281, 66)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(91, 20)
+        Me.Label11.TabIndex = 3
+        Me.Label11.Text = "Username:"
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Location = New System.Drawing.Point(324, 38)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(48, 20)
+        Me.Label10.TabIndex = 2
+        Me.Label10.Text = "URL:"
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Location = New System.Drawing.Point(318, 10)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(54, 20)
+        Me.Label9.TabIndex = 1
+        Me.Label9.Text = "Desc:"
+        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.TabControl2)
         Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
         Me.tabAlerts.Name = "tabAlerts"
-        Me.tabAlerts.Size = New System.Drawing.Size(1195, 298)
+        Me.tabAlerts.Size = New System.Drawing.Size(814, 293)
         Me.tabAlerts.TabIndex = 3
         Me.tabAlerts.Text = "Alerts"
         Me.tabAlerts.UseVisualStyleBackColor = True
@@ -839,7 +1082,7 @@ Partial Class frmAntMonitor
         Me.TabControl2.Multiline = True
         Me.TabControl2.Name = "TabControl2"
         Me.TabControl2.SelectedIndex = 0
-        Me.TabControl2.Size = New System.Drawing.Size(1186, 288)
+        Me.TabControl2.Size = New System.Drawing.Size(805, 288)
         Me.TabControl2.TabIndex = 18
         '
         'tabS1Alerts
@@ -858,10 +1101,29 @@ Partial Class frmAntMonitor
         Me.tabS1Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS1Alerts.Name = "tabS1Alerts"
         Me.tabS1Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS1Alerts.Size = New System.Drawing.Size(1178, 255)
+        Me.tabS1Alerts.Size = New System.Drawing.Size(797, 255)
         Me.tabS1Alerts.TabIndex = 0
         Me.tabS1Alerts.Text = "S1 Alerts"
         Me.tabS1Alerts.UseVisualStyleBackColor = True
+        '
+        'chkAlertIfS1FanLow
+        '
+        Me.chkAlertIfS1FanLow.AutoSize = True
+        Me.chkAlertIfS1FanLow.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS1FanLow.Name = "chkAlertIfS1FanLow"
+        Me.chkAlertIfS1FanLow.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS1FanLow.TabIndex = 18
+        Me.chkAlertIfS1FanLow.Text = "Fan Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1FanLow, "Equal to or greater than")
+        Me.chkAlertIfS1FanLow.UseVisualStyleBackColor = True
+        '
+        'txtAlertS1FanLow
+        '
+        Me.txtAlertS1FanLow.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS1FanLow.Name = "txtAlertS1FanLow"
+        Me.txtAlertS1FanLow.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS1FanLow.TabIndex = 19
+        Me.txtAlertS1FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'cmdSaveAlerts1
         '
@@ -964,10 +1226,29 @@ Partial Class frmAntMonitor
         Me.tabS2Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS2Alerts.Name = "tabS2Alerts"
         Me.tabS2Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS2Alerts.Size = New System.Drawing.Size(1178, 255)
+        Me.tabS2Alerts.Size = New System.Drawing.Size(797, 255)
         Me.tabS2Alerts.TabIndex = 1
         Me.tabS2Alerts.Text = "S2 Alerts"
         Me.tabS2Alerts.UseVisualStyleBackColor = True
+        '
+        'chkAlertIfS2FanLow
+        '
+        Me.chkAlertIfS2FanLow.AutoSize = True
+        Me.chkAlertIfS2FanLow.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS2FanLow.Name = "chkAlertIfS2FanLow"
+        Me.chkAlertIfS2FanLow.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS2FanLow.TabIndex = 20
+        Me.chkAlertIfS2FanLow.Text = "Fan Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2FanLow, "Equal to or greater than")
+        Me.chkAlertIfS2FanLow.UseVisualStyleBackColor = True
+        '
+        'txtAlertS2FanLow
+        '
+        Me.txtAlertS2FanLow.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS2FanLow.Name = "txtAlertS2FanLow"
+        Me.txtAlertS2FanLow.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS2FanLow.TabIndex = 21
+        Me.txtAlertS2FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'cmdSaveAlerts2
         '
@@ -1077,7 +1358,7 @@ Partial Class frmAntMonitor
         Me.tabAlertTypes.Controls.Add(Me.txtAlertStartProcessParms)
         Me.tabAlertTypes.Location = New System.Drawing.Point(4, 4)
         Me.tabAlertTypes.Name = "tabAlertTypes"
-        Me.tabAlertTypes.Size = New System.Drawing.Size(1178, 255)
+        Me.tabAlertTypes.Size = New System.Drawing.Size(797, 255)
         Me.tabAlertTypes.TabIndex = 2
         Me.tabAlertTypes.Text = "Alert Types"
         Me.tabAlertTypes.UseVisualStyleBackColor = True
@@ -1293,7 +1574,7 @@ Partial Class frmAntMonitor
         Me.tabEmail.Controls.Add(Me.Label97)
         Me.tabEmail.Location = New System.Drawing.Point(4, 4)
         Me.tabEmail.Name = "tabEmail"
-        Me.tabEmail.Size = New System.Drawing.Size(1178, 255)
+        Me.tabEmail.Size = New System.Drawing.Size(797, 255)
         Me.tabEmail.TabIndex = 3
         Me.tabEmail.Text = "EMail Config"
         Me.tabEmail.UseVisualStyleBackColor = True
@@ -1545,7 +1826,7 @@ Partial Class frmAntMonitor
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(1195, 298)
+        Me.tabLog.Size = New System.Drawing.Size(814, 293)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -1559,13 +1840,13 @@ Partial Class frmAntMonitor
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtLog.Size = New System.Drawing.Size(1175, 288)
+        Me.txtLog.Size = New System.Drawing.Size(805, 288)
         Me.txtLog.TabIndex = 0
         '
         'cmdPause
         '
         Me.cmdPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdPause.Location = New System.Drawing.Point(692, 340)
+        Me.cmdPause.Location = New System.Drawing.Point(692, 335)
         Me.cmdPause.Name = "cmdPause"
         Me.cmdPause.Size = New System.Drawing.Size(85, 28)
         Me.cmdPause.TabIndex = 3
@@ -1579,7 +1860,7 @@ Partial Class frmAntMonitor
         'txtPleaseSupport
         '
         Me.txtPleaseSupport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 341)
+        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 336)
         Me.txtPleaseSupport.Name = "txtPleaseSupport"
         Me.txtPleaseSupport.ReadOnly = True
         Me.txtPleaseSupport.Size = New System.Drawing.Size(501, 27)
@@ -1624,49 +1905,22 @@ Partial Class frmAntMonitor
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
-        'chkAlertIfS1FanLow
+        'lstPools
         '
-        Me.chkAlertIfS1FanLow.AutoSize = True
-        Me.chkAlertIfS1FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfS1FanLow.Name = "chkAlertIfS1FanLow"
-        Me.chkAlertIfS1FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS1FanLow.TabIndex = 18
-        Me.chkAlertIfS1FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1FanLow, "Equal to or greater than")
-        Me.chkAlertIfS1FanLow.UseVisualStyleBackColor = True
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.TabIndex = 12
         '
-        'txtAlertS1FanLow
-        '
-        Me.txtAlertS1FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertS1FanLow.Name = "txtAlertS1FanLow"
-        Me.txtAlertS1FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1FanLow.TabIndex = 19
-        Me.txtAlertS1FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS2FanLow
-        '
-        Me.chkAlertIfS2FanLow.AutoSize = True
-        Me.chkAlertIfS2FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfS2FanLow.Name = "chkAlertIfS2FanLow"
-        Me.chkAlertIfS2FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS2FanLow.TabIndex = 20
-        Me.chkAlertIfS2FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2FanLow, "Equal to or greater than")
-        Me.chkAlertIfS2FanLow.UseVisualStyleBackColor = True
-        '
-        'txtAlertS2FanLow
-        '
-        Me.txtAlertS2FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertS2FanLow.Name = "txtAlertS2FanLow"
-        Me.txtAlertS2FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2FanLow.TabIndex = 21
-        Me.txtAlertS2FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'frmAntMonitor
+        'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1217, 375)
+        Me.ClientSize = New System.Drawing.Size(836, 370)
         Me.ContextMenuStrip = Me.menuStripMain
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
@@ -1676,7 +1930,7 @@ Partial Class frmAntMonitor
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
-        Me.Name = "frmAntMonitor"
+        Me.Name = "frmMain"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "M's Ant Monitor"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1687,6 +1941,8 @@ Partial Class frmAntMonitor
         Me.tabConfig.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.tabPools.ResumeLayout(False)
+        Me.tabPools.PerformLayout()
         Me.tabAlerts.ResumeLayout(False)
         Me.TabControl2.ResumeLayout(False)
         Me.tabS1Alerts.ResumeLayout(False)
@@ -1849,5 +2105,29 @@ Partial Class frmAntMonitor
     Friend WithEvents txtAlertS1FanLow As System.Windows.Forms.TextBox
     Friend WithEvents chkAlertIfS2FanLow As System.Windows.Forms.CheckBox
     Friend WithEvents txtAlertS2FanLow As System.Windows.Forms.TextBox
+    Friend WithEvents mnuShutdownS2 As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents tabPools As System.Windows.Forms.TabPage
+    Friend WithEvents cmdPoolDelete As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolChange As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolAdd As System.Windows.Forms.Button
+    Friend WithEvents txtPoolPassword As System.Windows.Forms.TextBox
+    Friend WithEvents txtPoolUsername As System.Windows.Forms.TextBox
+    Friend WithEvents txtPoolURL As System.Windows.Forms.TextBox
+    Friend WithEvents txtPoolDesc As System.Windows.Forms.TextBox
+    Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents Label11 As System.Windows.Forms.Label
+    Friend WithEvents Label10 As System.Windows.Forms.Label
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents lstPools As MAntMonitor.enListbox
+    Friend WithEvents cmdPoolsImportFromAnts As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolClear3 As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolClear2 As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolMake3 As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolMake2 As System.Windows.Forms.Button
+    Friend WithEvents cmdPoolMake1 As System.Windows.Forms.Button
+    Friend WithEvents lblPools3 As System.Windows.Forms.Label
+    Friend WithEvents lblPools2 As System.Windows.Forms.Label
+    Friend WithEvents lblPools1 As System.Windows.Forms.Label
+    Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
 
 End Class

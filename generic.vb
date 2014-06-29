@@ -267,3 +267,79 @@ Public Module Extensions
     End Function
 
 End Module
+
+Public Class enListbox
+
+    Inherits ListBox
+
+    Private dictTags As System.Collections.Generic.Dictionary(Of Integer, Object)
+
+    Public Function AddItem(ByRef o As Object, ByRef t As Object) As Integer
+
+        Dim i As Integer
+
+        i = MyBase.Items.Add(o)
+
+        dictTags.Add(i, t)
+
+        Return i
+
+    End Function
+
+    Public Sub RemoveSelectedItem()
+
+        Dim x As Integer
+        Dim b As Boolean
+        Dim o As Object
+
+        'when an item is removed from the list collection, the list indexes for every item after it are renumbered!
+        'this compensates for that in the dictionary of tags by renumbering them there as well
+        For x = MyBase.SelectedIndex To Me.dictTags.Count - 1
+            If b = False Then
+                dictTags.Remove(x)
+
+                MyBase.Items.RemoveAt(x)
+
+                b = True
+            Else
+                o = (Me.dictTags(x))
+
+                Me.dictTags.Remove(x)
+                Me.dictTags.Add(x - 1, o)
+            End If
+        Next
+
+    End Sub
+
+    Public Property ItemTag(ByVal iIndex As Integer) As Object
+        Get
+            Dim o As Object
+
+            If dictTags.TryGetValue(iIndex, o) = True Then
+                Return o
+            Else
+                Return Nothing
+            End If
+        End Get
+
+        Set(value)
+            Dim o As Object
+
+            If dictTags.TryGetValue(iIndex, o) = True Then
+                dictTags(iIndex) = value
+            Else
+                dictTags.Add(iIndex, value)
+            End If
+
+        End Set
+
+    End Property
+
+    Public Sub New()
+
+        MyBase.New()
+
+        Me.dictTags = New Dictionary(Of Integer, Object)
+
+    End Sub
+End Class

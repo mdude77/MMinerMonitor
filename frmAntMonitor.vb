@@ -1,6 +1,6 @@
 ﻿Imports MAntMonitor.Extensions
 
-Public Class frmAntMonitor
+Public Class frmMain
 
     Public Event StartupNextInstance As Microsoft.VisualBasic.ApplicationServices.StartupNextInstanceEventHandler
 
@@ -12,9 +12,9 @@ Public Class frmAntMonitor
     Private RebootInfo, EMailAlertInfo As System.Collections.Generic.Dictionary(Of String, Date)
 
     Private Shared colResponses As System.Collections.Generic.List(Of String)
-    
+
     Private ds As DataSet
-    
+
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     Private Const csVersion As String = "M's Ant Monitor v2.4"
@@ -33,6 +33,16 @@ Public Class frmAntMonitor
         S2
     End Enum
 
+    Private Class clsPoolData
+        Public URL As String
+        Public UID As String
+        Public PW As String
+
+        Public Sub New()
+            PW = ""
+        End Sub
+    End Class
+
 #If DEBUG Then
     Private Const bErrorHandle As Boolean = False
 #Else
@@ -42,6 +52,7 @@ Public Class frmAntMonitor
     Private Sub Form1_Load(sender As Object, e As System.EventArgs) Handles Me.Load
 
         Dim host As System.Net.IPHostEntry
+        Dim x As Integer
 
         bStarted = True
 
@@ -81,6 +92,7 @@ Public Class frmAntMonitor
                 .Add("Diff")
                 .Add("Pools")
                 .Add("PoolData")
+                .Add("PoolData2", GetType(Object))
                 .Add("Rej%")
                 .Add("Stale%")
                 .Add("HFan", GetType(Integer))
@@ -96,6 +108,7 @@ Public Class frmAntMonitor
         End With
 
         Me.dataAnts.Columns("PoolData").Visible = False
+        Me.dataAnts.Columns("PoolData2").Visible = False
         Me.dataAnts.Columns("IPAddress").Visible = False
 
         bSortingColumns = False
@@ -352,11 +365,22 @@ Public Class frmAntMonitor
             Next
 
             colResponses = New System.Collections.Generic.List(Of String)
-
         End With
 
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Pools")
+            If key Is Nothing Then
+                My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\Pools")
+            End If
+        End Using
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Pools")
+            For Each sKey As String In key.GetSubKeyNames
+                Me.lstPools.AddItem(My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & sKey, "Description", ""), sKey)
+            Next
+        End Using
+
         'check each of the boxes
-        For x As Integer = 0 To Me.chklstAnts.Items.Count - 1
+        For x = 0 To Me.chklstAnts.Items.Count - 1
             Me.chklstAnts.SetItemChecked(x, True)
         Next
 
@@ -851,6 +875,8 @@ Public Class frmAntMonitor
         Dim bStep As Byte
         Dim sWebUN, sWebPW As String
         Dim dbTemp As Double
+        Dim pd As clsPoolData
+        Dim pdl As System.Collections.Generic.List(Of clsPoolData)
 
         If Me.chklstAnts.Items.Count = 0 Then
             MsgBox("Please add some Ant addresses first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
@@ -1015,6 +1041,13 @@ Public Class frmAntMonitor
 
                     sbTemp2 = New System.Text.StringBuilder
 
+                    If IsDBNull(dr.Item("PoolData2")) = True Then
+                        dr.Item("PoolData2") = New System.Collections.Generic.List(Of clsPoolData)
+                    End If
+
+                    pdl = dr.Item("PoolData2")
+                    pd = New clsPoolData
+
                     For Each ja In j.Property("POOLS")
                         For Each jp1 In ja
                             If jp1.Value(Of Double)("Best Share") > dBestShare Then
@@ -1042,6 +1075,11 @@ Public Class frmAntMonitor
                             End If
 
                             sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
+
+                            pd.URL = jp1.Value(Of String)("URL")
+                            pd.UID = jp1.Value(Of String)("User")
+
+                            pdl.Add(pd)
                         Next
 
                         Exit For
@@ -1482,11 +1520,16 @@ Public Class frmAntMonitor
             sshCommand = ssh.CreateCommand("/sbin/reboot")
             sshCommand.Execute()
 
-            ssh.Disconnect()
+            If sshCommand.Error.IsNullOrEmpty = False Then
+                colResponses.Add("Reboot of " & sAnt & " appears to have failed: " & sshCommand.Error)
+            Else
+                colResponses.Add("Reboot of " & sAnt & " appears to have succeeded")
+            End If
 
+            ssh.Disconnect()
             ssh.Dispose()
 
-            colResponses.Add("Reboot of " & sAnt & " appears to have succeeded")
+            sshCommand.Dispose()
         Catch ex As Exception
             colResponses.Add("Reboot of " & sAnt & " FAILED: " & ex.Message)
         End Try
@@ -2402,27 +2445,73 @@ Public Class frmAntMonitor
 
     Private Sub dataAnts_CellContextMenuStripNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventArgs) Handles dataAnts.CellContextMenuStripNeeded
 
-        Dim colAntReboot As System.Collections.Generic.List(Of String)
+        Dim colAnts As System.Collections.Generic.List(Of String)
         Dim x As Integer
 
+        '0 - reboot one
+        '1 - reboot multiple
+        '2 - shutdown s2
+        '3 - update pools
         mnuAntMenu.Items(0).Text = "Reboot " & Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value
         mnuAntMenu.Items(0).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value
 
+        'reboot multiple
         If Me.dataAnts.SelectedRows.Count = 0 Then
             mnuAntMenu.Items(1).Visible = False
         Else
             mnuAntMenu.Items(1).Visible = True
 
             mnuAntMenu.Items(1).Tag = New System.Collections.Generic.List(Of String)
-            colAntReboot = mnuAntMenu.Items(1).Tag
+            colAnts = mnuAntMenu.Items(1).Tag
+
+            x = 0
 
             For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
-                colAntReboot.Add(dr.Cells("IPAddress").Value)
+                colAnts.Add(dr.Cells("IPAddress").Value)
 
                 x += 1
             Next
 
-            mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & ")"
+            If x > 1 Then
+                mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ants)"
+            Else
+                mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ant)"
+            End If
+        End If
+
+        'shutdown s2
+        If Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value.ToString.Substring(0, 2) = "S2" Then
+            mnuAntMenu.Items(2).Visible = True
+            mnuAntMenu.Items(2).Text = "Shutdown " & Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value
+            mnuAntMenu.Items(2).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value
+        End If
+
+        'update pools
+        If Me.lblPools1.Tag IsNot Nothing AndAlso Me.lblPools2.Tag IsNot Nothing AndAlso Me.lblPools3.Tag IsNot Nothing Then
+            mnuAntMenu.Items(3).Tag = New System.Collections.Generic.List(Of String)
+            colAnts = mnuAntMenu.Items(3).Tag
+
+            x = 0
+
+            If Me.dataAnts.SelectedRows.Count = 0 Then
+                colAnts.Add(Me.dataAnts.Rows(e.RowIndex).Cells("IPAddress").Value)
+
+                x = 1
+            Else
+                For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
+                    colAnts.Add(dr.Cells("IPAddress").Value)
+
+                    x += 1
+                Next
+            End If
+
+            If x > 1 Then
+                mnuAntMenu.Items(3).Text = "Update Pools (" & x & " Ants)"
+            Else
+                mnuAntMenu.Items(3).Text = "Update Pools (" & x & " Ant)"
+            End If
+
+            mnuAntMenu.Items(3).Visible = True
         End If
 
         e.ContextMenuStrip = mnuAntMenu
@@ -2566,6 +2655,359 @@ Public Class frmAntMonitor
             Call AddToLog("Reboot of " & sAnt & " requested")
             Call RebootAnt(sAnt, True)
         Next
-        
+
+    End Sub
+
+    Private Sub mnuShutdownS2_Click(sender As Object, e As System.EventArgs) Handles mnuShutdownS2.Click
+
+        Dim th As Threading.Thread
+        Dim t As ToolStripMenuItem
+        Dim sAnt As String
+
+        t = sender
+        sAnt = t.Tag
+
+        th = New Threading.Thread(AddressOf Me._RebootAnt)
+
+        AddToLog("SHUTTING DOWN " & sAnt)
+
+        th.Start(sAnt)
+
+    End Sub
+
+    Private Sub _ShutdownAnt(ByVal sAnt As String)
+
+        Dim ssh As Renci.SshNet.SshClient
+        Dim sshCommand As Renci.SshNet.SshCommand
+        Dim sUN, sPW As String
+
+        Try
+            Call GetSSHCredentials(sAnt, sUN, sPW)
+
+            ssh = New Renci.SshNet.SshClient(sAnt.Substring(4), sUN, sPW)
+            ssh.Connect()
+
+            sshCommand = ssh.CreateCommand("/sbin/shutdown -h -P now")
+            sshCommand.Execute()
+
+            If sshCommand.Error.IsNullOrEmpty = False Then
+                colResponses.Add("Shutdown of " & sAnt & " appears to have failed: " & sshCommand.Error)
+            Else
+                colResponses.Add("Shutdown of " & sAnt & " appears to have succeeded")
+            End If
+
+            ssh.Disconnect()
+            ssh.Dispose()
+
+            sshCommand.Dispose()
+
+        Catch ex As Exception
+            colResponses.Add("Shutdown of " & sAnt & " FAILED: " & ex.Message)
+        End Try
+
+    End Sub
+
+    Private Function ValidatePool() As Boolean
+
+        If Me.txtPoolDesc.Text.IsNullOrEmpty Then
+            MsgBox("Please enter a pool description first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            Me.txtPoolDesc.Focus()
+
+            Return False
+        End If
+
+        If Me.txtPoolURL.Text.IsNullOrEmpty Then
+            MsgBox("Please enter a pool URL first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            Me.txtPoolURL.Focus()
+
+            Return False
+        End If
+
+        If Me.txtPoolUsername.Text.IsNullOrEmpty Then
+            MsgBox("Please enter a pool username first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            Me.txtPoolUsername.Focus()
+
+            Return False
+        End If
+
+        Return True
+
+    End Function
+
+    Private Sub cmdPoolAdd_Click(sender As System.Object, e As System.EventArgs) Handles cmdPoolAdd.Click
+
+        Dim c As Integer
+
+        If ValidatePool() = False Then Exit Sub
+
+        c = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools", "Count", 0) + 1
+
+        Me.lstPools.AddItem(Me.txtPoolDesc.Text, c)
+
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "Description", Me.txtPoolDesc.Text, Microsoft.Win32.RegistryValueKind.String)
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "URL", Me.txtPoolURL.Text, Microsoft.Win32.RegistryValueKind.String)
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "Username", Me.txtPoolUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "Password", Me.txtPoolPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools", "Count", c, Microsoft.Win32.RegistryValueKind.String)
+
+        Me.txtPoolDesc.Text = ""
+        Me.txtPoolPassword.Text = ""
+        Me.txtPoolURL.Text = ""
+        Me.txtPoolUsername.Text = ""
+
+    End Sub
+
+    Private Sub lstPools_Click(sender As Object, e As System.EventArgs) Handles lstPools.Click
+
+        Dim i As Integer
+
+        i = Me.lstPools.ItemTag(Me.lstPools.SelectedIndex)
+
+        Me.txtPoolDesc.Text = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Description", "")
+        Me.txtPoolURL.Text = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "URL", "")
+        Me.txtPoolUsername.Text = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Username", "")
+        Me.txtPoolPassword.Text = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Password", "")
+
+    End Sub
+
+    Private Sub cmdPoolChange_Click(sender As System.Object, e As System.EventArgs) Handles cmdPoolChange.Click
+
+        Dim i As Integer
+
+        If ValidatePool() = False Then Exit Sub
+
+        i = Me.lstPools.ItemTag(Me.lstPools.SelectedIndex)
+
+        Me.lstPools.Items(Me.lstPools.SelectedIndex) = Me.txtPoolDesc.Text
+
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Description", Me.txtPoolDesc.Text, Microsoft.Win32.RegistryValueKind.String)
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "URL", Me.txtPoolURL.Text, Microsoft.Win32.RegistryValueKind.String)
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Username", Me.txtPoolUsername.Text, Microsoft.Win32.RegistryValueKind.String)
+        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Password", Me.txtPoolPassword.Text, Microsoft.Win32.RegistryValueKind.String)
+
+    End Sub
+
+    Private Sub cmdPoolDelete_Click(sender As Object, e As System.EventArgs) Handles cmdPoolDelete.Click
+
+        Dim i As Integer
+
+        If MsgBox("Are you sure you want to delete the selected pool: " & vbCrLf & vbCrLf & Me.lstPools.SelectedItem, MsgBoxStyle.Question Or MsgBoxStyle.YesNo) <> MsgBoxResult.Yes Then Exit Sub
+
+        i = Me.lstPools.ItemTag(Me.lstPools.SelectedIndex)
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Pools", True)
+            key.DeleteSubKey(i, False)
+        End Using
+
+        Me.lstPools.RemoveSelectedItem()
+
+        Me.txtPoolDesc.Text = ""
+        Me.txtPoolPassword.Text = ""
+        Me.txtPoolURL.Text = ""
+        Me.txtPoolUsername.Text = ""
+
+    End Sub
+
+    Private Sub cmdPoolsImportFromAnts_Click(sender As System.Object, e As System.EventArgs) Handles cmdPoolsImportFromAnts.Click
+
+        Dim pd, pd2 As clsPoolData
+        Dim pdl, pdl2 As System.Collections.Generic.List(Of clsPoolData)
+        Dim i, c, x As Integer
+        Dim bCheckAgain, bFound As Boolean
+
+        c = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools", "Count", 0) + 1
+
+        pdl = New System.Collections.Generic.List(Of clsPoolData)
+
+        'create a list of all the poolds we know about already
+        For x = 0 To Me.lstPools.Items.Count - 1
+            pd = New clsPoolData
+
+            i = Me.lstPools.ItemTag(x)
+
+            pd.UID = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "Username", "")
+            pd.URL = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & i, "URL", "")
+
+            pdl.Add(pd)
+        Next
+
+        'go through each ant
+        For Each dr As DataGridViewRow In Me.dataAnts.Rows
+            pdl2 = dr.Cells("PoolData2").Value
+
+            'go through each pool for each ant
+            For x = 0 To pdl2.Count - 1
+                pd = pdl2(x)
+
+                Do
+                    bCheckAgain = False
+                    bFound = False
+
+                    For Each pd2 In pdl 'see if pool is in list we know about
+                        If pd2.URL = pd.URL AndAlso pd2.UID = pd.UID Then
+                            bFound = True
+
+                            Exit For
+                        End If
+                    Next
+
+                    If bFound = False Then
+                        'add pool
+                        pdl.Add(pd)
+
+                        Me.lstPools.AddItem(dr.Cells("IPAddress").Value & " #" & x + 1, c)
+
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "Description", dr.Cells("IPAddress").Value & " #" & x + 1, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "URL", pd.URL, Microsoft.Win32.RegistryValueKind.String)
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & c, "Username", pd.UID, Microsoft.Win32.RegistryValueKind.String)
+
+                        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools", "Count", c, Microsoft.Win32.RegistryValueKind.String)
+
+                        c += 1
+
+                        bCheckAgain = True
+                    End If
+                Loop While bCheckAgain = True   'if the list is changed, the enumeration can not continue, so we start over again
+            Next
+        Next
+
+    End Sub
+
+    Private Sub cmdPoolMake1_Click(sender As System.Object, e As System.EventArgs) Handles cmdPoolMake1.Click, cmdPoolMake2.Click, cmdPoolMake3.Click
+
+        Dim pd As clsPoolData
+        Dim lblPool As Label
+
+        If ValidatePool() = False Then Exit Sub
+
+        Select Case DirectCast(sender, Button).Text
+            Case "Make Pool #1"
+                lblPool = Me.lblPools1
+
+            Case "Make Pool #2"
+                lblPool = Me.lblPools2
+
+            Case "Make Pool #3"
+                lblPool = Me.lblPools3
+
+        End Select
+
+        lblPool.Text = Me.txtPoolDesc.Text
+
+        If lblPool.Tag Is Nothing Then
+            lblPool.Tag = New clsPoolData
+        End If
+
+        pd = lblPool.Tag
+
+        pd.URL = Me.txtPoolURL.Text
+        pd.UID = Me.txtPoolUsername.Text
+        pd.PW = Me.txtPoolPassword.Text
+
+    End Sub
+
+    Private Sub cmdPoolClear2_Click(sender As System.Object, e As System.EventArgs) Handles cmdPoolClear2.Click, cmdPoolClear3.Click
+
+        Dim pd As clsPoolData
+        Dim lblPool As Label
+
+        Select Case DirectCast(sender, Button).Text
+            Case "Clear Pool #2"
+                lblPool = Me.lblPools2
+
+            Case "Clear Pool #3"
+                lblPool = Me.lblPools3
+
+        End Select
+
+        lblPool.Text = "<Blank>"
+
+        If lblPool.Tag Is Nothing Then
+            lblPool.Tag = New clsPoolData
+        End If
+
+        pd = lblPool.Tag
+
+        pd.URL = ""
+        pd.UID = ""
+        pd.PW = ""
+
+    End Sub
+
+    Private Sub mnuUpdatePools_Click(sender As Object, e As System.EventArgs) Handles mnuUpdatePools.Click
+
+        Dim th As Threading.Thread
+        Dim t As ToolStripMenuItem
+        Dim c As System.Collections.Generic.List(Of String)
+
+        t = sender
+        c = t.Tag
+
+        For Each sAnt As String In c
+            th = New Threading.Thread(AddressOf _UpdatePools)
+
+            Call AddToLog("Update of pool info on " & sAnt & " requested")
+            th.Start(sAnt)
+        Next
+
+    End Sub
+
+    Private Sub _UpdatePools(ByVal sAnt As String)
+
+        Dim ssh As Renci.SshNet.SshClient
+        Dim sshCommand As Renci.SshNet.SshCommand
+        Dim sUN, sPW As String
+        Dim pd1, pd2, pd3 As clsPoolData
+
+        Try
+            pd1 = Me.lblPools1.Tag
+            pd2 = Me.lblPools2.Tag
+            pd3 = Me.lblPools3.Tag
+
+            If pd1.PW = "" Then pd1.PW = "abc"
+            If pd2.PW = "" Then pd2.PW = "abc"
+            If pd3.PW = "" Then pd3.PW = "abc"
+
+            Call GetSSHCredentials(sAnt, sUN, sPW)
+
+            ssh = New Renci.SshNet.SshClient(sAnt.Substring(4), sUN, sPW)
+            ssh.Connect()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api ""removepool|1""")
+            sshCommand.Execute()
+            sshCommand.Execute()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api ""addpool|" & pd1.URL.Replace("\", "\\") & "," & pd1.UID.Replace("\", "\\").Replace(",", "\,") & "," & pd1.PW.Replace("\", "\\").Replace(",", "\,") & """")
+            sshCommand.Execute()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api ""switchpool|1""")
+            sshCommand.Execute()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api ""removepool|0""")
+            sshCommand.Execute()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api ""addpool|" & pd2.URL.Replace("\", "\\") & "," & pd2.UID.Replace("\", "\\").Replace(",", "\,") & "," & pd2.PW.Replace("\", "\\").Replace(",", "\,") & """")
+            sshCommand.Execute()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api ""addpool|" & pd3.URL.Replace("\", "\\") & "," & pd3.UID.Replace("\", "\\").Replace(",", "\,") & "," & pd3.PW.Replace("\", "\\").Replace(",", "\,") & """")
+            sshCommand.Execute()
+
+            sshCommand = ssh.CreateCommand("/usr/bin/cgminer-api save")
+            sshCommand.Execute()
+
+            colResponses.Add("Update of pool info on  " & sAnt & " appears to have succeeded")
+
+            ssh.Disconnect()
+            ssh.Dispose()
+
+            sshCommand.Dispose()
+        Catch ex As Exception
+            colResponses.Add("Update of pool info on " & sAnt & " FAILED: " & ex.Message)
+        End Try
+
     End Sub
 End Class
