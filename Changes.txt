@@ -1,3 +1,13 @@
+v2.6
+- Added some exception logic to the routine that retrieves the Ant userid and passwords.  There appears to be some cases where somehow those entries
+are completely missing, which can cause problems in multiple places.  Those places include rebooting your Ants, or clicking on an Ant in the config grid.  
+Now if those routines are called and the data is missing, it'll create it with the defaults.
+
+v2.5
+- Fixed the problem with right clicking on the header bar causing an error.
+- Changed the default startup position to be to be top left, since center screen doesn't seem to work.
+- Fixed the problem that would cause errors each refresh if one or more miners didn't respond properly.
+
 v2.4
 - Added the ability to shutdown an S2.  Note this is a one way operation, you'll have to manually power cycle it to bring it back.
 - Added the ability to update pool info on one or more Ants.  Note this only works with S2s by default!  You'll need to modify the cgminer config on S1s to allow SSH API access for it to work on S1s.

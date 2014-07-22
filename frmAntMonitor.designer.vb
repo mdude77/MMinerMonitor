@@ -104,6 +104,7 @@ Partial Class frmMain
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
+        Me.lstPools = New MAntMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.tabS1Alerts = New System.Windows.Forms.TabPage()
@@ -191,7 +192,6 @@ Partial Class frmMain
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.lstPools = New MAntMonitor.enListbox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -225,7 +225,7 @@ Partial Class frmMain
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(803, 271)
+        Me.dataAnts.Size = New System.Drawing.Size(803, 251)
         Me.dataAnts.TabIndex = 0
         '
         'mnuAntMenu
@@ -290,7 +290,7 @@ Partial Class frmMain
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(822, 326)
+        Me.TabControl1.Size = New System.Drawing.Size(1236, 326)
         Me.TabControl1.TabIndex = 2
         '
         'tabAnts
@@ -299,7 +299,7 @@ Partial Class frmMain
         Me.tabAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabAnts.Name = "tabAnts"
         Me.tabAnts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAnts.Size = New System.Drawing.Size(814, 293)
+        Me.tabAnts.Size = New System.Drawing.Size(1228, 293)
         Me.tabAnts.TabIndex = 0
         Me.tabAnts.Text = "Ants"
         Me.tabAnts.UseVisualStyleBackColor = True
@@ -338,7 +338,7 @@ Partial Class frmMain
         Me.tabConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabConfig.Name = "tabConfig"
         Me.tabConfig.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConfig.Size = New System.Drawing.Size(814, 293)
+        Me.tabConfig.Size = New System.Drawing.Size(1228, 293)
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
@@ -881,7 +881,7 @@ Partial Class frmMain
         Me.tabPools.Controls.Add(Me.lstPools)
         Me.tabPools.Location = New System.Drawing.Point(4, 4)
         Me.tabPools.Name = "tabPools"
-        Me.tabPools.Size = New System.Drawing.Size(1077, 293)
+        Me.tabPools.Size = New System.Drawing.Size(1228, 293)
         Me.tabPools.TabIndex = 4
         Me.tabPools.Text = "Pools"
         Me.tabPools.UseVisualStyleBackColor = True
@@ -1058,12 +1058,23 @@ Partial Class frmMain
         Me.Label9.TabIndex = 1
         Me.Label9.Text = "Desc:"
         '
+        'lstPools
+        '
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.TabIndex = 12
+        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.TabControl2)
         Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
         Me.tabAlerts.Name = "tabAlerts"
-        Me.tabAlerts.Size = New System.Drawing.Size(814, 293)
+        Me.tabAlerts.Size = New System.Drawing.Size(1228, 293)
         Me.tabAlerts.TabIndex = 3
         Me.tabAlerts.Text = "Alerts"
         Me.tabAlerts.UseVisualStyleBackColor = True
@@ -1826,7 +1837,7 @@ Partial Class frmMain
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(814, 293)
+        Me.tabLog.Size = New System.Drawing.Size(1228, 293)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -1905,22 +1916,11 @@ Partial Class frmMain
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
-        'lstPools
-        '
-        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstPools.FormattingEnabled = True
-        Me.lstPools.ItemHeight = 20
-        Me.lstPools.Location = New System.Drawing.Point(6, 7)
-        Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 264)
-        Me.lstPools.TabIndex = 12
-        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(836, 370)
+        Me.ClientSize = New System.Drawing.Size(1250, 370)
         Me.ContextMenuStrip = Me.menuStripMain
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
@@ -1928,10 +1928,11 @@ Partial Class frmMain
         Me.Controls.Add(Me.cmdRefresh)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Location = New System.Drawing.Point(144, 180)
         Me.Margin = New System.Windows.Forms.Padding(4)
         Me.MaximizeBox = False
         Me.Name = "frmMain"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "M's Ant Monitor"
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.mnuAntMenu.ResumeLayout(False)

@@ -17,7 +17,7 @@ Public Class frmMain
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.4"
+    Private Const csVersion As String = "M's Ant Monitor v2.6"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -1112,9 +1112,9 @@ Public Class frmMain
             For Each dg As DataGridViewRow In Me.dataAnts.Rows
                 If dg.Cells("Uptime").Value <> "ERROR" AndAlso dg.Cells("Uptime").Value <> "???" Then
                     x += 1
-                End If
 
-                dbTemp += dg.Cells("GH/s(avg)").Value
+                    dbTemp += dg.Cells("GH/s(avg)").Value
+                End If
             Next
 
             Me.Text = csVersion & " - " & Now.ToString & " - " & x & " of " & Me.chklstAnts.CheckedItems.Count & " responded - " & FormatHashRate(dbTemp * 1000)
@@ -1199,8 +1199,25 @@ Public Class frmMain
     Private Sub GetWebCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
+            If key Is Nothing Then
+                My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\Ants\" & sAnt)
+            End If
+        End Using
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt, True)
             sUsername = key.GetValue("WebUsername")
+
+            If sUsername.IsNullOrEmpty = True Then
+                key.SetValue("WebUsername", "root")
+                sUsername = "root"
+            End If
+
             sPassword = key.GetValue("WebPassword")
+
+            If sPassword.IsNullOrEmpty = True Then
+                key.SetValue("WebPassword", "root")
+                sPassword = "root"
+            End If
         End Using
 
     End Sub
@@ -1208,8 +1225,38 @@ Public Class frmMain
     Private Sub GetSSHCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
+            If key Is Nothing Then
+                My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\Ants\" & sAnt)
+            End If
+        End Using
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt, True)
             sUsername = key.GetValue("SSHUsername")
+
+            If sUsername.IsNullOrEmpty = True Then
+                key.SetValue("SSHUsername", "root")
+                sUsername = "root"
+            End If
+
             sPassword = key.GetValue("SSHPassword")
+
+            If sPassword.IsNullOrEmpty = True Then
+                Select Case sAnt.Substring(0, 2)
+                    Case "S1"
+                        key.SetValue("SSHPassword", "root")
+                        sPassword = "root"
+
+                    Case "S2"
+                        key.SetValue("SSHPassword", "admin")
+                        sPassword = "admin"
+
+                    Case "S3"   ' assume the same as S1
+                        key.SetValue("SSHPassword", "root")
+                        sPassword = "root"
+
+                End Select
+            End If
+            
         End Using
 
     End Sub
@@ -2448,6 +2495,8 @@ Public Class frmMain
         Dim colAnts As System.Collections.Generic.List(Of String)
         Dim x As Integer
 
+        If e.RowIndex = -1 Then Exit Sub
+
         '0 - reboot one
         '1 - reboot multiple
         '2 - shutdown s2
@@ -3010,4 +3059,5 @@ Public Class frmMain
         End Try
 
     End Sub
+
 End Class
