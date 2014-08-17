@@ -17,7 +17,7 @@ Public Class frmMain
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.7"
+    Private Const csVersion As String = "M's Ant Monitor v2.8"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -241,6 +241,7 @@ Public Class frmMain
             .AddControl(Me.chkSMTPSSL, "SMTPUseSSL")
 
             .AddControl(Me.chkAlertRebootIfXd, "RebootAntIfXd")
+            .AddControl(Me.chkAlertRebootAntsOnHashAlert, "RebootAntIfHashAlert")
             .AddControl(Me.txtAlertRebootGovernor, "AlertRebootGovernor")
             .AddControl(Me.cmbAlertRebootGovernor, "AlertRebootGovernorValue")
 
@@ -363,6 +364,7 @@ Public Class frmMain
             .SetControlByRegKey(Me.chkAlertSendEMail)
 
             .SetControlByRegKey(Me.chkAlertRebootIfXd, True)
+            .SetControlByRegKey(Me.chkAlertRebootAntsOnHashAlert)
             .SetControlByRegKey(Me.txtAlertRebootGovernor, 30)
             .SetControlByRegKey(Me.cmbAlertRebootGovernor, "Minutes")
 
@@ -1417,6 +1419,10 @@ Public Class frmMain
                                         colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S1 Hash Alert")
+
+                                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True AndAlso Me.chkUseAPI.Checked = True Then
+                                            Call RebootAnt(dr.Cells("IPAddress").Value, False)
+                                        End If
                                     End If
                                 End If
                             End If
@@ -1502,6 +1508,10 @@ Public Class frmMain
                                         colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
                                         Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S2 Hash Alert")
+
+                                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True AndAlso Me.chkUseAPI.Checked = True Then
+                                            Call RebootAnt(dr.Cells("IPAddress").Value, False)
+                                        End If
                                     End If
                                 End If
                             End If
@@ -1632,12 +1642,9 @@ Public Class frmMain
         Dim ssh As Renci.SshNet.SshClient
         Dim sshCommand As Renci.SshNet.SshCommand
         Dim sUN, sPW As String
-        Dim p() As String
-
+        
         Try
-            p = sAnt.Split(":")
-
-            sAnt = p(0) & ":" & p(1)
+            sAnt = RemoveAntPort(sAnt)
 
             Call GetSSHCredentials(sAnt, sUN, sPW)
 
@@ -2481,6 +2488,7 @@ Public Class frmMain
             End If
 
             Call .SetRegKeyByControl(Me.chkAlertRebootIfXd)
+            Call .SetRegKeyByControl(Me.chkAlertRebootAntsOnHashAlert)
             Call .SetRegKeyByControl(Me.txtAlertRebootGovernor)
             Call .SetRegKeyByControl(Me.cmbAlertRebootGovernor)
         End With
@@ -2690,17 +2698,29 @@ Public Class frmMain
         Else
             Me.cmdSaveAnt.Enabled = True
 
-            Call GetWebCredentials(Me.chklstAnts.SelectedItem.ToString, Me.txtWebUsername.Text, Me.txtWebPassword.Text)
-            Call GetSSHCredentials(Me.chklstAnts.SelectedItem.ToString, Me.txtSSHUsername.Text, Me.txtSSHPassword.Text)
+            Me.txtAntAddress.Text = Me.chklstAnts.SelectedItem.ToString.Substring(4)
+
+            Call GetWebCredentials(RemoveAntPort(Me.chklstAnts.SelectedItem.ToString), Me.txtWebUsername.Text, Me.txtWebPassword.Text)
+            Call GetSSHCredentials(RemoveAntPort(Me.chklstAnts.SelectedItem.ToString), Me.txtSSHUsername.Text, Me.txtSSHPassword.Text)
         End If
 
     End Sub
 
+    Private Function RemoveAntPort(ByVal sAnt As String) As String
+
+        Dim p() As String
+
+        p = sAnt.Split(":")
+
+        Return p(0) & ":" & p(1)
+
+    End Function
+
     Private Sub cmdSaveAnt_Click(sender As Object, e As System.EventArgs) Handles cmdSaveAnt.Click
 
         Dim sTemp As String
-
-        sTemp = Me.chklstAnts.SelectedItem
+        
+        sTemp = RemoveAntPort(Me.chklstAnts.SelectedItem.ToString)
 
         If sTemp.Substring(0, 2) = "S1" Then
             If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
@@ -2831,13 +2851,9 @@ Public Class frmMain
         Dim ssh As Renci.SshNet.SshClient
         Dim sshCommand As Renci.SshNet.SshCommand
         Dim sUN, sPW As String
-        Dim p() As String
-
+        
         Try
-            p = sAnt.Split(":")
-
-            sAnt = p(0) & ":" & p(1)
-
+            sAnt = RemoveAntPort(sAnt)
             Call GetSSHCredentials(sAnt, sUN, sPW)
 
             ssh = New Renci.SshNet.SshClient(sAnt.Substring(4), sUN, sPW)
@@ -3118,8 +3134,7 @@ Public Class frmMain
         Dim sshCommand As Renci.SshNet.SshCommand
         Dim sUN, sPW As String
         Dim pd1, pd2, pd3 As clsPoolData
-        Dim p() As String
-
+        
         Try
             pd1 = Me.lblPools1.Tag
             pd2 = Me.lblPools2.Tag
@@ -3135,9 +3150,7 @@ Public Class frmMain
                 If pd3.PW = "" Then pd3.PW = "abc"
             End If
 
-            p = sAnt.Split(":")
-
-            sAnt = p(0) & ":" & p(1)
+            sAnt = RemoveAntPort(sAnt)
 
             Call GetSSHCredentials(sAnt, sUN, sPW)
 

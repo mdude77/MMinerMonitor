@@ -1,3 +1,7 @@
+v2.8
+- Fixed the problem with one of the saves duplicating the Ants.
+- Added the ability to reboot your Ant if it triggers a low/high hash alert.
+
 v2.7
 - Fixed a problem with the web code that would trigger if you have less than 3 Ants.
 - Fixed multiple problems with the web reboot code.  I don't see how it would have ever worked.  Apparently I broke this at some point.

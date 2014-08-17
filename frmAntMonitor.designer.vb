@@ -104,6 +104,7 @@ Partial Class frmMain
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
+        Me.lstPools = New MAntMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.tabS1Alerts = New System.Windows.Forms.TabPage()
@@ -191,7 +192,7 @@ Partial Class frmMain
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.lstPools = New MAntMonitor.enListbox()
+        Me.chkAlertRebootAntsOnHashAlert = New System.Windows.Forms.CheckBox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -1058,6 +1059,17 @@ Partial Class frmMain
         Me.Label9.TabIndex = 1
         Me.Label9.Text = "Desc:"
         '
+        'lstPools
+        '
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.TabIndex = 12
+        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.TabControl2)
@@ -1337,6 +1349,7 @@ Partial Class frmMain
         '
         'tabAlertTypes
         '
+        Me.tabAlertTypes.Controls.Add(Me.chkAlertRebootAntsOnHashAlert)
         Me.tabAlertTypes.Controls.Add(Me.cmbAlertRebootGovernor)
         Me.tabAlertTypes.Controls.Add(Me.txtAlertRebootGovernor)
         Me.tabAlertTypes.Controls.Add(Me.Label8)
@@ -1367,7 +1380,7 @@ Partial Class frmMain
         '
         Me.cmbAlertRebootGovernor.FormattingEnabled = True
         Me.cmbAlertRebootGovernor.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours", "Days"})
-        Me.cmbAlertRebootGovernor.Location = New System.Drawing.Point(582, 63)
+        Me.cmbAlertRebootGovernor.Location = New System.Drawing.Point(582, 90)
         Me.cmbAlertRebootGovernor.Name = "cmbAlertRebootGovernor"
         Me.cmbAlertRebootGovernor.Size = New System.Drawing.Size(94, 28)
         Me.cmbAlertRebootGovernor.TabIndex = 26
@@ -1375,7 +1388,7 @@ Partial Class frmMain
         '
         'txtAlertRebootGovernor
         '
-        Me.txtAlertRebootGovernor.Location = New System.Drawing.Point(520, 64)
+        Me.txtAlertRebootGovernor.Location = New System.Drawing.Point(520, 91)
         Me.txtAlertRebootGovernor.Name = "txtAlertRebootGovernor"
         Me.txtAlertRebootGovernor.Size = New System.Drawing.Size(55, 27)
         Me.txtAlertRebootGovernor.TabIndex = 25
@@ -1383,7 +1396,7 @@ Partial Class frmMain
         '
         'Label8
         '
-        Me.Label8.Location = New System.Drawing.Point(518, 39)
+        Me.Label8.Location = New System.Drawing.Point(518, 66)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(320, 28)
         Me.Label8.TabIndex = 24
@@ -1905,16 +1918,17 @@ Partial Class frmMain
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
-        'lstPools
+        'chkAlertRebootAntsOnHashAlert
         '
-        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstPools.FormattingEnabled = True
-        Me.lstPools.ItemHeight = 20
-        Me.lstPools.Location = New System.Drawing.Point(6, 7)
-        Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 264)
-        Me.lstPools.TabIndex = 12
+        Me.chkAlertRebootAntsOnHashAlert.AutoSize = True
+        Me.chkAlertRebootAntsOnHashAlert.Checked = True
+        Me.chkAlertRebootAntsOnHashAlert.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertRebootAntsOnHashAlert.Location = New System.Drawing.Point(522, 39)
+        Me.chkAlertRebootAntsOnHashAlert.Name = "chkAlertRebootAntsOnHashAlert"
+        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(367, 24)
+        Me.chkAlertRebootAntsOnHashAlert.TabIndex = 27
+        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot Ants that trigger low/high Hash alerts"
+        Me.chkAlertRebootAntsOnHashAlert.UseVisualStyleBackColor = True
         '
         'frmMain
         '
@@ -2130,5 +2144,6 @@ Partial Class frmMain
     Friend WithEvents lblPools2 As System.Windows.Forms.Label
     Friend WithEvents lblPools1 As System.Windows.Forms.Label
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
 
 End Class
