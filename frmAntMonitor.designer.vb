@@ -104,7 +104,6 @@ Partial Class frmMain
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
-        Me.lstPools = New MAntMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.tabS1Alerts = New System.Windows.Forms.TabPage()
@@ -192,6 +191,7 @@ Partial Class frmMain
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
+        Me.lstPools = New MAntMonitor.enListbox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -225,7 +225,7 @@ Partial Class frmMain
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(803, 251)
+        Me.dataAnts.Size = New System.Drawing.Size(1214, 279)
         Me.dataAnts.TabIndex = 0
         '
         'mnuAntMenu
@@ -423,9 +423,9 @@ Partial Class frmMain
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(345, 75)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(155, 20)
+        Me.Label1.Size = New System.Drawing.Size(282, 20)
         Me.Label1.TabIndex = 54
-        Me.Label1.Text = "Ant address to add:"
+        Me.Label1.Text = "Ant address to add (eg: 192.168.x.y):"
         '
         'chkUseAPI
         '
@@ -1058,17 +1058,6 @@ Partial Class frmMain
         Me.Label9.TabIndex = 1
         Me.Label9.Text = "Desc:"
         '
-        'lstPools
-        '
-        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstPools.FormattingEnabled = True
-        Me.lstPools.ItemHeight = 20
-        Me.lstPools.Location = New System.Drawing.Point(6, 7)
-        Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 264)
-        Me.lstPools.TabIndex = 12
-        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.TabControl2)
@@ -1093,7 +1082,7 @@ Partial Class frmMain
         Me.TabControl2.Multiline = True
         Me.TabControl2.Name = "TabControl2"
         Me.TabControl2.SelectedIndex = 0
-        Me.TabControl2.Size = New System.Drawing.Size(805, 288)
+        Me.TabControl2.Size = New System.Drawing.Size(1219, 288)
         Me.TabControl2.TabIndex = 18
         '
         'tabS1Alerts
@@ -1112,7 +1101,7 @@ Partial Class frmMain
         Me.tabS1Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS1Alerts.Name = "tabS1Alerts"
         Me.tabS1Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS1Alerts.Size = New System.Drawing.Size(797, 255)
+        Me.tabS1Alerts.Size = New System.Drawing.Size(1211, 255)
         Me.tabS1Alerts.TabIndex = 0
         Me.tabS1Alerts.Text = "S1 Alerts"
         Me.tabS1Alerts.UseVisualStyleBackColor = True
@@ -1237,7 +1226,7 @@ Partial Class frmMain
         Me.tabS2Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS2Alerts.Name = "tabS2Alerts"
         Me.tabS2Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS2Alerts.Size = New System.Drawing.Size(797, 255)
+        Me.tabS2Alerts.Size = New System.Drawing.Size(1211, 255)
         Me.tabS2Alerts.TabIndex = 1
         Me.tabS2Alerts.Text = "S2 Alerts"
         Me.tabS2Alerts.UseVisualStyleBackColor = True
@@ -1369,7 +1358,7 @@ Partial Class frmMain
         Me.tabAlertTypes.Controls.Add(Me.txtAlertStartProcessParms)
         Me.tabAlertTypes.Location = New System.Drawing.Point(4, 4)
         Me.tabAlertTypes.Name = "tabAlertTypes"
-        Me.tabAlertTypes.Size = New System.Drawing.Size(797, 255)
+        Me.tabAlertTypes.Size = New System.Drawing.Size(1211, 255)
         Me.tabAlertTypes.TabIndex = 2
         Me.tabAlertTypes.Text = "Alert Types"
         Me.tabAlertTypes.UseVisualStyleBackColor = True
@@ -1585,7 +1574,7 @@ Partial Class frmMain
         Me.tabEmail.Controls.Add(Me.Label97)
         Me.tabEmail.Location = New System.Drawing.Point(4, 4)
         Me.tabEmail.Name = "tabEmail"
-        Me.tabEmail.Size = New System.Drawing.Size(797, 255)
+        Me.tabEmail.Size = New System.Drawing.Size(1211, 255)
         Me.tabEmail.TabIndex = 3
         Me.tabEmail.Text = "EMail Config"
         Me.tabEmail.UseVisualStyleBackColor = True
@@ -1851,7 +1840,7 @@ Partial Class frmMain
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtLog.Size = New System.Drawing.Size(805, 288)
+        Me.txtLog.Size = New System.Drawing.Size(1208, 288)
         Me.txtLog.TabIndex = 0
         '
         'cmdPause
@@ -1915,6 +1904,17 @@ Partial Class frmMain
         Me.mnuMainExit.Name = "mnuMainExit"
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
+        '
+        'lstPools
+        '
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.TabIndex = 12
         '
         'frmMain
         '

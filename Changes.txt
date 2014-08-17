@@ -1,3 +1,14 @@
+v2.7
+- Fixed a problem with the web code that would trigger if you have less than 3 Ants.
+- Fixed multiple problems with the web reboot code.  I don't see how it would have ever worked.  Apparently I broke this at some point.
+- Added more exception handling logic to hopefully catch odd errors instead of throwing the awful .Net default messages.
+- Hopefully addressed some issues that would occur if you entered your Ant's DNS name (antminer1) instead of the IP address.  This is theoretical 
+  functionality, for best results use an IP address.
+- Changed to use the last two parts of the IP address (0.90) instead of the last part (90) to allow you to have Ants on multiple subnets without
+  them walking on each other.  That is, 192.168.0.90 and 192.168.0.91 will now work properly.
+- Changed to use and store the port of the Ant address, so those using the Web scraping API on a non standard port will still be able to use it.
+- Changed the pushing of pool info to work if you don't have all 3 pools populated.  
+
 v2.6
 - Added some exception logic to the routine that retrieves the Ant userid and passwords.  There appears to be some cases where somehow those entries
 are completely missing, which can cause problems in multiple places.  Those places include rebooting your Ants, or clicking on an Ant in the config grid.  

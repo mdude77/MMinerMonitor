@@ -11,19 +11,19 @@ Public Class ControlsByRegistry
 
     End Sub
 
-    Public Sub SetControlByRegKey(ByRef chklstAny As CheckedListBox)
+    Public Sub SetControlByRegKeyAnt(ByRef chklstAny As CheckedListBox)
 
-        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey & "\" & chklstAny.Name)
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey & "\Ants")
             If key Is Nothing Then
-                My.Computer.Registry.CurrentUser.CreateSubKey(sRegKey & "\" & chklstAny.Name)
+                My.Computer.Registry.CurrentUser.CreateSubKey(sRegKey & "\Ants")
             End If
         End Using
 
-        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey & "\" & chklstAny.Name)
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey & "\Ants")
             Dim sTemp As String
 
-            For Each sTemp In key.GetValueNames
-                chklstAny.Items.Add(key.GetValue(sTemp))
+            For Each sTemp In key.GetSubKeyNames
+                chklstAny.Items.Add(sTemp)
             Next
         End Using
 
@@ -189,6 +189,7 @@ Public Class ControlsByRegistry
     Public Sub SetRegKeyByControl(ByRef chkLstAny As CheckedListBox)
 
         Dim sValue As String
+        Dim p() As String
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey & "\" & chkLstAny.Name, True)
             For Each sTemp In key.GetValueNames
@@ -197,6 +198,10 @@ Public Class ControlsByRegistry
         End Using
 
         For Each sValue In chkLstAny.Items
+            p = sValue.Split(":")
+
+            sValue = p(0) & ":" & p(1)
+
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & sRegKey & "\" & chkLstAny.Name, sValue, sValue, Microsoft.Win32.RegistryValueKind.String)
         Next
 
