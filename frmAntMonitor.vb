@@ -17,7 +17,7 @@ Public Class frmMain
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.8"
+    Private Const csVersion As String = "M's Ant Monitor v2.9"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -194,28 +194,38 @@ Public Class frmMain
             'alerts
             .AddControl(Me.chkAlertIfS1Temp, "AlertIfS1Temp")
             .AddControl(Me.chkAlertIfS2Temp, "AlertIfS2Temp")
+            .AddControl(Me.chkAlertIfS3Temp, "AlertIfS3Temp")
             .AddControl(Me.txtAlertS1Temp, "AlertValueS1Temp")
             .AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
+            .AddControl(Me.txtAlertS3Temp, "AlertValueS3Temp")
 
             .AddControl(Me.chkAlertIfS1FanHigh, "AlertIfS1Fan")
             .AddControl(Me.chkAlertIfS2FanHigh, "AlertIfS2Fan")
+            .AddControl(Me.chkAlertIfS3FanHigh, "AlertIfS3Fan")
             .AddControl(Me.txtAlertS1FanHigh, "AlertValueS1Fan")
             .AddControl(Me.txtAlertS2FanHigh, "AlertValueS2Fan")
+            .AddControl(Me.txtAlertS3FanHigh, "AlertValueS3Fan")
 
             .AddControl(Me.chkAlertIfS1FanLow, "AlertIfS1FanLow")
             .AddControl(Me.chkAlertIfS2FanLow, "AlertIfS2FanLow")
+            .AddControl(Me.chkAlertIfS3FanLow, "AlertIfS3FanLow")
             .AddControl(Me.txtAlertS1FanLow, "AlertValueS1FanLow")
             .AddControl(Me.txtAlertS2FanLow, "AlertValueS2FanLow")
+            .AddControl(Me.txtAlertS3FanLow, "AlertValueS3FanLow")
 
             .AddControl(Me.chkAlertIfS1Hash, "AlertIfS1Hash")
             .AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
+            .AddControl(Me.chkAlertIfS3Hash, "AlertIFS3Hash")
             .AddControl(Me.txtAlertS1Hash, "AlertValueS1Hash")
             .AddControl(Me.txtAlertS2Hash, "AlertValueS2Hash")
+            .AddControl(Me.txtAlertS3Hash, "AlertValueS3Hash")
 
             .AddControl(Me.chkAlertIfS1XCount, "AlertIfS1XCount")
             .AddControl(Me.chkAlertIfS2XCount, "AlertIFS2XCount")
+            .AddControl(Me.chkAlertIfS3XCount, "AlertIFS3XCount")
             .AddControl(Me.txtAlertS1XCount, "AlertValueS1XCount")
             .AddControl(Me.txtAlertS2XCount, "AlertValueS2XCount")
+            .AddControl(Me.txtAlertS3XCount, "AlertValueS3XCount")
 
             .AddControl(Me.chkAlertHighlightField, "AlertHighlightField")
             .AddControl(Me.chkAlertShowAnnoyingPopup, "AlertShowAnnoyingPopup")
@@ -276,7 +286,7 @@ Public Class frmMain
                 sDefaultPW = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Password", "root")
 
                 If My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", "") Is Nothing Then
-                    If sAnt.Substring(0, 2) = "S1" Then
+                    If sAnt.Substring(0, 2) = "S1" OrElse sAnt.Substring(0, 2) = "S3" Then
                         My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
                         My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
                         My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
@@ -332,28 +342,38 @@ Public Class frmMain
             'alerts
             .SetControlByRegKey(Me.chkAlertIfS1Temp)
             .SetControlByRegKey(Me.chkAlertIfS2Temp)
+            .SetControlByRegKey(Me.chkAlertIfS3Temp)
             .SetControlByRegKey(Me.txtAlertS1Temp)
             .SetControlByRegKey(Me.txtAlertS2Temp)
+            .SetControlByRegKey(Me.txtAlertS3Temp)
 
             .SetControlByRegKey(Me.chkAlertIfS1FanHigh)
             .SetControlByRegKey(Me.chkAlertIfS2FanHigh)
+            .SetControlByRegKey(Me.chkAlertIfS3FanHigh)
             .SetControlByRegKey(Me.txtAlertS1FanHigh)
             .SetControlByRegKey(Me.txtAlertS2FanHigh)
+            .SetControlByRegKey(Me.txtAlertS3FanHigh)
 
             .SetControlByRegKey(Me.chkAlertIfS1FanLow)
             .SetControlByRegKey(Me.chkAlertIfS2FanLow)
+            .SetControlByRegKey(Me.chkAlertIfS3FanLow)
             .SetControlByRegKey(Me.txtAlertS1FanLow)
             .SetControlByRegKey(Me.txtAlertS2FanLow)
+            .SetControlByRegKey(Me.txtAlertS3FanLow)
 
             .SetControlByRegKey(Me.chkAlertIfS1Hash)
             .SetControlByRegKey(Me.chkAlertIfS2Hash)
+            .SetControlByRegKey(Me.chkAlertIfS3Hash)
             .SetControlByRegKey(Me.txtAlertS1Hash)
             .SetControlByRegKey(Me.txtAlertS2Hash)
+            .SetControlByRegKey(Me.txtAlertS3Hash)
 
             .SetControlByRegKey(Me.chkAlertIfS1XCount)
             .SetControlByRegKey(Me.chkAlertIfS2XCount)
+            .SetControlByRegKey(Me.chkAlertIfS3XCount)
             .SetControlByRegKey(Me.txtAlertS1XCount)
             .SetControlByRegKey(Me.txtAlertS2XCount)
+            .SetControlByRegKey(Me.txtAlertS3XCount)
 
             .SetControlByRegKey(Me.chkAlertHighlightField, True)
             .SetControlByRegKey(Me.chkAlertShowNotifyPopup, True)
@@ -851,6 +871,7 @@ Public Class frmMain
     Private Sub TimerRefresh_Tick(sender As Object, e As System.EventArgs) Handles TimerRefresh.Tick
 
         Dim x As Integer
+        Dim bLoopAgain As Boolean
 
         iCountDown -= 1
 
@@ -858,11 +879,19 @@ Public Class frmMain
             iCountDown = iRefreshRate
         End If
 
-        For x = 0 To colResponses.Count - 1
-            AddToLog(colResponses(x))
+        Do
+            bLoopAgain = False
 
-            colResponses.RemoveAt(x)
-        Next
+            For x = 0 To colResponses.Count - 1
+                AddToLog(colResponses(x))
+
+                colResponses.RemoveAt(x)
+
+                bLoopAgain = True
+
+                Exit For
+            Next
+        Loop While bLoopAgain = True
 
         If iCountDown = 0 Then
             Me.TimerRefresh.Enabled = False
@@ -943,6 +972,9 @@ Public Class frmMain
                     sbTemp.Clear()
 
                     Select Case Me.chklstAnts.CheckedItems(bAnt).ToString.Substring(0, 2)
+                        Case "S3"
+                            AntType = enAntType.S3
+
                         Case "S2"
                             AntType = enAntType.S2
 
@@ -965,6 +997,8 @@ Public Class frmMain
                         sAnt = sAntIP
                     End If
 
+                    bAntFound = False
+
                     For Each dr In ds.Tables(0).Rows
                         If dr.Item("Name") = sAnt Then
                             bAntFound = True
@@ -984,85 +1018,96 @@ Public Class frmMain
 
                     sResult = GetIPData(sAntIP, "stats")
 
+                    If AntType = enAntType.S3 Then
+                        'fix mangled JSON
+                        x = InStr(sResult, """Type"":""S3""}{""STATS")
+
+                        If sResult.Substring(x + 11, 1) = "{" Then
+                            sResult = sResult.Insert(x + 11, ",")
+                        End If
+                    End If
+
                     j = Newtonsoft.Json.Linq.JObject.Parse(sResult)
 
                     For Each ja In j.Property("STATS")
-                        For Each jp1 In ja
-                            ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
+                        If AntType = enAntType.S3 Then
+                            jp1 = ja(1)
+                        Else
+                            jp1 = ja(0)
+                        End If
 
-                            dr.Item("Uptime") = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
-                            dr.Item("HWE%") = jp1.Value(Of String)("Device Hardware%") & "%"
+                        ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
 
-                            dr.Item("HFan") = GetHighValue(jp1.Value(Of Integer)("fan1"), jp1.Value(Of Integer)("fan2"), jp1.Value(Of Integer)("fan3"), jp1.Value(Of Integer)("fan4"))
+                        dr.Item("Uptime") = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
+                        dr.Item("HWE%") = jp1.Value(Of String)("Device Hardware%") & "%"
 
-                            sbTemp.Clear()
+                        dr.Item("HFan") = GetHighValue(jp1.Value(Of Integer)("fan1"), jp1.Value(Of Integer)("fan2"), jp1.Value(Of Integer)("fan3"), jp1.Value(Of Integer)("fan4"))
 
-                            For x = 1 To jp1.Value(Of Integer)("fan_num")
-                                sbTemp.Append(jp1.Value(Of Integer)("fan" & x))
+                        sbTemp.Clear()
 
-                                If x <> jp1.Value(Of Integer)("fan_num") Then
-                                    sbTemp.Append(" ")
-                                End If
-                            Next
+                        For x = 1 To jp1.Value(Of Integer)("fan_num")
+                            sbTemp.Append(jp1.Value(Of Integer)("fan" & x))
 
-                            dr.Item("Fans") = sbTemp.ToString
-
-                            sbTemp.Clear()
-
-                            iTemp = 0
-
-                            For x = 1 To jp1.Value(Of Integer)("temp_num")
-                                sbTemp.Append(jp1.Value(Of Integer)("temp" & x))
-
-                                If jp1.Value(Of Integer)("temp" & x) > iTemp Then
-                                    iTemp = jp1.Value(Of Integer)("temp" & x)
-                                End If
-
-                                If x <> jp1.Value(Of Integer)("temp_num") Then
-                                    sbTemp.Append(" ")
-                                End If
-                            Next
-
-                            dr.Item("HTemp") = iTemp
-
-                            dr.Item("Temps") = sbTemp.ToString
-
-                            dr.Item("Freq") = Val(jp1.Value(Of String)("frequency"))
-
-                            count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
-                            count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
-
-                            If AntType = enAntType.S2 Then
-                                count(2) = HowManyInString(jp1.Value(Of String)("chain_acs3"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs3"), "x")
-                                count(3) = HowManyInString(jp1.Value(Of String)("chain_acs4"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs4"), "x")
-                                count(4) = HowManyInString(jp1.Value(Of String)("chain_acs5"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs5"), "x")
-                                count(5) = HowManyInString(jp1.Value(Of String)("chain_acs6"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs6"), "x")
-                                count(6) = HowManyInString(jp1.Value(Of String)("chain_acs7"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs7"), "x")
-                                count(7) = HowManyInString(jp1.Value(Of String)("chain_acs8"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs8"), "x")
-                                count(8) = HowManyInString(jp1.Value(Of String)("chain_acs9"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs9"), "x")
-                                count(9) = HowManyInString(jp1.Value(Of String)("chain_acs10"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs10"), "x")
-                            Else
-                                count(2) = 0
-                                count(3) = 0
-                                count(4) = 0
-                                count(5) = 0
-                                count(6) = 0
-                                count(7) = 0
-                                count(8) = 0
-                                count(9) = 0
+                            If x <> jp1.Value(Of Integer)("fan_num") Then
+                                sbTemp.Append(" ")
                             End If
-
-                            dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
-
-                            If AntType = enAntType.S2 Then
-                                dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
-                                                    count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
-                            Else
-                                dr.Item("Status") = count(0) & "X " & count(1) & "X "
-                            End If
-
-                            Exit For
                         Next
+
+                        dr.Item("Fans") = sbTemp.ToString
+
+                        sbTemp.Clear()
+
+                        iTemp = 0
+
+                        For x = 1 To jp1.Value(Of Integer)("temp_num")
+                            sbTemp.Append(jp1.Value(Of Integer)("temp" & x))
+
+                            If jp1.Value(Of Integer)("temp" & x) > iTemp Then
+                                iTemp = jp1.Value(Of Integer)("temp" & x)
+                            End If
+
+                            If x <> jp1.Value(Of Integer)("temp_num") Then
+                                sbTemp.Append(" ")
+                            End If
+                        Next
+
+                        dr.Item("HTemp") = iTemp
+
+                        dr.Item("Temps") = sbTemp.ToString
+
+                        dr.Item("Freq") = Val(jp1.Value(Of String)("frequency"))
+
+                        count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
+                        count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
+
+                        If AntType = enAntType.S2 Then
+                            count(2) = HowManyInString(jp1.Value(Of String)("chain_acs3"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs3"), "x")
+                            count(3) = HowManyInString(jp1.Value(Of String)("chain_acs4"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs4"), "x")
+                            count(4) = HowManyInString(jp1.Value(Of String)("chain_acs5"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs5"), "x")
+                            count(5) = HowManyInString(jp1.Value(Of String)("chain_acs6"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs6"), "x")
+                            count(6) = HowManyInString(jp1.Value(Of String)("chain_acs7"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs7"), "x")
+                            count(7) = HowManyInString(jp1.Value(Of String)("chain_acs8"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs8"), "x")
+                            count(8) = HowManyInString(jp1.Value(Of String)("chain_acs9"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs9"), "x")
+                            count(9) = HowManyInString(jp1.Value(Of String)("chain_acs10"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs10"), "x")
+                        Else
+                            count(2) = 0
+                            count(3) = 0
+                            count(4) = 0
+                            count(5) = 0
+                            count(6) = 0
+                            count(7) = 0
+                            count(8) = 0
+                            count(9) = 0
+                        End If
+
+                        dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
+
+                        If AntType = enAntType.S2 Then
+                            dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
+                                                count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
+                        Else
+                            dr.Item("Status") = count(0) & "X " & count(1) & "X "
+                        End If
 
                         Exit For
                     Next
@@ -1149,7 +1194,7 @@ Public Class frmMain
                     AddToLog("ERROR when querying " & sAnt & " (step " & bStep & "): " & ex.Message)
                 End Try
 
-                If bAntFound = False Then
+                If bAntFound = False AndAlso dr IsNot Nothing Then
                     ds.Tables(0).Rows.Add(dr)
                 End If
 
@@ -1166,7 +1211,7 @@ Public Class frmMain
             x = 0
 
             For Each dg As DataGridViewRow In Me.dataAnts.Rows
-                If dg.Cells("Uptime").Value <> "ERROR" AndAlso dg.Cells("Uptime").Value <> "???" Then
+                If IsDBNull(dg.Cells("Uptime").Value) = False AndAlso dg.Cells("Uptime").Value <> "ERROR" AndAlso dg.Cells("Uptime").Value <> "???" Then
                     x += 1
 
                     dbTemp += dg.Cells("GH/s(avg)").Value
@@ -1349,7 +1394,7 @@ Public Class frmMain
 
         For Each dr In Me.dataAnts.Rows
             Try
-                If dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
+                If IsDBNull(dr.Cells("Uptime").Value) = False AndAlso dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
                     iAntAlertCount = 0
 
                     If dr.Tag Is Nothing Then
@@ -1537,6 +1582,94 @@ Public Class frmMain
                                 End If
                             End If
 
+                        Case "S3"
+                            If Me.chkAlertIfS3Temp.Checked = True Then
+                                bStep = 1
+
+                                x = Val(Me.txtAlertS3Temp.Text)
+
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S3 Temp Alert")
+                                    End If
+                                End If
+                            End If
+
+                            If Me.chkAlertIfS3FanHigh.Checked = True Then
+                                bStep = 2
+
+                                x = Val(Me.txtAlertS3FanHigh.Text)
+
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S3 Fan Alert")
+                                    End If
+                                End If
+                            End If
+
+                            If Me.chkAlertIfS3FanLow.Checked = True Then
+                                bStep = 3
+
+                                x = Val(Me.txtAlertS3FanLow.Text)
+
+                                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S3 Fan Alert")
+                                End If
+                            End If
+
+                            If Me.chkAlertIfS3Hash.Checked = True Then
+                                bStep = 4
+
+                                x = Val(Me.txtAlertS3Hash.Text)
+
+                                If x > 0 Then
+                                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S3 Hash Alert")
+
+                                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True AndAlso Me.chkUseAPI.Checked = True Then
+                                            Call RebootAnt(dr.Cells("IPAddress").Value, False)
+                                        End If
+                                    End If
+                                End If
+                            End If
+
+                            If Me.chkAlertIfS3XCount.Checked = True Then
+                                bStep = 5
+
+                                x = Val(Me.txtAlertS3XCount.Text)
+
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                                        iAntAlertCount += 1
+
+                                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S3 XCount Alert")
+
+                                        'use SSH only if using the API, as the web code has its own reboot logic
+                                        If Me.chkAlertRebootIfXd.Checked = True AndAlso Me.chkUseAPI.Checked = True Then
+                                            Call RebootAnt(dr.Cells("IPAddress").Value, False)
+                                        End If
+                                    End If
+                                End If
+                            End If
+
                     End Select
 
                     dr.Cells("ACount").Value = iAntAlertCount
@@ -1547,16 +1680,18 @@ Public Class frmMain
         Next
 
         For Each dr In Me.dataAnts.Rows
-            colHighlightColumns = dr.Tag
+            If dr.Tag IsNot Nothing Then
+                colHighlightColumns = dr.Tag
 
-            dr.Cells("HTemp").Style.BackColor = New Color
-            dr.Cells("HFan").Style.BackColor = New Color
-            dr.Cells("GH/s(avg)").Style.BackColor = New Color
-            dr.Cells("XCount").Style.BackColor = New Color
+                dr.Cells("HTemp").Style.BackColor = New Color
+                dr.Cells("HFan").Style.BackColor = New Color
+                dr.Cells("GH/s(avg)").Style.BackColor = New Color
+                dr.Cells("XCount").Style.BackColor = New Color
 
-            For Each x In colHighlightColumns
-                dr.Cells(x).Style.BackColor = Color.Red
-            Next
+                For Each x In colHighlightColumns
+                    dr.Cells(x).Style.BackColor = Color.Red
+                Next
+            End If
         Next
 
         If iAlertCount <> 0 Then
@@ -2013,8 +2148,8 @@ Public Class frmMain
         Dim sTemp, sPort As String
         Dim p() As String
 
-        If Me.optAddS1.Checked = False AndAlso Me.optAddS2.Checked = False Then
-            MsgBox("Please specify if this is an S1 or an S2.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+        If Me.optAddS1.Checked = False AndAlso Me.optAddS2.Checked = False AndAlso Me.optAddS3.Checked = False Then
+            MsgBox("Please specify if this is an S1, S2, or and S3.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
             Exit Sub
         End If
@@ -2023,6 +2158,8 @@ Public Class frmMain
             sTemp = "S1: "
         ElseIf Me.optAddS2.Checked = True Then
             sTemp = "S2: "
+        ElseIf Me.optAddS3.Checked = True Then
+            sTemp = "S3: "
         End If
 
         If Me.txtAntAddress.Text.IsNullOrEmpty = False Then
@@ -2044,7 +2181,7 @@ Public Class frmMain
 
                 My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "Port", sPort, Microsoft.Win32.RegistryValueKind.String)
 
-                If sTemp.Substring(0, 2) = "S1" Then
+                If sTemp.Substring(0, 2) = "S1" OrElse sTemp.Substring(0, 2) = "S3" Then
                     If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
                         My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
                         My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
@@ -2091,13 +2228,21 @@ Public Class frmMain
 
     Private Sub cmdDelAnt_Click(sender As System.Object, e As System.EventArgs) Handles cmdDelAnt.Click
 
-        If Me.chklstAnts.SelectedItem Is Nothing Then
-            MsgBox("Please select an item to remove first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+        Try
+            If Me.chklstAnts.SelectedItem Is Nothing Then
+                MsgBox("Please select an item to remove first.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
-            Exit Sub
-        End If
+                Exit Sub
+            End If
 
-        Me.chklstAnts.Items.RemoveAt(Me.chklstAnts.SelectedIndex)
+            Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants", True)
+                key.DeleteSubKey(Me.chklstAnts.SelectedItem)
+            End Using
+
+            Me.chklstAnts.Items.RemoveAt(Me.chklstAnts.SelectedIndex)
+        Catch ex As Exception When bErrorHandle = True
+            MsgBox("An error occurred when trying to delete " & Me.chklstAnts.SelectedItem & ":" & vbCrLf & vbCrLf & ex.Message)
+        End Try
 
     End Sub
 
@@ -2316,7 +2461,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, cmdSaveAlerts3.Click, cmdSaveAlerts4.Click
+    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click
 
         With ctlsByKey
             .SetRegKeyByControl(Me.chkAlertHighlightField)
@@ -2335,6 +2480,7 @@ Public Class frmMain
             .SetRegKeyByControl(Me.txtAlertStartProcessName)
             .SetRegKeyByControl(Me.txtAlertStartProcessParms)
 
+            's1
             If Me.chkAlertIfS1Temp.Checked = True Then
                 If Me.txtAlertS1Temp.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2346,6 +2492,7 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS1Temp)
             .SetRegKeyByControl(Me.txtAlertS1Temp)
 
+            's2
             If Me.chkAlertIfS2Temp.Checked = True Then
                 If Me.txtAlertS2Temp.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S2 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2357,6 +2504,19 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS2Temp)
             .SetRegKeyByControl(Me.txtAlertS2Temp)
 
+            's3
+            If Me.chkAlertIfS3Temp.Checked = True Then
+                If Me.txtAlertS3Temp.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S3 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS3Temp.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS3Temp)
+            .SetRegKeyByControl(Me.txtAlertS3Temp)
+
+            's1
             If Me.chkAlertIfS1FanHigh.Checked = True Then
                 If Me.txtAlertS1FanHigh.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2368,6 +2528,7 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS1FanHigh)
             .SetRegKeyByControl(Me.txtAlertS1FanHigh)
 
+            's2
             If Me.chkAlertIfS2FanHigh.Checked = True Then
                 If Me.txtAlertS2FanHigh.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S2 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2379,6 +2540,19 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS2FanHigh)
             .SetRegKeyByControl(Me.txtAlertS2FanHigh)
 
+            'S3
+            If Me.chkAlertIfS3FanHigh.Checked = True Then
+                If Me.txtAlertS3FanHigh.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S3 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS3FanHigh.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS3FanHigh)
+            .SetRegKeyByControl(Me.txtAlertS3FanHigh)
+
+            'S1
             If Me.chkAlertIfS1FanLow.Checked = True Then
                 If Me.txtAlertS1FanLow.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2390,6 +2564,7 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS1FanLow)
             .SetRegKeyByControl(Me.txtAlertS1FanLow)
 
+            'S2
             If Me.chkAlertIfS2FanLow.Checked = True Then
                 If Me.txtAlertS2FanLow.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S2 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2401,6 +2576,19 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS2FanLow)
             .SetRegKeyByControl(Me.txtAlertS2FanLow)
 
+            'S3
+            If Me.chkAlertIfS3FanLow.Checked = True Then
+                If Me.txtAlertS3FanLow.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S3 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS3FanLow.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS3FanLow)
+            .SetRegKeyByControl(Me.txtAlertS3FanLow)
+
+            's1
             If Me.chkAlertIfS1Hash.Checked = True Then
                 If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2412,6 +2600,7 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS1Hash)
             .SetRegKeyByControl(Me.txtAlertS1Hash)
 
+            's2
             If Me.chkAlertIfS2Hash.Checked = True Then
                 If Me.txtAlertS2Hash.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S2 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2423,6 +2612,19 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS2Hash)
             .SetRegKeyByControl(Me.txtAlertS2Hash)
 
+            'S3
+            If Me.chkAlertIfS3Hash.Checked = True Then
+                If Me.txtAlertS3Hash.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S3 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS3Hash.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS3Hash)
+            .SetRegKeyByControl(Me.txtAlertS3Hash)
+
+            'S1
             If Me.chkAlertIfS1XCount.Checked = True Then
                 If Me.txtAlertS1XCount.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2434,6 +2636,7 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS1XCount)
             .SetRegKeyByControl(Me.txtAlertS1XCount)
 
+            'S2
             If Me.chkAlertIfS2XCount.Checked = True Then
                 If Me.txtAlertS2XCount.Text.IsNullOrEmpty Then
                     MsgBox("Please specify an S2 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
@@ -2444,6 +2647,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfS2XCount)
             .SetRegKeyByControl(Me.txtAlertS2XCount)
+
+            'S3
+            If Me.chkAlertIfS3XCount.Checked = True Then
+                If Me.txtAlertS3XCount.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S3 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS3XCount.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS3XCount)
+            .SetRegKeyByControl(Me.txtAlertS3XCount)
 
             'email notifications
             Call ctlsByKey.SetRegKeyByControl(Me.txtSMTPServer)
@@ -2722,7 +2937,7 @@ Public Class frmMain
         
         sTemp = RemoveAntPort(Me.chklstAnts.SelectedItem.ToString)
 
-        If sTemp.Substring(0, 2) = "S1" Then
+        If sTemp.Substring(0, 2) = "S1" OrElse sTemp.Substring(0, 2) = "S3" Then
             If Me.txtWebUsername.Text.IsNullOrEmpty = True Then
                 My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
                 My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)

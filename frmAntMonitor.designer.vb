@@ -104,7 +104,6 @@ Partial Class frmMain
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
-        Me.lstPools = New MAntMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.tabS1Alerts = New System.Windows.Forms.TabPage()
@@ -132,6 +131,7 @@ Partial Class frmMain
         Me.chkAlertIfS2FanHigh = New System.Windows.Forms.CheckBox()
         Me.txtAlertS2Temp = New System.Windows.Forms.TextBox()
         Me.tabAlertTypes = New System.Windows.Forms.TabPage()
+        Me.chkAlertRebootAntsOnHashAlert = New System.Windows.Forms.CheckBox()
         Me.cmbAlertRebootGovernor = New System.Windows.Forms.ComboBox()
         Me.txtAlertRebootGovernor = New System.Windows.Forms.TextBox()
         Me.Label8 = New System.Windows.Forms.Label()
@@ -192,7 +192,20 @@ Partial Class frmMain
         Me.mnuExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.chkAlertRebootAntsOnHashAlert = New System.Windows.Forms.CheckBox()
+        Me.optAddS3 = New System.Windows.Forms.RadioButton()
+        Me.lstPools = New MAntMonitor.enListbox()
+        Me.tabS3Alerts = New System.Windows.Forms.TabPage()
+        Me.chkAlertIfS3FanLow = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS3FanLow = New System.Windows.Forms.TextBox()
+        Me.cmdSaveAlerts5 = New System.Windows.Forms.Button()
+        Me.chkAlertIfS3XCount = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS3XCount = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS3FanHigh = New System.Windows.Forms.CheckBox()
+        Me.chkAlertIfS3Hash = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS3Temp = New System.Windows.Forms.TextBox()
+        Me.txtAlertS3Hash = New System.Windows.Forms.TextBox()
+        Me.chkAlertIfS3Temp = New System.Windows.Forms.CheckBox()
+        Me.txtAlertS3FanHigh = New System.Windows.Forms.TextBox()
         CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -209,6 +222,7 @@ Partial Class frmMain
         Me.tabLog.SuspendLayout()
         Me.menuStripNotifyIcon.SuspendLayout()
         Me.menuStripMain.SuspendLayout()
+        Me.tabS3Alerts.SuspendLayout()
         Me.SuspendLayout()
         '
         'dataAnts
@@ -226,7 +240,7 @@ Partial Class frmMain
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1214, 279)
+        Me.dataAnts.Size = New System.Drawing.Size(1214, 255)
         Me.dataAnts.TabIndex = 0
         '
         'mnuAntMenu
@@ -307,6 +321,7 @@ Partial Class frmMain
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.optAddS3)
         Me.tabConfig.Controls.Add(Me.chkShowSelectionColumn)
         Me.tabConfig.Controls.Add(Me.cmdSaveAnt)
         Me.tabConfig.Controls.Add(Me.Label7)
@@ -435,9 +450,9 @@ Partial Class frmMain
         Me.chkUseAPI.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkUseAPI.Location = New System.Drawing.Point(662, 263)
         Me.chkUseAPI.Name = "chkUseAPI"
-        Me.chkUseAPI.Size = New System.Drawing.Size(92, 24)
+        Me.chkUseAPI.Size = New System.Drawing.Size(171, 24)
         Me.chkUseAPI.TabIndex = 53
-        Me.chkUseAPI.Text = "Use API"
+        Me.chkUseAPI.Text = "Use API (non web)"
         Me.ToolTip1.SetToolTip(Me.chkUseAPI, "If unchecked, will use a browser control, that has mixed results for some users.")
         Me.chkUseAPI.UseVisualStyleBackColor = True
         '
@@ -1059,17 +1074,6 @@ Partial Class frmMain
         Me.Label9.TabIndex = 1
         Me.Label9.Text = "Desc:"
         '
-        'lstPools
-        '
-        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstPools.FormattingEnabled = True
-        Me.lstPools.ItemHeight = 20
-        Me.lstPools.Location = New System.Drawing.Point(6, 7)
-        Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 264)
-        Me.lstPools.TabIndex = 12
-        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.TabControl2)
@@ -1088,6 +1092,7 @@ Partial Class frmMain
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl2.Controls.Add(Me.tabS1Alerts)
         Me.TabControl2.Controls.Add(Me.tabS2Alerts)
+        Me.TabControl2.Controls.Add(Me.tabS3Alerts)
         Me.TabControl2.Controls.Add(Me.tabAlertTypes)
         Me.TabControl2.Controls.Add(Me.tabEmail)
         Me.TabControl2.Location = New System.Drawing.Point(6, 7)
@@ -1375,6 +1380,18 @@ Partial Class frmMain
         Me.tabAlertTypes.TabIndex = 2
         Me.tabAlertTypes.Text = "Alert Types"
         Me.tabAlertTypes.UseVisualStyleBackColor = True
+        '
+        'chkAlertRebootAntsOnHashAlert
+        '
+        Me.chkAlertRebootAntsOnHashAlert.AutoSize = True
+        Me.chkAlertRebootAntsOnHashAlert.Checked = True
+        Me.chkAlertRebootAntsOnHashAlert.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertRebootAntsOnHashAlert.Location = New System.Drawing.Point(522, 39)
+        Me.chkAlertRebootAntsOnHashAlert.Name = "chkAlertRebootAntsOnHashAlert"
+        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(367, 24)
+        Me.chkAlertRebootAntsOnHashAlert.TabIndex = 27
+        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot Ants that trigger low/high Hash alerts"
+        Me.chkAlertRebootAntsOnHashAlert.UseVisualStyleBackColor = True
         '
         'cmbAlertRebootGovernor
         '
@@ -1918,17 +1935,151 @@ Partial Class frmMain
         Me.mnuMainExit.Size = New System.Drawing.Size(102, 24)
         Me.mnuMainExit.Text = "E&xit"
         '
-        'chkAlertRebootAntsOnHashAlert
+        'optAddS3
         '
-        Me.chkAlertRebootAntsOnHashAlert.AutoSize = True
-        Me.chkAlertRebootAntsOnHashAlert.Checked = True
-        Me.chkAlertRebootAntsOnHashAlert.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAlertRebootAntsOnHashAlert.Location = New System.Drawing.Point(522, 39)
-        Me.chkAlertRebootAntsOnHashAlert.Name = "chkAlertRebootAntsOnHashAlert"
-        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(367, 24)
-        Me.chkAlertRebootAntsOnHashAlert.TabIndex = 27
-        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot Ants that trigger low/high Hash alerts"
-        Me.chkAlertRebootAntsOnHashAlert.UseVisualStyleBackColor = True
+        Me.optAddS3.AutoSize = True
+        Me.optAddS3.Location = New System.Drawing.Point(480, 215)
+        Me.optAddS3.Name = "optAddS3"
+        Me.optAddS3.Size = New System.Drawing.Size(50, 24)
+        Me.optAddS3.TabIndex = 65
+        Me.optAddS3.TabStop = True
+        Me.optAddS3.Text = "S3"
+        Me.optAddS3.UseVisualStyleBackColor = True
+        '
+        'lstPools
+        '
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.TabIndex = 12
+        '
+        'tabS3Alerts
+        '
+        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3FanLow)
+        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3FanLow)
+        Me.tabS3Alerts.Controls.Add(Me.cmdSaveAlerts5)
+        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3XCount)
+        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3XCount)
+        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3FanHigh)
+        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3Hash)
+        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3Temp)
+        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3Hash)
+        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3Temp)
+        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3FanHigh)
+        Me.tabS3Alerts.Location = New System.Drawing.Point(4, 4)
+        Me.tabS3Alerts.Name = "tabS3Alerts"
+        Me.tabS3Alerts.Size = New System.Drawing.Size(1211, 255)
+        Me.tabS3Alerts.TabIndex = 4
+        Me.tabS3Alerts.Text = "S3 Alerts"
+        Me.tabS3Alerts.UseVisualStyleBackColor = True
+        '
+        'chkAlertIfS3FanLow
+        '
+        Me.chkAlertIfS3FanLow.AutoSize = True
+        Me.chkAlertIfS3FanLow.Location = New System.Drawing.Point(12, 43)
+        Me.chkAlertIfS3FanLow.Name = "chkAlertIfS3FanLow"
+        Me.chkAlertIfS3FanLow.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS3FanLow.TabIndex = 29
+        Me.chkAlertIfS3FanLow.Text = "Fan Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3FanLow, "Equal to or greater than")
+        Me.chkAlertIfS3FanLow.UseVisualStyleBackColor = True
+        '
+        'txtAlertS3FanLow
+        '
+        Me.txtAlertS3FanLow.Location = New System.Drawing.Point(141, 39)
+        Me.txtAlertS3FanLow.Name = "txtAlertS3FanLow"
+        Me.txtAlertS3FanLow.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS3FanLow.TabIndex = 30
+        Me.txtAlertS3FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'cmdSaveAlerts5
+        '
+        Me.cmdSaveAlerts5.Location = New System.Drawing.Point(12, 216)
+        Me.cmdSaveAlerts5.Name = "cmdSaveAlerts5"
+        Me.cmdSaveAlerts5.Size = New System.Drawing.Size(121, 32)
+        Me.cmdSaveAlerts5.TabIndex = 28
+        Me.cmdSaveAlerts5.Text = "Save Config"
+        Me.cmdSaveAlerts5.UseVisualStyleBackColor = True
+        '
+        'chkAlertIfS3XCount
+        '
+        Me.chkAlertIfS3XCount.AutoSize = True
+        Me.chkAlertIfS3XCount.Location = New System.Drawing.Point(12, 136)
+        Me.chkAlertIfS3XCount.Name = "chkAlertIfS3XCount"
+        Me.chkAlertIfS3XCount.Size = New System.Drawing.Size(129, 24)
+        Me.chkAlertIfS3XCount.TabIndex = 26
+        Me.chkAlertIfS3XCount.Text = "XCount Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3XCount, "Great than or equal to")
+        Me.chkAlertIfS3XCount.UseVisualStyleBackColor = True
+        '
+        'txtAlertS3XCount
+        '
+        Me.txtAlertS3XCount.Location = New System.Drawing.Point(141, 132)
+        Me.txtAlertS3XCount.Name = "txtAlertS3XCount"
+        Me.txtAlertS3XCount.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS3XCount.TabIndex = 27
+        Me.txtAlertS3XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS3FanHigh
+        '
+        Me.chkAlertIfS3FanHigh.AutoSize = True
+        Me.chkAlertIfS3FanHigh.Location = New System.Drawing.Point(12, 12)
+        Me.chkAlertIfS3FanHigh.Name = "chkAlertIfS3FanHigh"
+        Me.chkAlertIfS3FanHigh.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertIfS3FanHigh.TabIndex = 22
+        Me.chkAlertIfS3FanHigh.Text = "Fan Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3FanHigh, "Equal to or greater than")
+        Me.chkAlertIfS3FanHigh.UseVisualStyleBackColor = True
+        '
+        'chkAlertIfS3Hash
+        '
+        Me.chkAlertIfS3Hash.AutoSize = True
+        Me.chkAlertIfS3Hash.Location = New System.Drawing.Point(12, 74)
+        Me.chkAlertIfS3Hash.Name = "chkAlertIfS3Hash"
+        Me.chkAlertIfS3Hash.Size = New System.Drawing.Size(114, 24)
+        Me.chkAlertIfS3Hash.TabIndex = 24
+        Me.chkAlertIfS3Hash.Text = "Hash Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3Hash, "Avg Hash is equal to or less than")
+        Me.chkAlertIfS3Hash.UseVisualStyleBackColor = True
+        '
+        'txtAlertS3Temp
+        '
+        Me.txtAlertS3Temp.Location = New System.Drawing.Point(141, 101)
+        Me.txtAlertS3Temp.Name = "txtAlertS3Temp"
+        Me.txtAlertS3Temp.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS3Temp.TabIndex = 21
+        Me.txtAlertS3Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtAlertS3Hash
+        '
+        Me.txtAlertS3Hash.Location = New System.Drawing.Point(141, 70)
+        Me.txtAlertS3Hash.Name = "txtAlertS3Hash"
+        Me.txtAlertS3Hash.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS3Hash.TabIndex = 25
+        Me.txtAlertS3Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertIfS3Temp
+        '
+        Me.chkAlertIfS3Temp.AutoSize = True
+        Me.chkAlertIfS3Temp.Location = New System.Drawing.Point(12, 105)
+        Me.chkAlertIfS3Temp.Name = "chkAlertIfS3Temp"
+        Me.chkAlertIfS3Temp.Size = New System.Drawing.Size(116, 24)
+        Me.chkAlertIfS3Temp.TabIndex = 20
+        Me.chkAlertIfS3Temp.Text = "Temp Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3Temp, "Equal to or greater than")
+        Me.chkAlertIfS3Temp.UseVisualStyleBackColor = True
+        '
+        'txtAlertS3FanHigh
+        '
+        Me.txtAlertS3FanHigh.Location = New System.Drawing.Point(141, 8)
+        Me.txtAlertS3FanHigh.Name = "txtAlertS3FanHigh"
+        Me.txtAlertS3FanHigh.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertS3FanHigh.TabIndex = 23
+        Me.txtAlertS3FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'frmMain
         '
@@ -1972,6 +2123,8 @@ Partial Class frmMain
         Me.tabLog.PerformLayout()
         Me.menuStripNotifyIcon.ResumeLayout(False)
         Me.menuStripMain.ResumeLayout(False)
+        Me.tabS3Alerts.ResumeLayout(False)
+        Me.tabS3Alerts.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2145,5 +2298,18 @@ Partial Class frmMain
     Friend WithEvents lblPools1 As System.Windows.Forms.Label
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
+    Friend WithEvents optAddS3 As System.Windows.Forms.RadioButton
+    Friend WithEvents tabS3Alerts As System.Windows.Forms.TabPage
+    Friend WithEvents chkAlertIfS3FanLow As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS3FanLow As System.Windows.Forms.TextBox
+    Friend WithEvents cmdSaveAlerts5 As System.Windows.Forms.Button
+    Friend WithEvents chkAlertIfS3XCount As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS3XCount As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS3FanHigh As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertIfS3Hash As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS3Temp As System.Windows.Forms.TextBox
+    Friend WithEvents txtAlertS3Hash As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertIfS3Temp As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertS3FanHigh As System.Windows.Forms.TextBox
 
 End Class

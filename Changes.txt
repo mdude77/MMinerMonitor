@@ -1,3 +1,9 @@
+v2.9
+- Fixed a few instances where .net errors could be thrown if an Ant didn't respond for whatever reason.
+- Fixed the problem with deleted Ants coming back on their own accord.
+- Fixed a problem that would cause Ants to not show up on the grid when they should.
+- Added API support for S3s.
+
 v2.8
 - Fixed the problem with one of the saves duplicating the Ants.
 - Added the ability to reboot your Ant if it triggers a low/high hash alert.
