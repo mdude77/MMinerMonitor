@@ -1,3 +1,10 @@
+v3.0
+- Added support for S3 Web scraping (non API)
+- Fixed a problem that would cause Ants to duplicate on their own
+
+v2.91
+- Fixed the problem with not being able to delete Ants. 
+
 v2.9
 - Fixed a few instances where .net errors could be thrown if an Ant didn't respond for whatever reason.
 - Fixed the problem with deleted Ants coming back on their own accord.

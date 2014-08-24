@@ -17,7 +17,7 @@ Public Class frmMain
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v2.9"
+    Private Const csVersion As String = "M's Ant Monitor v3.0"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -438,6 +438,18 @@ Public Class frmMain
 
     End Sub
 
+    Private Function FindAntInConfigList(ByVal sAntName As String) As String
+
+        For Each sTemp As String In Me.chklstAnts.Items
+            If sTemp.Contains(sAntNAme) Then
+                Return sTemp
+            End If
+        Next
+
+        Return ""
+
+    End Function
+
     Private Sub wb_completed(sender As Object, e As System.Windows.Forms.WebBrowserDocumentCompletedEventArgs)
 
         Dim dr As DataRow
@@ -450,6 +462,7 @@ Public Class frmMain
         Dim sWebUN, sWebPW As String
         Dim sIP As String
         Dim s(), p() As String
+        Dim sFullAntName, sTemp As String
 
         Try
             wb = sender
@@ -492,9 +505,14 @@ Public Class frmMain
 
             If wb.Url.AbsoluteUri.Contains(".") = False Then
                 sAnt = wb.Url.AbsoluteUri.Substring(y, x - y - 1)
+                sFullAntName = FindAntInConfigList(sAnt)
             Else
                 s = wb.Url.AbsoluteUri.Split(".")
                 p = wb.Url.AbsoluteUri.Substring(6).Split(":")
+
+                sTemp = FindAntInConfigList(p(0).Split("/")(1).Split(":")(0))
+
+                sFullAntName = sTemp.Split(":")(0) & ":" & sTemp.Split(":")(1)
 
                 If p.Count = 2 Then
                     sAnt = s(2) & "." & s(3).Substring(0, InStr(s(3), "/") - 1) & ":" & p(1)
@@ -508,7 +526,7 @@ Public Class frmMain
             If wb.Document.All(1).OuterHtml.ToLower.Contains("authorization") Then
                 AddToLog(sAnt & " responded with login page")
 
-                Call GetWebCredentials("S1: " & wb.Url.AbsoluteUri.Substring(7, InStr(8, wb.Url.AbsoluteUri, "/") - 8), sWebUN, sWebPW)
+                Call GetWebCredentials(sFullAntName, sWebUN, sWebPW)
 
                 wb.Document.All("username").SetAttribute("value", sWebUN)
                 wb.Document.All("password").SetAttribute("value", sWebPW)
@@ -640,10 +658,10 @@ Public Class frmMain
                     wb.Document.All(66).InvokeMember("click")
 
                 ElseIf wb.Url.AbsoluteUri.Contains("/admin/status/minerstatus/") = True Then
-                    'S1 status code    
+                    'S1/S3 status code    
                     AddToLog(wb.Url.AbsoluteUri & " responded with status page")
 
-                    sAnt = "S1:" & sAnt
+                    sAnt = sFullAntName.Substring(0, 3) & sAnt
 
                     For Each dr In ds.Tables(0).Rows
                         If dr.Item("Name") = sAnt Then
@@ -658,7 +676,7 @@ Public Class frmMain
                     End If
 
                     dr.Item("Name") = sAnt
-                    dr.Item("IPAddress") = "S1: " & sIP
+                    dr.Item("IPAddress") = sFullAntName.Substring(0, 3) & sIP
 
                     If wb.Url.AbsoluteUri.Contains("minerstatus") AndAlso wb.Document.All.Count > 75 Then
                         dr.Item("Uptime") = wb.Document.All(122).OuterText.TrimEnd
@@ -1234,13 +1252,11 @@ Public Class frmMain
                     'sock.Connect("192.168.0.91", 4028)
 
                     Select Case sTemp.Substring(0, 2)
-                        Case "S1"
+                        Case "S1", "S3"
                             wb(0).Navigate("http://" & sTemp.Substring(4) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
                         Case "S2"
                             wb(0).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
-
-                        Case "S3"
 
                     End Select
 
@@ -1260,13 +1276,11 @@ Public Class frmMain
                         AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 1")
 
                         Select Case sTemp.Substring(0, 2)
-                            Case "S1"
+                            Case "S1", "S3"
                                 wb(1).Navigate("http://" & sTemp.Substring(4) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
                             Case "S2"
                                 wb(1).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
-
-                            Case "S3"
 
                         End Select
                         
@@ -1287,13 +1301,11 @@ Public Class frmMain
                         AddToLog("Submitting " & Me.chklstAnts.CheckedItems(bAnt) & " on instance 2")
 
                         Select Case sTemp.Substring(0, 2)
-                            Case "S1"
+                            Case "S1", "S3"
                                 wb(2).Navigate("http://" & sTemp.Substring(4) & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
 
                             Case "S2"
                                 wb(2).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
-
-                            Case "S3"
 
                         End Select
                         
@@ -1317,6 +1329,8 @@ Public Class frmMain
     End Sub
 
     Private Sub GetWebCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
+
+        sAnt = RemoveAntPort(sAnt)
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
             If key Is Nothing Then
@@ -1343,6 +1357,8 @@ Public Class frmMain
     End Sub
 
     Private Sub GetSSHCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
+
+        sAnt = RemoveAntPort(sAnt)
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
             If key Is Nothing Then
@@ -2236,7 +2252,7 @@ Public Class frmMain
             End If
 
             Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants", True)
-                key.DeleteSubKey(Me.chklstAnts.SelectedItem)
+                key.DeleteSubKey(RemoveAntPort(Me.chklstAnts.SelectedItem))
             End Using
 
             Me.chklstAnts.Items.RemoveAt(Me.chklstAnts.SelectedIndex)
@@ -2925,9 +2941,13 @@ Public Class frmMain
 
         Dim p() As String
 
-        p = sAnt.Split(":")
+        If sAnt.Contains(":") = True Then
+            p = sAnt.Split(":")
 
-        Return p(0) & ":" & p(1)
+            Return p(0) & ":" & p(1)
+        Else
+            Return sAnt
+        End If
 
     End Function
 
