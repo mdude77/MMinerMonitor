@@ -17,7 +17,7 @@ Public Class frmMain
 
     Private Const csRegKey As String = "Software\MAntMonitor"
 
-    Private Const csVersion As String = "M's Ant Monitor v3.0"
+    Private Const csVersion As String = "M's Ant Monitor v3.1"
 
     Private iCountDown, iWatchDog, bAnt As Integer
 
@@ -101,7 +101,7 @@ Public Class frmMain
                 .Add("Fans")
                 .Add("HTemp", GetType(Integer))
                 .Add("Temps")
-                .Add("Freq", GetType(Integer))
+                .Add("Freq", GetType(Double))
                 .Add("XCount")
                 .Add("Status")
                 .Add("ACount", GetType(Integer))
@@ -524,7 +524,7 @@ Public Class frmMain
             'sAnt = Me.chklstAnts.CheckedItems(bAnt).ToString.Substring(0, 2) & ":" & wb.Url.AbsoluteUri.Substring(y, x - y - 1)
 
             If wb.Document.All(1).OuterHtml.ToLower.Contains("authorization") Then
-                AddToLog(sAnt & " responded with login page")
+                AddToLog(sFullAntName.Substring(0, 3) & sAnt & " responded with login page")
 
                 Call GetWebCredentials(sFullAntName, sWebUN, sWebPW)
 
@@ -557,7 +557,7 @@ Public Class frmMain
                     dr.Item("IPAddress") = "S2: " & sIP
 
                     'S2 status code
-                    AddToLog(wb.Url.AbsoluteUri & " responded with status page")
+                    AddToLog(sAnt & " responded with status page")
 
                     dr.Item("Uptime") = wb.Document.All(88).OuterText
                     dr.Item("GH/s(5s)") = wb.Document.All(91).OuterText
@@ -598,6 +598,12 @@ Public Class frmMain
                         dr.Item("Pools") = sbTemp.ToString
 
                         sbTemp.Clear()
+
+                        dr.Item("Diff") = wb.Document.All(215).OuterText & " " & wb.Document.All(267).OuterText & " " & wb.Document.All(319).OuterText
+
+                        dr.Item("Rej%") = Format(Val(wb.Document.All(107).OuterText) / (Val(wb.Document.All(104).OuterText) + Val(wb.Document.All(107).OuterText)) * 100, "##0.###")
+
+                        dr.Item("Stale%") = Format(Val(wb.Document.All(119).OuterText) / (Val(wb.Document.All(104).OuterText) + Val(wb.Document.All(119).OuterText)) * 100, "##0.###")
 
                         dr.Item("HFan") = GetHighValue(wb.Document.All(530).OuterText, wb.Document.All(531).OuterText, wb.Document.All(532).OuterText, wb.Document.All(533).OuterText)
 
@@ -659,9 +665,9 @@ Public Class frmMain
 
                 ElseIf wb.Url.AbsoluteUri.Contains("/admin/status/minerstatus/") = True Then
                     'S1/S3 status code    
-                    AddToLog(wb.Url.AbsoluteUri & " responded with status page")
-
                     sAnt = sFullAntName.Substring(0, 3) & sAnt
+
+                    AddToLog(sAnt & " responded with status page")
 
                     For Each dr In ds.Tables(0).Rows
                         If dr.Item("Name") = sAnt Then
@@ -742,6 +748,12 @@ Public Class frmMain
                             dr.Item("Pools") = sbTemp.ToString
 
                             sbTemp.Clear()
+
+                            dr.Item("Diff") = wb.Document.All(276).OuterText.Trim & " " & wb.Document.All(345).OuterText.Trim & " " & wb.Document.All(414).OuterText.Trim
+
+                            dr.Item("Rej%") = Format(Val(wb.Document.All(147).OuterText.Replace(",", "")) / (Val(wb.Document.All(143).OuterText.Replace(",", "")) + Val(wb.Document.All(147).OuterText.Replace(",", ""))) * 100, "##0.###")
+
+                            dr.Item("Stale%") = Format(Val(wb.Document.All(163).OuterText.Replace(",", "")) / (Val(wb.Document.All(143).OuterText.Replace(",", "")) + Val(wb.Document.All(163).OuterText.Replace(",", ""))) * 100, "##0.###")
 
                             dr.Item("HFan") = GetHighValue(wb.Document.All(x + 33).OuterText.TrimEnd, wb.Document.All(x + 58).OuterText.TrimEnd)
 
@@ -1036,11 +1048,11 @@ Public Class frmMain
 
                     sResult = GetIPData(sAntIP, "stats")
 
-                    If AntType = enAntType.S3 Then
+                    If AntType = enAntType.S3 OrElse AntType = enAntType.S1 Then
                         'fix mangled JSON
                         x = InStr(sResult, """Type"":""S3""}{""STATS")
 
-                        If sResult.Substring(x + 11, 1) = "{" Then
+                        If x <> 0 AndAlso sResult.Substring(x + 11, 1) = "{" Then
                             sResult = sResult.Insert(x + 11, ",")
                         End If
                     End If
@@ -1142,7 +1154,7 @@ Public Class frmMain
                             dr.Item("GH/s(avg)") = Val(jp1.Value(Of String)("GHS av"))
 
                             dr.Item("Rej%") = jp1.Value(Of String)("Pool Rejected%")
-                            dr.Item("Stale%") = jp1.Value(Of String)("Pool Stale%")
+                            dr.Item("Stale%") = Format(jp1.Value(Of Integer)("Stale") / (jp1.Value(Of Integer)("Accepted") + jp1.Value(Of Integer)("Stale")) * 100, "##0.###")
 
                             dr.Item("Blocks") = jp1.Value(Of String)("Found Blocks")
                         Next
@@ -1240,6 +1252,8 @@ Public Class frmMain
 
             Call HandleAlerts()
         Else
+            iBrowserSubmitted = 0
+
             'browser logic
             Call GetWebCredentials(Me.chklstAnts.CheckedItems(bAnt).ToString, sWebUN, sWebPW)
 
@@ -1283,7 +1297,7 @@ Public Class frmMain
                                 wb(1).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
 
                         End Select
-                        
+
                         bAnt += 1
 
                         iBrowserSubmitted += 1
@@ -1308,7 +1322,7 @@ Public Class frmMain
                                 wb(2).Navigate(String.Format("http://{0}:{1}@" & sTemp.Substring(4) & "/cgi-bin/minerStatus.cgi", sWebUN, sWebPW), Nothing, Nothing, GetHeader)
 
                         End Select
-                        
+
                         bAnt += 1
 
                         iBrowserSubmitted += 1
@@ -2316,6 +2330,8 @@ Public Class frmMain
     Private Sub AddToLog(ByVal sText As String)
 
         Me.txtLog.AppendText(Now.ToLocalTime & ": " & sText & vbCrLf)
+        Me.txtLog.SelectionStart = Me.txtLog.TextLength
+        Me.txtLog.ScrollToCaret()
 
     End Sub
 
@@ -2836,6 +2852,8 @@ Public Class frmMain
         Dim colAnts As System.Collections.Generic.List(Of String)
         Dim x As Integer
 
+        If Me.chkUseAPI.Checked = False Then Exit Sub
+
         If e.RowIndex = -1 Then Exit Sub
 
         '0 - reboot one
@@ -2911,7 +2929,7 @@ Public Class frmMain
     Private Sub dataAnts_CellToolTipTextNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellToolTipTextNeededEventArgs) Handles dataAnts.CellToolTipTextNeeded
 
         If e.ColumnIndex = Me.dataAnts.Columns("Pools").Index AndAlso e.RowIndex <> -1 Then
-            e.ToolTipText = Me.dataAnts.Rows(e.RowIndex).Cells("PoolData").Value
+            e.ToolTipText = Me.dataAnts.Rows(e.RowIndex).Cells("PoolData").Value.ToString
         End If
 
     End Sub
@@ -3445,4 +3463,10 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub txtLog_VisibleChanged(sender As Object, e As System.EventArgs) Handles txtLog.VisibleChanged
+
+        Me.txtLog.SelectionStart = Me.txtLog.TextLength
+        Me.txtLog.ScrollToCaret()
+
+    End Sub
 End Class

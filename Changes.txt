@@ -1,3 +1,13 @@
+v3.1
+- Changed the frequency display to show the decimal value instead of rounding.
+- Changed the S3 JSON fix to also work if it happens to be marked as an S1.
+- Hopefully fixed the problem with an error being thrown on the display grid if you're not using the API.
+- Added difficulty (from all 3 pools), reject%, and stale% to the Web scraping routine.
+- Changed the Stale % for the API to be calculated, as the value from the API seems to always be zero.
+- Changed the log for Web "ant responded" to show the short Ant name instead of the full URL.
+- Hopefully changed the log to properly autoscroll to the end of the log so you don't have to.
+- Fixed a potential problem that could cause alerts not to trigger when using the Web scraping routines.
+
 v3.0
 - Added support for S3 Web scraping (non API)
 - Fixed a problem that would cause Ants to duplicate on their own
