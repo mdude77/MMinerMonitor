@@ -1,3 +1,12 @@
+v3.2
+- Fixed the problem with not being able to save the config if you've never used it before.
+- Changed to query the Ants via the API on background threads.  The numbers of threads is configurable.  The more Ants you have, the higher you likely want
+  this value to be.  It defaults to 4.
+- Changed to refresh the display grid X numbers of seconds after the Ant refresh has started.  This value is configurable. If you have a large number of  
+  Ants, or have slow video, you'll benefit from setting this to a larger value.
+- Fixed the default column widths and also added tool tips to the column headers that aren't self explanatory.
+- Added a routine to trim the log size down to approx 1m characters when it reaches 1.5m characters.
+
 v3.1
 - Changed the frequency display to show the decimal value instead of rounding.
 - Changed the S3 JSON fix to also work if it happens to be marked as an S1.

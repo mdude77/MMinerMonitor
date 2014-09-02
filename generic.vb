@@ -29,6 +29,14 @@ Public Class ControlsByRegistry
 
     End Sub
 
+    Public Sub SetControlByRegKey(ByRef trackAny As TrackBar, Optional iValue As Integer = 4)
+
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey)
+            Call SetControlByRegKey(key, trackAny, iValue)
+        End Using
+
+    End Sub
+
     Public Sub SetControlByRegKey(ByRef chkAny As CheckBox, Optional bDefault As Boolean = False)
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey)
@@ -64,6 +72,25 @@ Public Class ControlsByRegistry
             End If
         Else
             Throw New Exception("Internal error: " & chkAny.Name & " not found in regKey dictionary.")
+        End If
+
+    End Sub
+
+    Public Sub SetControlByRegKey(ByRef regKey As Microsoft.Win32.RegistryKey, ByRef trackAny As TrackBar, Optional iValue As Integer = 4)
+
+        Dim sKey As String
+        Dim sTemp As String
+
+        If dictRegkeyNames.TryGetValue(trackAny.Name, sKey) = True Then
+            sTemp = regKey.GetValue(sKey)
+
+            If sTemp.IsNullOrEmpty = True Then
+                trackAny.Value = iValue
+            Else
+                trackAny.Value = Val(sTemp)
+            End If
+        Else
+            Throw New Exception("Internal error: " & trackAny.Name & " not found in regKey dictionary.")
         End If
 
     End Sub
@@ -144,6 +171,12 @@ Public Class ControlsByRegistry
 
     End Sub
 
+    Public Sub SetRegKeyByControl(ByRef trackAny As TrackBar)
+
+        _SetRegKeyByControl(trackAny)
+
+    End Sub
+
     Public Sub SetRegKeyByControl(ByRef optAny As RadioButton)
 
         _SetRegKeyByControl(optAny)
@@ -186,15 +219,29 @@ Public Class ControlsByRegistry
 
     End Sub
 
+    Private Sub _SetRegKeyByControl(ByRef ctlAny As TrackBar)
+
+        Dim sKeyname As String
+
+        If dictRegkeyNames.TryGetValue(ctlAny.Name, sKeyname) = True Then
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & sRegKey, sKeyname, ctlAny.Value, Microsoft.Win32.RegistryValueKind.String)
+        Else
+            Throw New Exception("Internal error: " & ctlAny.Name & " not found in regKey dictionary.")
+        End If
+
+    End Sub
+
     Public Sub SetRegKeyByControl(ByRef chkLstAny As CheckedListBox)
 
         Dim sValue As String
         Dim p() As String
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(sRegKey & "\" & chkLstAny.Name, True)
-            For Each sTemp In key.GetValueNames
-                key.DeleteValue(sTemp)
-            Next
+            If key IsNot Nothing Then
+                For Each sTemp In key.GetValueNames
+                    key.DeleteValue(sTemp)
+                Next
+            End If
         End Using
 
         For Each sValue In chkLstAny.Items
