@@ -24,7 +24,6 @@ Partial Class frmMain
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMain))
-        Me.dataAnts = New MAntMonitor.dgvWrapper()
         Me.mnuAntMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuRebootAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuRebootMultiple = New System.Windows.Forms.ToolStripMenuItem()
@@ -34,29 +33,63 @@ Partial Class frmMain
         Me.cmdRefresh = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tabAnts = New System.Windows.Forms.TabPage()
+        Me.tabScanForAnts = New System.Windows.Forms.TabPage()
+        Me.cmbAntScanStop = New System.Windows.Forms.ComboBox()
+        Me.Label24 = New System.Windows.Forms.Label()
+        Me.Label22 = New System.Windows.Forms.Label()
+        Me.cmbAntScanStart = New System.Windows.Forms.ComboBox()
+        Me.cmdAntClear = New System.Windows.Forms.Button()
+        Me.lblAntID = New System.Windows.Forms.Label()
+        Me.txtAntSSHPort = New System.Windows.Forms.TextBox()
+        Me.Label23 = New System.Windows.Forms.Label()
+        Me.txtAntWebPort = New System.Windows.Forms.TextBox()
+        Me.txtAntAPIPort = New System.Windows.Forms.TextBox()
+        Me.Label21 = New System.Windows.Forms.Label()
+        Me.chkAntRebootViaSSH = New System.Windows.Forms.CheckBox()
+        Me.chkAntUseAPI = New System.Windows.Forms.CheckBox()
+        Me.chkAntActive = New System.Windows.Forms.CheckBox()
+        Me.Label20 = New System.Windows.Forms.Label()
+        Me.Label19 = New System.Windows.Forms.Label()
+        Me.dataAntConfig = New System.Windows.Forms.DataGridView()
+        Me.txtAntName = New System.Windows.Forms.TextBox()
+        Me.Label15 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.txtIPRangeToScan = New System.Windows.Forms.TextBox()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.cmdScan = New System.Windows.Forms.Button()
+        Me.optAntS3 = New System.Windows.Forms.RadioButton()
+        Me.cmdSaveAnt = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.txtAntAddress = New System.Windows.Forms.TextBox()
+        Me.txtAntSSHPassword = New System.Windows.Forms.TextBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.optAntS1 = New System.Windows.Forms.RadioButton()
+        Me.cmdAddAnt = New System.Windows.Forms.Button()
+        Me.lblWBPassword = New System.Windows.Forms.Label()
+        Me.txtAntWebPassword = New System.Windows.Forms.TextBox()
+        Me.optAntS2 = New System.Windows.Forms.RadioButton()
+        Me.cmdDelAnt = New System.Windows.Forms.Button()
+        Me.txtAntSSHUsername = New System.Windows.Forms.TextBox()
+        Me.txtAntWebUsername = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.lblWBUserName = New System.Windows.Forms.Label()
         Me.tabConfig = New System.Windows.Forms.TabPage()
+        Me.Label18 = New System.Windows.Forms.Label()
+        Me.Label17 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.Label14 = New System.Windows.Forms.Label()
         Me.txtDisplayRefreshInSecs = New System.Windows.Forms.TextBox()
         Me.cmdChangeThreads = New System.Windows.Forms.Button()
         Me.trackThreadCount = New System.Windows.Forms.TrackBar()
         Me.Label13 = New System.Windows.Forms.Label()
-        Me.optAddS3 = New System.Windows.Forms.RadioButton()
-        Me.chkShowSelectionColumn = New System.Windows.Forms.CheckBox()
-        Me.cmdSaveAnt = New System.Windows.Forms.Button()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.txtWebPassword = New System.Windows.Forms.TextBox()
-        Me.txtWebUsername = New System.Windows.Forms.TextBox()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.optAddS2 = New System.Windows.Forms.RadioButton()
-        Me.optAddS1 = New System.Windows.Forms.RadioButton()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.chkUseAPI = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.chkShowACount = New System.Windows.Forms.CheckBox()
         Me.chkShowDifficulty = New System.Windows.Forms.CheckBox()
         Me.chkShowStale = New System.Windows.Forms.CheckBox()
         Me.chkShowRej = New System.Windows.Forms.CheckBox()
         Me.chkShowXCount = New System.Windows.Forms.CheckBox()
+        Me.chkShowSelectionColumn = New System.Windows.Forms.CheckBox()
         Me.chkShowHighTemp = New System.Windows.Forms.CheckBox()
         Me.chkShowHighFan = New System.Windows.Forms.CheckBox()
         Me.chkShowFreqs = New System.Windows.Forms.CheckBox()
@@ -71,19 +104,6 @@ Partial Class frmMain
         Me.chkShowGHsAvg = New System.Windows.Forms.CheckBox()
         Me.chkShowGHs5s = New System.Windows.Forms.CheckBox()
         Me.chkShowUptime = New System.Windows.Forms.CheckBox()
-        Me.cmbRefreshRate = New System.Windows.Forms.ComboBox()
-        Me.txtRefreshRate = New System.Windows.Forms.TextBox()
-        Me.Label16 = New System.Windows.Forms.Label()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.txtSSHPassword = New System.Windows.Forms.TextBox()
-        Me.lblWBPassword = New System.Windows.Forms.Label()
-        Me.txtSSHUsername = New System.Windows.Forms.TextBox()
-        Me.lblWBUserName = New System.Windows.Forms.Label()
-        Me.cmdDelAnt = New System.Windows.Forms.Button()
-        Me.cmdAddAnt = New System.Windows.Forms.Button()
-        Me.txtAntAddress = New System.Windows.Forms.TextBox()
-        Me.chklstAnts = New System.Windows.Forms.CheckedListBox()
         Me.tabPools = New System.Windows.Forms.TabPage()
         Me.cmdPoolClear3 = New System.Windows.Forms.Button()
         Me.cmdPoolClear2 = New System.Windows.Forms.Button()
@@ -105,7 +125,6 @@ Partial Class frmMain
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
-        Me.lstPools = New MAntMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.TabControl2 = New System.Windows.Forms.TabControl()
         Me.tabS1Alerts = New System.Windows.Forms.TabPage()
@@ -195,14 +214,11 @@ Partial Class frmMain
         Me.Label99 = New System.Windows.Forms.Label()
         Me.Label98 = New System.Windows.Forms.Label()
         Me.Label97 = New System.Windows.Forms.Label()
-        Me.tabScanForAnts = New System.Windows.Forms.TabPage()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.lblScanning = New System.Windows.Forms.Label()
-        Me.cmbLocalIPs = New System.Windows.Forms.ComboBox()
-        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
-        Me.cmdScan = New System.Windows.Forms.Button()
         Me.tabLog = New System.Windows.Forms.TabPage()
         Me.txtLog = New System.Windows.Forms.TextBox()
+        Me.cmbRefreshRate = New System.Windows.Forms.ComboBox()
+        Me.txtRefreshRate = New System.Windows.Forms.TextBox()
+        Me.Label16 = New System.Windows.Forms.Label()
         Me.cmdPause = New System.Windows.Forms.Button()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.txtPleaseSupport = New System.Windows.Forms.TextBox()
@@ -213,10 +229,14 @@ Partial Class frmMain
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.timerDoStuff = New System.Windows.Forms.Timer(Me.components)
-        CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.dataAnts = New MAntMonitor.dgvWrapper()
+        Me.lstPools = New MAntMonitor.enListbox()
+        Me.mnuRemoveAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
+        Me.tabScanForAnts.SuspendLayout()
+        CType(Me.dataAntConfig, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabConfig.SuspendLayout()
         CType(Me.trackThreadCount, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
@@ -228,35 +248,17 @@ Partial Class frmMain
         Me.tabS3Alerts.SuspendLayout()
         Me.tabAlertTypes.SuspendLayout()
         Me.tabEmail.SuspendLayout()
-        Me.tabScanForAnts.SuspendLayout()
         Me.tabLog.SuspendLayout()
         Me.menuStripNotifyIcon.SuspendLayout()
         Me.menuStripMain.SuspendLayout()
+        CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'dataAnts
-        '
-        Me.dataAnts.AllowUserToAddRows = False
-        Me.dataAnts.AllowUserToDeleteRows = False
-        Me.dataAnts.AllowUserToOrderColumns = True
-        Me.dataAnts.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dataAnts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dataAnts.Location = New System.Drawing.Point(7, 7)
-        Me.dataAnts.Margin = New System.Windows.Forms.Padding(4)
-        Me.dataAnts.Name = "dataAnts"
-        Me.dataAnts.ReadOnly = True
-        Me.dataAnts.RowHeadersVisible = False
-        Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1214, 271)
-        Me.dataAnts.TabIndex = 0
         '
         'mnuAntMenu
         '
-        Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple, Me.mnuShutdownS2, Me.mnuUpdatePools})
+        Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple, Me.mnuRemoveAnt, Me.mnuShutdownS2, Me.mnuUpdatePools})
         Me.mnuAntMenu.Name = "menuAntMenu"
-        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 100)
+        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 146)
         '
         'mnuRebootAnt
         '
@@ -292,7 +294,7 @@ Partial Class frmMain
         'cmdRefresh
         '
         Me.cmdRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdRefresh.Location = New System.Drawing.Point(514, 340)
+        Me.cmdRefresh.Location = New System.Drawing.Point(514, 339)
         Me.cmdRefresh.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdRefresh.Name = "cmdRefresh"
         Me.cmdRefresh.Size = New System.Drawing.Size(164, 29)
@@ -307,16 +309,16 @@ Partial Class frmMain
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.tabAnts)
+        Me.TabControl1.Controls.Add(Me.tabScanForAnts)
         Me.TabControl1.Controls.Add(Me.tabConfig)
         Me.TabControl1.Controls.Add(Me.tabPools)
         Me.TabControl1.Controls.Add(Me.tabAlerts)
-        Me.TabControl1.Controls.Add(Me.tabScanForAnts)
         Me.TabControl1.Controls.Add(Me.tabLog)
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1236, 332)
-        Me.TabControl1.TabIndex = 2
+        Me.TabControl1.Size = New System.Drawing.Size(1161, 330)
+        Me.TabControl1.TabIndex = 0
         '
         'tabAnts
         '
@@ -324,62 +326,488 @@ Partial Class frmMain
         Me.tabAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabAnts.Name = "tabAnts"
         Me.tabAnts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAnts.Size = New System.Drawing.Size(1228, 299)
+        Me.tabAnts.Size = New System.Drawing.Size(1153, 297)
         Me.tabAnts.TabIndex = 0
-        Me.tabAnts.Text = "Ants"
+        Me.tabAnts.Text = "Ant Output"
         Me.tabAnts.UseVisualStyleBackColor = True
+        '
+        'tabScanForAnts
+        '
+        Me.tabScanForAnts.Controls.Add(Me.cmbAntScanStop)
+        Me.tabScanForAnts.Controls.Add(Me.Label24)
+        Me.tabScanForAnts.Controls.Add(Me.Label22)
+        Me.tabScanForAnts.Controls.Add(Me.cmbAntScanStart)
+        Me.tabScanForAnts.Controls.Add(Me.cmdAntClear)
+        Me.tabScanForAnts.Controls.Add(Me.lblAntID)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntSSHPort)
+        Me.tabScanForAnts.Controls.Add(Me.Label23)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntWebPort)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntAPIPort)
+        Me.tabScanForAnts.Controls.Add(Me.Label21)
+        Me.tabScanForAnts.Controls.Add(Me.chkAntRebootViaSSH)
+        Me.tabScanForAnts.Controls.Add(Me.chkAntUseAPI)
+        Me.tabScanForAnts.Controls.Add(Me.chkAntActive)
+        Me.tabScanForAnts.Controls.Add(Me.Label20)
+        Me.tabScanForAnts.Controls.Add(Me.Label19)
+        Me.tabScanForAnts.Controls.Add(Me.dataAntConfig)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntName)
+        Me.tabScanForAnts.Controls.Add(Me.Label15)
+        Me.tabScanForAnts.Controls.Add(Me.Label3)
+        Me.tabScanForAnts.Controls.Add(Me.txtIPRangeToScan)
+        Me.tabScanForAnts.Controls.Add(Me.ProgressBar1)
+        Me.tabScanForAnts.Controls.Add(Me.cmdScan)
+        Me.tabScanForAnts.Controls.Add(Me.optAntS3)
+        Me.tabScanForAnts.Controls.Add(Me.cmdSaveAnt)
+        Me.tabScanForAnts.Controls.Add(Me.Label1)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntAddress)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntSSHPassword)
+        Me.tabScanForAnts.Controls.Add(Me.Label7)
+        Me.tabScanForAnts.Controls.Add(Me.optAntS1)
+        Me.tabScanForAnts.Controls.Add(Me.cmdAddAnt)
+        Me.tabScanForAnts.Controls.Add(Me.lblWBPassword)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntWebPassword)
+        Me.tabScanForAnts.Controls.Add(Me.optAntS2)
+        Me.tabScanForAnts.Controls.Add(Me.cmdDelAnt)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntSSHUsername)
+        Me.tabScanForAnts.Controls.Add(Me.txtAntWebUsername)
+        Me.tabScanForAnts.Controls.Add(Me.Label6)
+        Me.tabScanForAnts.Controls.Add(Me.lblWBUserName)
+        Me.tabScanForAnts.Location = New System.Drawing.Point(4, 4)
+        Me.tabScanForAnts.Name = "tabScanForAnts"
+        Me.tabScanForAnts.Size = New System.Drawing.Size(1153, 297)
+        Me.tabScanForAnts.TabIndex = 5
+        Me.tabScanForAnts.Text = "Ants Config"
+        Me.tabScanForAnts.UseVisualStyleBackColor = True
+        '
+        'cmbAntScanStop
+        '
+        Me.cmbAntScanStop.FormattingEnabled = True
+        Me.cmbAntScanStop.Location = New System.Drawing.Point(1071, 235)
+        Me.cmbAntScanStop.Name = "cmbAntScanStop"
+        Me.cmbAntScanStop.Size = New System.Drawing.Size(52, 28)
+        Me.cmbAntScanStop.TabIndex = 11
+        Me.cmbAntScanStop.Text = "254"
+        '
+        'Label24
+        '
+        Me.Label24.AutoSize = True
+        Me.Label24.Location = New System.Drawing.Point(1020, 238)
+        Me.Label24.Name = "Label24"
+        Me.Label24.Size = New System.Drawing.Size(48, 20)
+        Me.Label24.TabIndex = 88
+        Me.Label24.Text = "Stop:"
+        '
+        'Label22
+        '
+        Me.Label22.AutoSize = True
+        Me.Label22.Location = New System.Drawing.Point(911, 238)
+        Me.Label22.Name = "Label22"
+        Me.Label22.Size = New System.Drawing.Size(50, 20)
+        Me.Label22.TabIndex = 87
+        Me.Label22.Text = "Start:"
+        '
+        'cmbAntScanStart
+        '
+        Me.cmbAntScanStart.FormattingEnabled = True
+        Me.cmbAntScanStart.Location = New System.Drawing.Point(961, 235)
+        Me.cmbAntScanStart.Name = "cmbAntScanStart"
+        Me.cmbAntScanStart.Size = New System.Drawing.Size(52, 28)
+        Me.cmbAntScanStart.TabIndex = 10
+        Me.cmbAntScanStart.Text = "1"
+        '
+        'cmdAntClear
+        '
+        Me.cmdAntClear.Location = New System.Drawing.Point(707, 173)
+        Me.cmdAntClear.Name = "cmdAntClear"
+        Me.cmdAntClear.Size = New System.Drawing.Size(74, 32)
+        Me.cmdAntClear.TabIndex = 85
+        Me.cmdAntClear.Text = "&Clear"
+        Me.cmdAntClear.UseVisualStyleBackColor = True
+        '
+        'lblAntID
+        '
+        Me.lblAntID.AutoSize = True
+        Me.lblAntID.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblAntID.Location = New System.Drawing.Point(591, 264)
+        Me.lblAntID.Name = "lblAntID"
+        Me.lblAntID.Size = New System.Drawing.Size(56, 20)
+        Me.lblAntID.TabIndex = 84
+        Me.lblAntID.Text = "Ant ID"
+        '
+        'txtAntSSHPort
+        '
+        Me.txtAntSSHPort.Location = New System.Drawing.Point(488, 183)
+        Me.txtAntSSHPort.Name = "txtAntSSHPort"
+        Me.txtAntSSHPort.Size = New System.Drawing.Size(60, 27)
+        Me.txtAntSSHPort.TabIndex = 4
+        Me.txtAntSSHPort.Text = "22"
+        '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Location = New System.Drawing.Point(424, 185)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(45, 20)
+        Me.Label23.TabIndex = 82
+        Me.Label23.Text = "Port:"
+        '
+        'txtAntWebPort
+        '
+        Me.txtAntWebPort.Location = New System.Drawing.Point(594, 183)
+        Me.txtAntWebPort.Name = "txtAntWebPort"
+        Me.txtAntWebPort.Size = New System.Drawing.Size(60, 27)
+        Me.txtAntWebPort.TabIndex = 7
+        Me.txtAntWebPort.Text = "80"
+        '
+        'txtAntAPIPort
+        '
+        Me.txtAntAPIPort.Location = New System.Drawing.Point(594, 213)
+        Me.txtAntAPIPort.Name = "txtAntAPIPort"
+        Me.txtAntAPIPort.Size = New System.Drawing.Size(60, 27)
+        Me.txtAntAPIPort.TabIndex = 8
+        Me.txtAntAPIPort.Text = "4028"
+        '
+        'Label21
+        '
+        Me.Label21.Location = New System.Drawing.Point(541, 217)
+        Me.Label21.Name = "Label21"
+        Me.Label21.Size = New System.Drawing.Size(47, 27)
+        Me.Label21.TabIndex = 78
+        Me.Label21.Text = "Port:"
+        '
+        'chkAntRebootViaSSH
+        '
+        Me.chkAntRebootViaSSH.AutoSize = True
+        Me.chkAntRebootViaSSH.Checked = True
+        Me.chkAntRebootViaSSH.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAntRebootViaSSH.Location = New System.Drawing.Point(428, 240)
+        Me.chkAntRebootViaSSH.Name = "chkAntRebootViaSSH"
+        Me.chkAntRebootViaSSH.Size = New System.Drawing.Size(150, 24)
+        Me.chkAntRebootViaSSH.TabIndex = 77
+        Me.chkAntRebootViaSSH.Text = "Reboot via SSH"
+        Me.chkAntRebootViaSSH.UseVisualStyleBackColor = True
+        '
+        'chkAntUseAPI
+        '
+        Me.chkAntUseAPI.AutoSize = True
+        Me.chkAntUseAPI.Checked = True
+        Me.chkAntUseAPI.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAntUseAPI.Location = New System.Drawing.Point(428, 216)
+        Me.chkAntUseAPI.Name = "chkAntUseAPI"
+        Me.chkAntUseAPI.Size = New System.Drawing.Size(92, 24)
+        Me.chkAntUseAPI.TabIndex = 76
+        Me.chkAntUseAPI.Text = "Use API"
+        Me.chkAntUseAPI.UseVisualStyleBackColor = True
+        '
+        'chkAntActive
+        '
+        Me.chkAntActive.AutoSize = True
+        Me.chkAntActive.Checked = True
+        Me.chkAntActive.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAntActive.Location = New System.Drawing.Point(428, 263)
+        Me.chkAntActive.Name = "chkAntActive"
+        Me.chkAntActive.Size = New System.Drawing.Size(77, 24)
+        Me.chkAntActive.TabIndex = 75
+        Me.chkAntActive.Text = "Active"
+        Me.chkAntActive.UseVisualStyleBackColor = True
+        '
+        'Label20
+        '
+        Me.Label20.AutoSize = True
+        Me.Label20.Location = New System.Drawing.Point(424, 73)
+        Me.Label20.Name = "Label20"
+        Me.Label20.Size = New System.Drawing.Size(58, 20)
+        Me.Label20.TabIndex = 74
+        Me.Label20.Text = "Name:"
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Location = New System.Drawing.Point(424, 44)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(50, 20)
+        Me.Label19.TabIndex = 72
+        Me.Label19.Text = "Type:"
+        '
+        'dataAntConfig
+        '
+        Me.dataAntConfig.AllowUserToAddRows = False
+        Me.dataAntConfig.AllowUserToDeleteRows = False
+        Me.dataAntConfig.AllowUserToOrderColumns = True
+        Me.dataAntConfig.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.dataAntConfig.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dataAntConfig.Location = New System.Drawing.Point(7, 7)
+        Me.dataAntConfig.Name = "dataAntConfig"
+        Me.dataAntConfig.ReadOnly = True
+        Me.dataAntConfig.RowTemplate.Height = 24
+        Me.dataAntConfig.Size = New System.Drawing.Size(411, 285)
+        Me.dataAntConfig.TabIndex = 71
+        '
+        'txtAntName
+        '
+        Me.txtAntName.Location = New System.Drawing.Point(524, 70)
+        Me.txtAntName.Name = "txtAntName"
+        Me.txtAntName.Size = New System.Drawing.Size(155, 27)
+        Me.txtAntName.TabIndex = 1
+        '
+        'Label15
+        '
+        Me.Label15.AutoSize = True
+        Me.Label15.Location = New System.Drawing.Point(808, 168)
+        Me.Label15.Name = "Label15"
+        Me.Label15.Size = New System.Drawing.Size(96, 20)
+        Me.Label15.TabIndex = 6
+        Me.Label15.Text = "IP Address:"
+        '
+        'Label3
+        '
+        Me.Label3.Location = New System.Drawing.Point(806, 10)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(335, 154)
+        Me.Label3.TabIndex = 5
+        Me.Label3.Text = resources.GetString("Label3.Text")
+        '
+        'txtIPRangeToScan
+        '
+        Me.txtIPRangeToScan.Location = New System.Drawing.Point(915, 165)
+        Me.txtIPRangeToScan.Name = "txtIPRangeToScan"
+        Me.txtIPRangeToScan.Size = New System.Drawing.Size(135, 27)
+        Me.txtIPRangeToScan.TabIndex = 9
+        '
+        'ProgressBar1
+        '
+        Me.ProgressBar1.Location = New System.Drawing.Point(812, 198)
+        Me.ProgressBar1.Maximum = 254
+        Me.ProgressBar1.Minimum = 1
+        Me.ProgressBar1.Name = "ProgressBar1"
+        Me.ProgressBar1.Size = New System.Drawing.Size(319, 23)
+        Me.ProgressBar1.TabIndex = 3
+        Me.ProgressBar1.Value = 1
+        Me.ProgressBar1.Visible = False
+        '
+        'cmdScan
+        '
+        Me.cmdScan.Location = New System.Drawing.Point(811, 233)
+        Me.cmdScan.Margin = New System.Windows.Forms.Padding(4)
+        Me.cmdScan.Name = "cmdScan"
+        Me.cmdScan.Size = New System.Drawing.Size(94, 31)
+        Me.cmdScan.TabIndex = 2
+        Me.cmdScan.Text = "Scan"
+        Me.cmdScan.UseVisualStyleBackColor = True
+        '
+        'optAntS3
+        '
+        Me.optAntS3.AutoSize = True
+        Me.optAntS3.Location = New System.Drawing.Point(629, 42)
+        Me.optAntS3.Name = "optAntS3"
+        Me.optAntS3.Size = New System.Drawing.Size(50, 24)
+        Me.optAntS3.TabIndex = 65
+        Me.optAntS3.TabStop = True
+        Me.optAntS3.Text = "S3"
+        Me.optAntS3.UseVisualStyleBackColor = True
+        '
+        'cmdSaveAnt
+        '
+        Me.cmdSaveAnt.Location = New System.Drawing.Point(707, 63)
+        Me.cmdSaveAnt.Name = "cmdSaveAnt"
+        Me.cmdSaveAnt.Size = New System.Drawing.Size(74, 32)
+        Me.cmdSaveAnt.TabIndex = 63
+        Me.cmdSaveAnt.Text = "&Save"
+        Me.cmdSaveAnt.UseVisualStyleBackColor = True
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(424, 14)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(96, 20)
+        Me.Label1.TabIndex = 54
+        Me.Label1.Text = "IP Address:"
+        '
+        'txtAntAddress
+        '
+        Me.txtAntAddress.Location = New System.Drawing.Point(524, 10)
+        Me.txtAntAddress.Name = "txtAntAddress"
+        Me.txtAntAddress.Size = New System.Drawing.Size(155, 27)
+        Me.txtAntAddress.TabIndex = 0
+        '
+        'txtAntSSHPassword
+        '
+        Me.txtAntSSHPassword.Location = New System.Drawing.Point(488, 154)
+        Me.txtAntSSHPassword.Name = "txtAntSSHPassword"
+        Me.txtAntSSHPassword.Size = New System.Drawing.Size(100, 27)
+        Me.txtAntSSHPassword.TabIndex = 3
+        Me.txtAntSSHPassword.Text = "root"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(591, 100)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(80, 20)
+        Me.Label7.TabIndex = 62
+        Me.Label7.Text = "Web Info:"
+        '
+        'optAntS1
+        '
+        Me.optAntS1.AutoSize = True
+        Me.optAntS1.Location = New System.Drawing.Point(526, 42)
+        Me.optAntS1.Name = "optAntS1"
+        Me.optAntS1.Size = New System.Drawing.Size(50, 24)
+        Me.optAntS1.TabIndex = 55
+        Me.optAntS1.TabStop = True
+        Me.optAntS1.Text = "S1"
+        Me.optAntS1.UseVisualStyleBackColor = True
+        '
+        'cmdAddAnt
+        '
+        Me.cmdAddAnt.Location = New System.Drawing.Point(707, 10)
+        Me.cmdAddAnt.Name = "cmdAddAnt"
+        Me.cmdAddAnt.Size = New System.Drawing.Size(74, 32)
+        Me.cmdAddAnt.TabIndex = 1
+        Me.cmdAddAnt.Text = "&Add"
+        Me.cmdAddAnt.UseVisualStyleBackColor = True
+        '
+        'lblWBPassword
+        '
+        Me.lblWBPassword.AutoSize = True
+        Me.lblWBPassword.Location = New System.Drawing.Point(424, 157)
+        Me.lblWBPassword.Name = "lblWBPassword"
+        Me.lblWBPassword.Size = New System.Drawing.Size(52, 20)
+        Me.lblWBPassword.TabIndex = 9
+        Me.lblWBPassword.Text = "Pass:"
+        '
+        'txtAntWebPassword
+        '
+        Me.txtAntWebPassword.Location = New System.Drawing.Point(594, 154)
+        Me.txtAntWebPassword.Name = "txtAntWebPassword"
+        Me.txtAntWebPassword.Size = New System.Drawing.Size(100, 27)
+        Me.txtAntWebPassword.TabIndex = 6
+        Me.txtAntWebPassword.Text = "root"
+        '
+        'optAntS2
+        '
+        Me.optAntS2.AutoSize = True
+        Me.optAntS2.Location = New System.Drawing.Point(577, 42)
+        Me.optAntS2.Name = "optAntS2"
+        Me.optAntS2.Size = New System.Drawing.Size(50, 24)
+        Me.optAntS2.TabIndex = 56
+        Me.optAntS2.TabStop = True
+        Me.optAntS2.Text = "S2"
+        Me.optAntS2.UseVisualStyleBackColor = True
+        '
+        'cmdDelAnt
+        '
+        Me.cmdDelAnt.Location = New System.Drawing.Point(707, 116)
+        Me.cmdDelAnt.Name = "cmdDelAnt"
+        Me.cmdDelAnt.Size = New System.Drawing.Size(74, 32)
+        Me.cmdDelAnt.TabIndex = 2
+        Me.cmdDelAnt.Text = "&Delete"
+        Me.cmdDelAnt.UseVisualStyleBackColor = True
+        '
+        'txtAntSSHUsername
+        '
+        Me.txtAntSSHUsername.Location = New System.Drawing.Point(488, 125)
+        Me.txtAntSSHUsername.Name = "txtAntSSHUsername"
+        Me.txtAntSSHUsername.Size = New System.Drawing.Size(100, 27)
+        Me.txtAntSSHUsername.TabIndex = 2
+        Me.txtAntSSHUsername.Text = "root"
+        Me.ToolTip1.SetToolTip(Me.txtAntSSHUsername, "If left empty, default is used")
+        '
+        'txtAntWebUsername
+        '
+        Me.txtAntWebUsername.Location = New System.Drawing.Point(594, 125)
+        Me.txtAntWebUsername.Name = "txtAntWebUsername"
+        Me.txtAntWebUsername.Size = New System.Drawing.Size(100, 27)
+        Me.txtAntWebUsername.TabIndex = 5
+        Me.txtAntWebUsername.Text = "root"
+        Me.ToolTip1.SetToolTip(Me.txtAntWebUsername, "If left empty, default is used")
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(424, 100)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(81, 20)
+        Me.Label6.TabIndex = 57
+        Me.Label6.Text = "SSH Info:"
+        '
+        'lblWBUserName
+        '
+        Me.lblWBUserName.AutoSize = True
+        Me.lblWBUserName.Location = New System.Drawing.Point(424, 128)
+        Me.lblWBUserName.Name = "lblWBUserName"
+        Me.lblWBUserName.Size = New System.Drawing.Size(50, 20)
+        Me.lblWBUserName.TabIndex = 7
+        Me.lblWBUserName.Text = "User:"
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.Label18)
+        Me.tabConfig.Controls.Add(Me.Label17)
+        Me.tabConfig.Controls.Add(Me.Label5)
+        Me.tabConfig.Controls.Add(Me.Label4)
         Me.tabConfig.Controls.Add(Me.Label14)
         Me.tabConfig.Controls.Add(Me.txtDisplayRefreshInSecs)
         Me.tabConfig.Controls.Add(Me.cmdChangeThreads)
         Me.tabConfig.Controls.Add(Me.trackThreadCount)
         Me.tabConfig.Controls.Add(Me.Label13)
-        Me.tabConfig.Controls.Add(Me.optAddS3)
-        Me.tabConfig.Controls.Add(Me.chkShowSelectionColumn)
-        Me.tabConfig.Controls.Add(Me.cmdSaveAnt)
-        Me.tabConfig.Controls.Add(Me.Label7)
-        Me.tabConfig.Controls.Add(Me.txtWebPassword)
-        Me.tabConfig.Controls.Add(Me.txtWebUsername)
-        Me.tabConfig.Controls.Add(Me.Label6)
-        Me.tabConfig.Controls.Add(Me.optAddS2)
-        Me.tabConfig.Controls.Add(Me.optAddS1)
-        Me.tabConfig.Controls.Add(Me.Label1)
-        Me.tabConfig.Controls.Add(Me.chkUseAPI)
         Me.tabConfig.Controls.Add(Me.GroupBox1)
-        Me.tabConfig.Controls.Add(Me.cmbRefreshRate)
-        Me.tabConfig.Controls.Add(Me.txtRefreshRate)
-        Me.tabConfig.Controls.Add(Me.Label16)
-        Me.tabConfig.Controls.Add(Me.Label5)
-        Me.tabConfig.Controls.Add(Me.Label4)
-        Me.tabConfig.Controls.Add(Me.txtSSHPassword)
-        Me.tabConfig.Controls.Add(Me.lblWBPassword)
-        Me.tabConfig.Controls.Add(Me.txtSSHUsername)
-        Me.tabConfig.Controls.Add(Me.lblWBUserName)
-        Me.tabConfig.Controls.Add(Me.cmdDelAnt)
-        Me.tabConfig.Controls.Add(Me.cmdAddAnt)
-        Me.tabConfig.Controls.Add(Me.txtAntAddress)
-        Me.tabConfig.Controls.Add(Me.chklstAnts)
         Me.tabConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabConfig.Name = "tabConfig"
         Me.tabConfig.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConfig.Size = New System.Drawing.Size(1228, 299)
+        Me.tabConfig.Size = New System.Drawing.Size(1153, 297)
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
         '
+        'Label18
+        '
+        Me.Label18.Location = New System.Drawing.Point(477, 237)
+        Me.Label18.Name = "Label18"
+        Me.Label18.Size = New System.Drawing.Size(343, 85)
+        Me.Label18.TabIndex = 74
+        Me.Label18.Text = "A properly matched Thread Count and DIsplay Refresh Display can result in an extr" & _
+    "emely fast refresh.  One user monitors 1200 Ants in 52 seconds!"
+        '
+        'Label17
+        '
+        Me.Label17.Location = New System.Drawing.Point(477, 130)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(343, 103)
+        Me.Label17.TabIndex = 73
+        Me.Label17.Text = resources.GetString("Label17.Text")
+        '
+        'Label5
+        '
+        Me.Label5.Location = New System.Drawing.Point(477, 22)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(343, 104)
+        Me.Label5.TabIndex = 72
+        Me.Label5.Text = "The Thread Count is how many background workers run simultaneously to monitor you" & _
+    "r Ants.  The higher the number, the faster it'll be, but the more resources (PC " & _
+    "and network) that it'll consume."
+        '
+        'Label4
+        '
+        Me.Label4.Location = New System.Drawing.Point(7, 271)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(97, 24)
+        Me.Label4.TabIndex = 71
+        Me.Label4.Text = "In seconds:"
+        '
         'Label14
         '
-        Me.Label14.Location = New System.Drawing.Point(660, 59)
+        Me.Label14.Location = New System.Drawing.Point(6, 245)
         Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(99, 48)
+        Me.Label14.Size = New System.Drawing.Size(182, 24)
         Me.Label14.TabIndex = 70
-        Me.Label14.Text = "Display Refresh (s):"
+        Me.Label14.Text = "Display Refresh Delay"
         '
         'txtDisplayRefreshInSecs
         '
-        Me.txtDisplayRefreshInSecs.Location = New System.Drawing.Point(761, 75)
+        Me.txtDisplayRefreshInSecs.Location = New System.Drawing.Point(106, 269)
         Me.txtDisplayRefreshInSecs.Name = "txtDisplayRefreshInSecs"
         Me.txtDisplayRefreshInSecs.Size = New System.Drawing.Size(34, 27)
         Me.txtDisplayRefreshInSecs.TabIndex = 69
@@ -391,7 +819,7 @@ Partial Class frmMain
         '
         'cmdChangeThreads
         '
-        Me.cmdChangeThreads.Location = New System.Drawing.Point(841, 75)
+        Me.cmdChangeThreads.Location = New System.Drawing.Point(187, 261)
         Me.cmdChangeThreads.Name = "cmdChangeThreads"
         Me.cmdChangeThreads.Size = New System.Drawing.Size(153, 32)
         Me.cmdChangeThreads.TabIndex = 68
@@ -402,7 +830,7 @@ Partial Class frmMain
         '
         'trackThreadCount
         '
-        Me.trackThreadCount.Location = New System.Drawing.Point(841, 13)
+        Me.trackThreadCount.Location = New System.Drawing.Point(187, 199)
         Me.trackThreadCount.Maximum = 64
         Me.trackThreadCount.Minimum = 2
         Me.trackThreadCount.Name = "trackThreadCount"
@@ -413,119 +841,11 @@ Partial Class frmMain
         'Label13
         '
         Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(660, 35)
+        Me.Label13.Location = New System.Drawing.Point(6, 201)
         Me.Label13.Name = "Label13"
         Me.Label13.Size = New System.Drawing.Size(146, 20)
         Me.Label13.TabIndex = 66
         Me.Label13.Text = "API Thread Count:"
-        '
-        'optAddS3
-        '
-        Me.optAddS3.AutoSize = True
-        Me.optAddS3.Location = New System.Drawing.Point(480, 149)
-        Me.optAddS3.Name = "optAddS3"
-        Me.optAddS3.Size = New System.Drawing.Size(50, 24)
-        Me.optAddS3.TabIndex = 65
-        Me.optAddS3.TabStop = True
-        Me.optAddS3.Text = "S3"
-        Me.optAddS3.UseVisualStyleBackColor = True
-        '
-        'chkShowSelectionColumn
-        '
-        Me.chkShowSelectionColumn.AutoSize = True
-        Me.chkShowSelectionColumn.Location = New System.Drawing.Point(353, 247)
-        Me.chkShowSelectionColumn.Name = "chkShowSelectionColumn"
-        Me.chkShowSelectionColumn.Size = New System.Drawing.Size(208, 24)
-        Me.chkShowSelectionColumn.TabIndex = 64
-        Me.chkShowSelectionColumn.Text = "Show Selection Column"
-        Me.chkShowSelectionColumn.UseVisualStyleBackColor = True
-        '
-        'cmdSaveAnt
-        '
-        Me.cmdSaveAnt.Enabled = False
-        Me.cmdSaveAnt.Location = New System.Drawing.Point(545, 178)
-        Me.cmdSaveAnt.Name = "cmdSaveAnt"
-        Me.cmdSaveAnt.Size = New System.Drawing.Size(74, 32)
-        Me.cmdSaveAnt.TabIndex = 63
-        Me.cmdSaveAnt.Text = "&Save"
-        Me.cmdSaveAnt.UseVisualStyleBackColor = True
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(516, 62)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(138, 20)
-        Me.Label7.TabIndex = 62
-        Me.Label7.Text = "Web Credentials:"
-        '
-        'txtWebPassword
-        '
-        Me.txtWebPassword.Location = New System.Drawing.Point(519, 116)
-        Me.txtWebPassword.Name = "txtWebPassword"
-        Me.txtWebPassword.Size = New System.Drawing.Size(100, 27)
-        Me.txtWebPassword.TabIndex = 61
-        '
-        'txtWebUsername
-        '
-        Me.txtWebUsername.Location = New System.Drawing.Point(519, 87)
-        Me.txtWebUsername.Name = "txtWebUsername"
-        Me.txtWebUsername.Size = New System.Drawing.Size(100, 27)
-        Me.txtWebUsername.TabIndex = 59
-        Me.ToolTip1.SetToolTip(Me.txtWebUsername, "If left empty, default is used")
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(348, 62)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(139, 20)
-        Me.Label6.TabIndex = 57
-        Me.Label6.Text = "SSH Credentials:"
-        '
-        'optAddS2
-        '
-        Me.optAddS2.AutoSize = True
-        Me.optAddS2.Location = New System.Drawing.Point(414, 149)
-        Me.optAddS2.Name = "optAddS2"
-        Me.optAddS2.Size = New System.Drawing.Size(50, 24)
-        Me.optAddS2.TabIndex = 56
-        Me.optAddS2.TabStop = True
-        Me.optAddS2.Text = "S2"
-        Me.optAddS2.UseVisualStyleBackColor = True
-        '
-        'optAddS1
-        '
-        Me.optAddS1.AutoSize = True
-        Me.optAddS1.Location = New System.Drawing.Point(349, 149)
-        Me.optAddS1.Name = "optAddS1"
-        Me.optAddS1.Size = New System.Drawing.Size(50, 24)
-        Me.optAddS1.TabIndex = 55
-        Me.optAddS1.TabStop = True
-        Me.optAddS1.Text = "S1"
-        Me.optAddS1.UseVisualStyleBackColor = True
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(345, 9)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(282, 20)
-        Me.Label1.TabIndex = 54
-        Me.Label1.Text = "Ant address to add (eg: 192.168.x.y):"
-        '
-        'chkUseAPI
-        '
-        Me.chkUseAPI.AutoSize = True
-        Me.chkUseAPI.Checked = True
-        Me.chkUseAPI.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkUseAPI.Location = New System.Drawing.Point(664, 8)
-        Me.chkUseAPI.Name = "chkUseAPI"
-        Me.chkUseAPI.Size = New System.Drawing.Size(171, 24)
-        Me.chkUseAPI.TabIndex = 53
-        Me.chkUseAPI.Text = "Use API (non web)"
-        Me.ToolTip1.SetToolTip(Me.chkUseAPI, "If unchecked, will use a browser control, that has mixed results for some users.")
-        Me.chkUseAPI.UseVisualStyleBackColor = True
         '
         'GroupBox1
         '
@@ -534,6 +854,7 @@ Partial Class frmMain
         Me.GroupBox1.Controls.Add(Me.chkShowStale)
         Me.GroupBox1.Controls.Add(Me.chkShowRej)
         Me.GroupBox1.Controls.Add(Me.chkShowXCount)
+        Me.GroupBox1.Controls.Add(Me.chkShowSelectionColumn)
         Me.GroupBox1.Controls.Add(Me.chkShowHighTemp)
         Me.GroupBox1.Controls.Add(Me.chkShowHighFan)
         Me.GroupBox1.Controls.Add(Me.chkShowFreqs)
@@ -548,9 +869,9 @@ Partial Class frmMain
         Me.GroupBox1.Controls.Add(Me.chkShowGHsAvg)
         Me.GroupBox1.Controls.Add(Me.chkShowGHs5s)
         Me.GroupBox1.Controls.Add(Me.chkShowUptime)
-        Me.GroupBox1.Location = New System.Drawing.Point(664, 126)
+        Me.GroupBox1.Location = New System.Drawing.Point(6, 13)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(451, 145)
+        Me.GroupBox1.Size = New System.Drawing.Size(451, 169)
         Me.GroupBox1.TabIndex = 48
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Output options"
@@ -614,6 +935,16 @@ Partial Class frmMain
         Me.chkShowXCount.TabIndex = 28
         Me.chkShowXCount.Text = "XCount"
         Me.chkShowXCount.UseVisualStyleBackColor = True
+        '
+        'chkShowSelectionColumn
+        '
+        Me.chkShowSelectionColumn.AutoSize = True
+        Me.chkShowSelectionColumn.Location = New System.Drawing.Point(9, 141)
+        Me.chkShowSelectionColumn.Name = "chkShowSelectionColumn"
+        Me.chkShowSelectionColumn.Size = New System.Drawing.Size(208, 24)
+        Me.chkShowSelectionColumn.TabIndex = 64
+        Me.chkShowSelectionColumn.Text = "Show Selection Column"
+        Me.chkShowSelectionColumn.UseVisualStyleBackColor = True
         '
         'chkShowHighTemp
         '
@@ -713,7 +1044,7 @@ Partial Class frmMain
         '
         'cmdSaveConfig
         '
-        Me.cmdSaveConfig.Location = New System.Drawing.Point(324, 101)
+        Me.cmdSaveConfig.Location = New System.Drawing.Point(324, 131)
         Me.cmdSaveConfig.Name = "cmdSaveConfig"
         Me.cmdSaveConfig.Size = New System.Drawing.Size(121, 32)
         Me.cmdSaveConfig.TabIndex = 15
@@ -780,123 +1111,6 @@ Partial Class frmMain
         Me.chkShowUptime.Text = "Uptime"
         Me.chkShowUptime.UseVisualStyleBackColor = True
         '
-        'cmbRefreshRate
-        '
-        Me.cmbRefreshRate.FormattingEnabled = True
-        Me.cmbRefreshRate.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
-        Me.cmbRefreshRate.Location = New System.Drawing.Point(531, 220)
-        Me.cmbRefreshRate.Name = "cmbRefreshRate"
-        Me.cmbRefreshRate.Size = New System.Drawing.Size(94, 28)
-        Me.cmbRefreshRate.TabIndex = 47
-        Me.cmbRefreshRate.Text = "Seconds"
-        '
-        'txtRefreshRate
-        '
-        Me.txtRefreshRate.Location = New System.Drawing.Point(469, 221)
-        Me.txtRefreshRate.Name = "txtRefreshRate"
-        Me.txtRefreshRate.Size = New System.Drawing.Size(55, 27)
-        Me.txtRefreshRate.TabIndex = 46
-        Me.txtRefreshRate.Text = "300"
-        '
-        'Label16
-        '
-        Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(348, 223)
-        Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(118, 20)
-        Me.Label16.TabIndex = 45
-        Me.Label16.Text = "Refresh every:"
-        '
-        'Label5
-        '
-        Me.Label5.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(6, 230)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(234, 20)
-        Me.Label5.TabIndex = 17
-        Me.Label5.Text = "Selected items can be deleted"
-        '
-        'Label4
-        '
-        Me.Label4.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(6, 255)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(229, 20)
-        Me.Label4.TabIndex = 16
-        Me.Label4.Text = "Unchecked items are skipped"
-        '
-        'txtSSHPassword
-        '
-        Me.txtSSHPassword.Location = New System.Drawing.Point(413, 116)
-        Me.txtSSHPassword.Name = "txtSSHPassword"
-        Me.txtSSHPassword.Size = New System.Drawing.Size(100, 27)
-        Me.txtSSHPassword.TabIndex = 10
-        '
-        'lblWBPassword
-        '
-        Me.lblWBPassword.AutoSize = True
-        Me.lblWBPassword.Location = New System.Drawing.Point(346, 119)
-        Me.lblWBPassword.Name = "lblWBPassword"
-        Me.lblWBPassword.Size = New System.Drawing.Size(52, 20)
-        Me.lblWBPassword.TabIndex = 9
-        Me.lblWBPassword.Text = "Pass:"
-        '
-        'txtSSHUsername
-        '
-        Me.txtSSHUsername.Location = New System.Drawing.Point(413, 87)
-        Me.txtSSHUsername.Name = "txtSSHUsername"
-        Me.txtSSHUsername.Size = New System.Drawing.Size(100, 27)
-        Me.txtSSHUsername.TabIndex = 8
-        Me.ToolTip1.SetToolTip(Me.txtSSHUsername, "If left empty, default is used")
-        '
-        'lblWBUserName
-        '
-        Me.lblWBUserName.AutoSize = True
-        Me.lblWBUserName.Location = New System.Drawing.Point(346, 90)
-        Me.lblWBUserName.Name = "lblWBUserName"
-        Me.lblWBUserName.Size = New System.Drawing.Size(50, 20)
-        Me.lblWBUserName.TabIndex = 7
-        Me.lblWBUserName.Text = "User:"
-        '
-        'cmdDelAnt
-        '
-        Me.cmdDelAnt.Location = New System.Drawing.Point(445, 178)
-        Me.cmdDelAnt.Name = "cmdDelAnt"
-        Me.cmdDelAnt.Size = New System.Drawing.Size(74, 32)
-        Me.cmdDelAnt.TabIndex = 2
-        Me.cmdDelAnt.Text = "&Delete"
-        Me.cmdDelAnt.UseVisualStyleBackColor = True
-        '
-        'cmdAddAnt
-        '
-        Me.cmdAddAnt.Location = New System.Drawing.Point(345, 178)
-        Me.cmdAddAnt.Name = "cmdAddAnt"
-        Me.cmdAddAnt.Size = New System.Drawing.Size(74, 32)
-        Me.cmdAddAnt.TabIndex = 1
-        Me.cmdAddAnt.Text = "&Add"
-        Me.cmdAddAnt.UseVisualStyleBackColor = True
-        '
-        'txtAntAddress
-        '
-        Me.txtAntAddress.Location = New System.Drawing.Point(345, 32)
-        Me.txtAntAddress.Name = "txtAntAddress"
-        Me.txtAntAddress.Size = New System.Drawing.Size(168, 27)
-        Me.txtAntAddress.TabIndex = 0
-        '
-        'chklstAnts
-        '
-        Me.chklstAnts.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chklstAnts.FormattingEnabled = True
-        Me.chklstAnts.Location = New System.Drawing.Point(6, 8)
-        Me.chklstAnts.Name = "chklstAnts"
-        Me.chklstAnts.Size = New System.Drawing.Size(333, 202)
-        Me.chklstAnts.TabIndex = 0
-        '
         'tabPools
         '
         Me.tabPools.Controls.Add(Me.cmdPoolClear3)
@@ -922,7 +1136,7 @@ Partial Class frmMain
         Me.tabPools.Controls.Add(Me.lstPools)
         Me.tabPools.Location = New System.Drawing.Point(4, 4)
         Me.tabPools.Name = "tabPools"
-        Me.tabPools.Size = New System.Drawing.Size(1228, 299)
+        Me.tabPools.Size = New System.Drawing.Size(1153, 297)
         Me.tabPools.TabIndex = 4
         Me.tabPools.Text = "Pools"
         Me.tabPools.UseVisualStyleBackColor = True
@@ -1099,23 +1313,12 @@ Partial Class frmMain
         Me.Label9.TabIndex = 1
         Me.Label9.Text = "Desc:"
         '
-        'lstPools
-        '
-        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstPools.FormattingEnabled = True
-        Me.lstPools.ItemHeight = 20
-        Me.lstPools.Location = New System.Drawing.Point(6, 7)
-        Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 264)
-        Me.lstPools.TabIndex = 12
-        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.TabControl2)
         Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
         Me.tabAlerts.Name = "tabAlerts"
-        Me.tabAlerts.Size = New System.Drawing.Size(1228, 299)
+        Me.tabAlerts.Size = New System.Drawing.Size(1153, 297)
         Me.tabAlerts.TabIndex = 3
         Me.tabAlerts.Text = "Alerts"
         Me.tabAlerts.UseVisualStyleBackColor = True
@@ -2022,72 +2225,12 @@ Partial Class frmMain
         Me.Label97.TabIndex = 37
         Me.Label97.Text = "*"
         '
-        'tabScanForAnts
-        '
-        Me.tabScanForAnts.Controls.Add(Me.Label3)
-        Me.tabScanForAnts.Controls.Add(Me.lblScanning)
-        Me.tabScanForAnts.Controls.Add(Me.cmbLocalIPs)
-        Me.tabScanForAnts.Controls.Add(Me.ProgressBar1)
-        Me.tabScanForAnts.Controls.Add(Me.cmdScan)
-        Me.tabScanForAnts.Location = New System.Drawing.Point(4, 4)
-        Me.tabScanForAnts.Name = "tabScanForAnts"
-        Me.tabScanForAnts.Size = New System.Drawing.Size(1228, 299)
-        Me.tabScanForAnts.TabIndex = 5
-        Me.tabScanForAnts.Text = "Scan for Ants"
-        Me.tabScanForAnts.UseVisualStyleBackColor = True
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(551, 27)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(234, 20)
-        Me.Label3.TabIndex = 13
-        Me.Label3.Text = "Local IP Address for scanning"
-        '
-        'lblScanning
-        '
-        Me.lblScanning.AutoSize = True
-        Me.lblScanning.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblScanning.Location = New System.Drawing.Point(118, 20)
-        Me.lblScanning.Name = "lblScanning"
-        Me.lblScanning.Size = New System.Drawing.Size(411, 20)
-        Me.lblScanning.TabIndex = 18
-        Me.lblScanning.Text = "This could take a while and may appear unresponsive."
-        Me.lblScanning.Visible = False
-        '
-        'cmbLocalIPs
-        '
-        Me.cmbLocalIPs.FormattingEnabled = True
-        Me.cmbLocalIPs.Location = New System.Drawing.Point(597, 50)
-        Me.cmbLocalIPs.Name = "cmbLocalIPs"
-        Me.cmbLocalIPs.Size = New System.Drawing.Size(183, 28)
-        Me.cmbLocalIPs.TabIndex = 12
-        '
-        'ProgressBar1
-        '
-        Me.ProgressBar1.Location = New System.Drawing.Point(15, 52)
-        Me.ProgressBar1.Name = "ProgressBar1"
-        Me.ProgressBar1.Size = New System.Drawing.Size(530, 23)
-        Me.ProgressBar1.TabIndex = 3
-        Me.ProgressBar1.Visible = False
-        '
-        'cmdScan
-        '
-        Me.cmdScan.Location = New System.Drawing.Point(15, 16)
-        Me.cmdScan.Margin = New System.Windows.Forms.Padding(4)
-        Me.cmdScan.Name = "cmdScan"
-        Me.cmdScan.Size = New System.Drawing.Size(94, 31)
-        Me.cmdScan.TabIndex = 2
-        Me.cmdScan.Text = "Scan"
-        Me.cmdScan.UseVisualStyleBackColor = True
-        '
         'tabLog
         '
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(1228, 299)
+        Me.tabLog.Size = New System.Drawing.Size(1153, 297)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -2104,10 +2247,40 @@ Partial Class frmMain
         Me.txtLog.Size = New System.Drawing.Size(1208, 288)
         Me.txtLog.TabIndex = 0
         '
+        'cmbRefreshRate
+        '
+        Me.cmbRefreshRate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmbRefreshRate.FormattingEnabled = True
+        Me.cmbRefreshRate.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
+        Me.cmbRefreshRate.Location = New System.Drawing.Point(995, 342)
+        Me.cmbRefreshRate.Name = "cmbRefreshRate"
+        Me.cmbRefreshRate.Size = New System.Drawing.Size(94, 28)
+        Me.cmbRefreshRate.TabIndex = 47
+        Me.cmbRefreshRate.Text = "Seconds"
+        '
+        'txtRefreshRate
+        '
+        Me.txtRefreshRate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.txtRefreshRate.Location = New System.Drawing.Point(933, 343)
+        Me.txtRefreshRate.Name = "txtRefreshRate"
+        Me.txtRefreshRate.Size = New System.Drawing.Size(55, 27)
+        Me.txtRefreshRate.TabIndex = 46
+        Me.txtRefreshRate.Text = "300"
+        '
+        'Label16
+        '
+        Me.Label16.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Label16.AutoSize = True
+        Me.Label16.Location = New System.Drawing.Point(812, 345)
+        Me.Label16.Name = "Label16"
+        Me.Label16.Size = New System.Drawing.Size(118, 20)
+        Me.Label16.TabIndex = 45
+        Me.Label16.Text = "Refresh every:"
+        '
         'cmdPause
         '
         Me.cmdPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdPause.Location = New System.Drawing.Point(692, 340)
+        Me.cmdPause.Location = New System.Drawing.Point(692, 339)
         Me.cmdPause.Name = "cmdPause"
         Me.cmdPause.Size = New System.Drawing.Size(85, 28)
         Me.cmdPause.TabIndex = 3
@@ -2117,7 +2290,7 @@ Partial Class frmMain
         'txtPleaseSupport
         '
         Me.txtPleaseSupport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 341)
+        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 340)
         Me.txtPleaseSupport.Name = "txtPleaseSupport"
         Me.txtPleaseSupport.ReadOnly = True
         Me.txtPleaseSupport.Size = New System.Drawing.Size(501, 27)
@@ -2164,17 +2337,57 @@ Partial Class frmMain
         '
         'timerDoStuff
         '
+        Me.timerDoStuff.Interval = 10
+        '
+        'dataAnts
+        '
+        Me.dataAnts.AllowUserToAddRows = False
+        Me.dataAnts.AllowUserToDeleteRows = False
+        Me.dataAnts.AllowUserToOrderColumns = True
+        Me.dataAnts.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dataAnts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dataAnts.Location = New System.Drawing.Point(7, 7)
+        Me.dataAnts.Margin = New System.Windows.Forms.Padding(4)
+        Me.dataAnts.Name = "dataAnts"
+        Me.dataAnts.ReadOnly = True
+        Me.dataAnts.RowHeadersVisible = False
+        Me.dataAnts.RowTemplate.Height = 24
+        Me.dataAnts.Size = New System.Drawing.Size(1139, 274)
+        Me.dataAnts.TabIndex = 0
+        '
+        'lstPools
+        '
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.TabIndex = 12
+        '
+        'mnuRemoveAnt
+        '
+        Me.mnuRemoveAnt.Name = "mnuRemoveAnt"
+        Me.mnuRemoveAnt.Size = New System.Drawing.Size(186, 24)
+        Me.mnuRemoveAnt.Text = "Remove"
+        Me.mnuRemoveAnt.Visible = False
         '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1250, 375)
+        Me.ClientSize = New System.Drawing.Size(1175, 374)
         Me.ContextMenuStrip = Me.menuStripMain
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cmdRefresh)
+        Me.Controls.Add(Me.cmbRefreshRate)
+        Me.Controls.Add(Me.txtRefreshRate)
+        Me.Controls.Add(Me.Label16)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Location = New System.Drawing.Point(144, 180)
@@ -2183,10 +2396,12 @@ Partial Class frmMain
         Me.Name = "frmMain"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "M's Ant Monitor"
-        CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.mnuAntMenu.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.tabAnts.ResumeLayout(False)
+        Me.tabScanForAnts.ResumeLayout(False)
+        Me.tabScanForAnts.PerformLayout()
+        CType(Me.dataAntConfig, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tabConfig.ResumeLayout(False)
         Me.tabConfig.PerformLayout()
         CType(Me.trackThreadCount, System.ComponentModel.ISupportInitialize).EndInit()
@@ -2206,12 +2421,11 @@ Partial Class frmMain
         Me.tabAlertTypes.PerformLayout()
         Me.tabEmail.ResumeLayout(False)
         Me.tabEmail.PerformLayout()
-        Me.tabScanForAnts.ResumeLayout(False)
-        Me.tabScanForAnts.PerformLayout()
         Me.tabLog.ResumeLayout(False)
         Me.tabLog.PerformLayout()
         Me.menuStripNotifyIcon.ResumeLayout(False)
         Me.menuStripMain.ResumeLayout(False)
+        CType(Me.dataAnts, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -2223,18 +2437,15 @@ Partial Class frmMain
     Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
     Friend WithEvents tabAnts As System.Windows.Forms.TabPage
     Friend WithEvents tabConfig As System.Windows.Forms.TabPage
-    Friend WithEvents chklstAnts As System.Windows.Forms.CheckedListBox
     Friend WithEvents cmdDelAnt As System.Windows.Forms.Button
     Friend WithEvents cmdAddAnt As System.Windows.Forms.Button
     Friend WithEvents txtAntAddress As System.Windows.Forms.TextBox
     Friend WithEvents cmdPause As System.Windows.Forms.Button
-    Friend WithEvents txtSSHPassword As System.Windows.Forms.TextBox
+    Friend WithEvents txtAntSSHPassword As System.Windows.Forms.TextBox
     Friend WithEvents lblWBPassword As System.Windows.Forms.Label
-    Friend WithEvents txtSSHUsername As System.Windows.Forms.TextBox
+    Friend WithEvents txtAntSSHUsername As System.Windows.Forms.TextBox
     Friend WithEvents lblWBUserName As System.Windows.Forms.Label
     Friend WithEvents cmdSaveConfig As System.Windows.Forms.Button
-    Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents txtPleaseSupport As System.Windows.Forms.TextBox
     Friend WithEvents cmbRefreshRate As System.Windows.Forms.ComboBox
@@ -2259,7 +2470,6 @@ Partial Class frmMain
     Friend WithEvents chkShowXCount As System.Windows.Forms.CheckBox
     Friend WithEvents chkShowStale As System.Windows.Forms.CheckBox
     Friend WithEvents chkShowRej As System.Windows.Forms.CheckBox
-    Friend WithEvents chkUseAPI As System.Windows.Forms.CheckBox
     Friend WithEvents tabAlerts As System.Windows.Forms.TabPage
     Friend WithEvents NotifyIcon1 As System.Windows.Forms.NotifyIcon
     Friend WithEvents menuStripNotifyIcon As System.Windows.Forms.ContextMenuStrip
@@ -2335,11 +2545,11 @@ Partial Class frmMain
     Friend WithEvents txtAlertEMailGovernor As System.Windows.Forms.TextBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents chkShowDifficulty As System.Windows.Forms.CheckBox
-    Friend WithEvents optAddS2 As System.Windows.Forms.RadioButton
-    Friend WithEvents optAddS1 As System.Windows.Forms.RadioButton
+    Friend WithEvents optAntS2 As System.Windows.Forms.RadioButton
+    Friend WithEvents optAntS1 As System.Windows.Forms.RadioButton
     Friend WithEvents Label7 As System.Windows.Forms.Label
-    Friend WithEvents txtWebPassword As System.Windows.Forms.TextBox
-    Friend WithEvents txtWebUsername As System.Windows.Forms.TextBox
+    Friend WithEvents txtAntWebPassword As System.Windows.Forms.TextBox
+    Friend WithEvents txtAntWebUsername As System.Windows.Forms.TextBox
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents cmdSaveAnt As System.Windows.Forms.Button
     Friend WithEvents chkShowACount As System.Windows.Forms.CheckBox
@@ -2380,7 +2590,7 @@ Partial Class frmMain
     Friend WithEvents lblPools1 As System.Windows.Forms.Label
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
-    Friend WithEvents optAddS3 As System.Windows.Forms.RadioButton
+    Friend WithEvents optAntS3 As System.Windows.Forms.RadioButton
     Friend WithEvents tabS3Alerts As System.Windows.Forms.TabPage
     Friend WithEvents chkAlertIfS3FanLow As System.Windows.Forms.CheckBox
     Friend WithEvents txtAlertS3FanLow As System.Windows.Forms.TextBox
@@ -2397,14 +2607,37 @@ Partial Class frmMain
     Friend WithEvents cmdChangeThreads As System.Windows.Forms.Button
     Friend WithEvents trackThreadCount As System.Windows.Forms.TrackBar
     Friend WithEvents Label13 As System.Windows.Forms.Label
-    Friend WithEvents tabScanForAnts As System.Windows.Forms.TabPage
-    Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents lblScanning As System.Windows.Forms.Label
-    Friend WithEvents cmbLocalIPs As System.Windows.Forms.ComboBox
-    Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
-    Friend WithEvents cmdScan As System.Windows.Forms.Button
     Friend WithEvents Label14 As System.Windows.Forms.Label
     Friend WithEvents txtDisplayRefreshInSecs As System.Windows.Forms.TextBox
     Friend WithEvents chkRebootAntOnError As System.Windows.Forms.CheckBox
+    Friend WithEvents tabScanForAnts As System.Windows.Forms.TabPage
+    Friend WithEvents Label15 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents txtIPRangeToScan As System.Windows.Forms.TextBox
+    Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents cmdScan As System.Windows.Forms.Button
+    Friend WithEvents dataAntConfig As System.Windows.Forms.DataGridView
+    Friend WithEvents Label18 As System.Windows.Forms.Label
+    Friend WithEvents Label17 As System.Windows.Forms.Label
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents chkAntRebootViaSSH As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAntUseAPI As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAntActive As System.Windows.Forms.CheckBox
+    Friend WithEvents Label20 As System.Windows.Forms.Label
+    Friend WithEvents txtAntName As System.Windows.Forms.TextBox
+    Friend WithEvents Label19 As System.Windows.Forms.Label
+    Friend WithEvents lblAntID As System.Windows.Forms.Label
+    Friend WithEvents txtAntSSHPort As System.Windows.Forms.TextBox
+    Friend WithEvents Label23 As System.Windows.Forms.Label
+    Friend WithEvents txtAntWebPort As System.Windows.Forms.TextBox
+    Friend WithEvents txtAntAPIPort As System.Windows.Forms.TextBox
+    Friend WithEvents Label21 As System.Windows.Forms.Label
+    Friend WithEvents cmdAntClear As System.Windows.Forms.Button
+    Friend WithEvents cmbAntScanStop As System.Windows.Forms.ComboBox
+    Friend WithEvents Label24 As System.Windows.Forms.Label
+    Friend WithEvents Label22 As System.Windows.Forms.Label
+    Friend WithEvents cmbAntScanStart As System.Windows.Forms.ComboBox
+    Friend WithEvents mnuRemoveAnt As System.Windows.Forms.ToolStripMenuItem
 
 End Class

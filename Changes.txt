@@ -1,3 +1,16 @@
+v3.4
+- Added support for the prior version of the S3 firmware.
+- Rewrote the Scanning for Ants routine to use the API.  Each address has 5 seconds to respond before it moves to the next.  Enter the first 3 pieces
+of the quad address to scan (ie 192.168.0) and it'll scan the segment, adding Ants that it finds if they aren't already there.
+- Completely revised the Ant configuration to allow each Ant to have completely configurable options, including name, SSH Port, API Port, and Web Port.
+- Fixed the problem with S2 shutdowns not shutting down, but rebooting.
+- Fixed the problem with web scraping failing if you don't have 3 pools configured.
+- Added the ability to right click -> remove an Ant from the output display.
+
+v3.3
+- Fixed the problem with leading zeros in part of an IP address causing the API call to fail. 
+- Changed the field where you enter Ant addresses to only support IP addresses.  Before there was theoretical support for DNS names, that is being removed.
+
 v3.2
 - Fixed the problem with not being able to save the config if you've never used it before.
 - Changed to query the Ants via the API on background threads.  The numbers of threads is configurable.  The more Ants you have, the higher you likely want
