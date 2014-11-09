@@ -1,3 +1,6 @@
+v3.5
+- Added support for the newest S2 firmware.
+
 v3.4
 - Added support for the prior version of the S3 firmware.
 - Rewrote the Scanning for Ants routine to use the API.  Each address has 5 seconds to respond before it moves to the next.  Enter the first 3 pieces

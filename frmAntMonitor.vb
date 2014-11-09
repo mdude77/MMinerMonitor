@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Ant Monitor v3.4"
+    Private Const csVersion As String = "M's Ant Monitor v3.5"
 
     'alert string   
     Private sAlerts As String
@@ -1555,7 +1555,7 @@ Public Class frmMain
             j = Newtonsoft.Json.Linq.JObject.Parse(AntData.sStats)
 
             For Each ja In j.Property("STATS")
-                If AntData.AntType = enAntType.S3 Then
+                If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S2 Then
                     If ja.Count = 4 Then
                         jp1 = ja(0)
                     Else
@@ -1792,18 +1792,18 @@ Public Class frmMain
 
             sTemp = GetIPData(AntToCheck.sIP, AntToCheck.sAPIPort, "stats")
 
-            If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S1 Then
-                'fix mangled JSON
-                x = InStr(sTemp, "}{")
+            'If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S1 Then
+            'fix mangled JSON
+            x = InStr(sTemp, "}{")
 
-                If x <> 0 Then
-                    AntData.sStats = sTemp.Insert(x, ",")
-                Else
-                    AntData.sStats = sTemp
-                End If
+            If x <> 0 Then
+                AntData.sStats = sTemp.Insert(x, ",")
             Else
                 AntData.sStats = sTemp
             End If
+            '          Else
+            '            AntData.sStats = sTemp
+            '           End If
 
             bStep = 2
 

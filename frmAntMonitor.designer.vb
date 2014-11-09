@@ -27,6 +27,7 @@ Partial Class frmMain
         Me.mnuAntMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuRebootAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuRebootMultiple = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuRemoveAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuShutdownS2 = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuUpdatePools = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerRefresh = New System.Windows.Forms.Timer(Me.components)
@@ -231,7 +232,6 @@ Partial Class frmMain
         Me.timerDoStuff = New System.Windows.Forms.Timer(Me.components)
         Me.dataAnts = New MAntMonitor.dgvWrapper()
         Me.lstPools = New MAntMonitor.enListbox()
-        Me.mnuRemoveAnt = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
@@ -258,7 +258,7 @@ Partial Class frmMain
         '
         Me.mnuAntMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuRebootAnt, Me.mnuRebootMultiple, Me.mnuRemoveAnt, Me.mnuShutdownS2, Me.mnuUpdatePools})
         Me.mnuAntMenu.Name = "menuAntMenu"
-        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 146)
+        Me.mnuAntMenu.Size = New System.Drawing.Size(187, 124)
         '
         'mnuRebootAnt
         '
@@ -272,6 +272,13 @@ Partial Class frmMain
         Me.mnuRebootMultiple.Size = New System.Drawing.Size(186, 24)
         Me.mnuRebootMultiple.Text = "Reboot Multiple"
         Me.mnuRebootMultiple.Visible = False
+        '
+        'mnuRemoveAnt
+        '
+        Me.mnuRemoveAnt.Name = "mnuRemoveAnt"
+        Me.mnuRemoveAnt.Size = New System.Drawing.Size(186, 24)
+        Me.mnuRemoveAnt.Text = "Remove"
+        Me.mnuRemoveAnt.Visible = False
         '
         'mnuShutdownS2
         '
@@ -2296,7 +2303,7 @@ Partial Class frmMain
         Me.txtPleaseSupport.Size = New System.Drawing.Size(501, 27)
         Me.txtPleaseSupport.TabIndex = 100
         Me.txtPleaseSupport.TabStop = False
-        Me.txtPleaseSupport.Text = "Please support this app: 1PA1sji28iztspKxDquwFrNjp5SksjkCHE"
+        Me.txtPleaseSupport.Text = "Donations: 1DHT7jkmP7msxb3YbyGPettGm3VmJS9Wtk"
         '
         'NotifyIcon1
         '
@@ -2354,7 +2361,7 @@ Partial Class frmMain
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1139, 274)
+        Me.dataAnts.Size = New System.Drawing.Size(1139, 262)
         Me.dataAnts.TabIndex = 0
         '
         'lstPools
@@ -2367,13 +2374,6 @@ Partial Class frmMain
         Me.lstPools.Name = "lstPools"
         Me.lstPools.Size = New System.Drawing.Size(269, 264)
         Me.lstPools.TabIndex = 12
-        '
-        'mnuRemoveAnt
-        '
-        Me.mnuRemoveAnt.Name = "mnuRemoveAnt"
-        Me.mnuRemoveAnt.Size = New System.Drawing.Size(186, 24)
-        Me.mnuRemoveAnt.Text = "Remove"
-        Me.mnuRemoveAnt.Visible = False
         '
         'frmMain
         '
