@@ -165,12 +165,6 @@ Partial Class frmMain
         Me.chkAlertIfS3Temp = New System.Windows.Forms.CheckBox()
         Me.txtAlertS3FanHigh = New System.Windows.Forms.TextBox()
         Me.tabAlertTypes = New System.Windows.Forms.TabPage()
-        Me.chkRebootAntOnError = New System.Windows.Forms.CheckBox()
-        Me.chkAlertRebootAntsOnHashAlert = New System.Windows.Forms.CheckBox()
-        Me.cmbAlertRebootGovernor = New System.Windows.Forms.ComboBox()
-        Me.txtAlertRebootGovernor = New System.Windows.Forms.TextBox()
-        Me.Label8 = New System.Windows.Forms.Label()
-        Me.chkAlertRebootIfXd = New System.Windows.Forms.CheckBox()
         Me.cmbAlertEMailGovernor = New System.Windows.Forms.ComboBox()
         Me.txtAlertEMailGovernor = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -186,6 +180,23 @@ Partial Class frmMain
         Me.Label39 = New System.Windows.Forms.Label()
         Me.Label40 = New System.Windows.Forms.Label()
         Me.txtAlertStartProcessParms = New System.Windows.Forms.TextBox()
+        Me.tabReboots = New System.Windows.Forms.TabPage()
+        Me.cmdSaveReboots = New System.Windows.Forms.Button()
+        Me.cmbRebootAllAntsAtAlso = New System.Windows.Forms.ComboBox()
+        Me.txtRebootAllAntsAtAlso = New System.Windows.Forms.TextBox()
+        Me.cmbRebootAllAntsAt = New System.Windows.Forms.ComboBox()
+        Me.txtRebootAllAntsAt = New System.Windows.Forms.TextBox()
+        Me.txtRebootAntsByUptime = New System.Windows.Forms.TextBox()
+        Me.cmbRebootAntsByUptime = New System.Windows.Forms.ComboBox()
+        Me.chkRebootAllAntsAtAlso = New System.Windows.Forms.CheckBox()
+        Me.chkRebootAllAntsAt = New System.Windows.Forms.CheckBox()
+        Me.chkRebootAntsByUptime = New System.Windows.Forms.CheckBox()
+        Me.chkRebootAntOnError = New System.Windows.Forms.CheckBox()
+        Me.txtAlertRebootGovernor = New System.Windows.Forms.TextBox()
+        Me.chkAlertRebootIfXd = New System.Windows.Forms.CheckBox()
+        Me.chkAlertRebootAntsOnHashAlert = New System.Windows.Forms.CheckBox()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.cmbAlertRebootGovernor = New System.Windows.Forms.ComboBox()
         Me.tabEmail = New System.Windows.Forms.TabPage()
         Me.cmdSendTestEMail = New System.Windows.Forms.Button()
         Me.txtSMTPAlertAddress = New System.Windows.Forms.TextBox()
@@ -232,6 +243,9 @@ Partial Class frmMain
         Me.timerDoStuff = New System.Windows.Forms.Timer(Me.components)
         Me.dataAnts = New MAntMonitor.dgvWrapper()
         Me.lstPools = New MAntMonitor.enListbox()
+        Me.Label25 = New System.Windows.Forms.Label()
+        Me.Label26 = New System.Windows.Forms.Label()
+        Me.Label27 = New System.Windows.Forms.Label()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabAnts.SuspendLayout()
@@ -247,6 +261,7 @@ Partial Class frmMain
         Me.tabS2Alerts.SuspendLayout()
         Me.tabS3Alerts.SuspendLayout()
         Me.tabAlertTypes.SuspendLayout()
+        Me.tabReboots.SuspendLayout()
         Me.tabEmail.SuspendLayout()
         Me.tabLog.SuspendLayout()
         Me.menuStripNotifyIcon.SuspendLayout()
@@ -301,7 +316,7 @@ Partial Class frmMain
         'cmdRefresh
         '
         Me.cmdRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdRefresh.Location = New System.Drawing.Point(514, 339)
+        Me.cmdRefresh.Location = New System.Drawing.Point(514, 366)
         Me.cmdRefresh.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdRefresh.Name = "cmdRefresh"
         Me.cmdRefresh.Size = New System.Drawing.Size(164, 29)
@@ -324,7 +339,7 @@ Partial Class frmMain
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1161, 330)
+        Me.TabControl1.Size = New System.Drawing.Size(1161, 358)
         Me.TabControl1.TabIndex = 0
         '
         'tabAnts
@@ -333,7 +348,7 @@ Partial Class frmMain
         Me.tabAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabAnts.Name = "tabAnts"
         Me.tabAnts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabAnts.Size = New System.Drawing.Size(1153, 297)
+        Me.tabAnts.Size = New System.Drawing.Size(1153, 325)
         Me.tabAnts.TabIndex = 0
         Me.tabAnts.Text = "Ant Output"
         Me.tabAnts.UseVisualStyleBackColor = True
@@ -381,7 +396,7 @@ Partial Class frmMain
         Me.tabScanForAnts.Controls.Add(Me.lblWBUserName)
         Me.tabScanForAnts.Location = New System.Drawing.Point(4, 4)
         Me.tabScanForAnts.Name = "tabScanForAnts"
-        Me.tabScanForAnts.Size = New System.Drawing.Size(1153, 297)
+        Me.tabScanForAnts.Size = New System.Drawing.Size(1153, 325)
         Me.tabScanForAnts.TabIndex = 5
         Me.tabScanForAnts.Text = "Ants Config"
         Me.tabScanForAnts.UseVisualStyleBackColor = True
@@ -548,7 +563,7 @@ Partial Class frmMain
         Me.dataAntConfig.Name = "dataAntConfig"
         Me.dataAntConfig.ReadOnly = True
         Me.dataAntConfig.RowTemplate.Height = 24
-        Me.dataAntConfig.Size = New System.Drawing.Size(411, 285)
+        Me.dataAntConfig.Size = New System.Drawing.Size(411, 313)
         Me.dataAntConfig.TabIndex = 71
         '
         'txtAntName
@@ -764,7 +779,7 @@ Partial Class frmMain
         Me.tabConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabConfig.Name = "tabConfig"
         Me.tabConfig.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConfig.Size = New System.Drawing.Size(1153, 297)
+        Me.tabConfig.Size = New System.Drawing.Size(1153, 325)
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
@@ -775,7 +790,7 @@ Partial Class frmMain
         Me.Label18.Name = "Label18"
         Me.Label18.Size = New System.Drawing.Size(343, 85)
         Me.Label18.TabIndex = 74
-        Me.Label18.Text = "A properly matched Thread Count and DIsplay Refresh Display can result in an extr" & _
+        Me.Label18.Text = "A properly matched Thread Count and Display Refresh Display can result in an extr" & _
     "emely fast refresh.  One user monitors 1200 Ants in 52 seconds!"
         '
         'Label17
@@ -1143,7 +1158,7 @@ Partial Class frmMain
         Me.tabPools.Controls.Add(Me.lstPools)
         Me.tabPools.Location = New System.Drawing.Point(4, 4)
         Me.tabPools.Name = "tabPools"
-        Me.tabPools.Size = New System.Drawing.Size(1153, 297)
+        Me.tabPools.Size = New System.Drawing.Size(1153, 325)
         Me.tabPools.TabIndex = 4
         Me.tabPools.Text = "Pools"
         Me.tabPools.UseVisualStyleBackColor = True
@@ -1325,9 +1340,9 @@ Partial Class frmMain
         Me.tabAlerts.Controls.Add(Me.TabControl2)
         Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
         Me.tabAlerts.Name = "tabAlerts"
-        Me.tabAlerts.Size = New System.Drawing.Size(1153, 297)
+        Me.tabAlerts.Size = New System.Drawing.Size(1153, 325)
         Me.tabAlerts.TabIndex = 3
-        Me.tabAlerts.Text = "Alerts"
+        Me.tabAlerts.Text = "Alerts & Reboots"
         Me.tabAlerts.UseVisualStyleBackColor = True
         '
         'TabControl2
@@ -1340,12 +1355,13 @@ Partial Class frmMain
         Me.TabControl2.Controls.Add(Me.tabS2Alerts)
         Me.TabControl2.Controls.Add(Me.tabS3Alerts)
         Me.TabControl2.Controls.Add(Me.tabAlertTypes)
+        Me.TabControl2.Controls.Add(Me.tabReboots)
         Me.TabControl2.Controls.Add(Me.tabEmail)
         Me.TabControl2.Location = New System.Drawing.Point(6, 7)
         Me.TabControl2.Multiline = True
         Me.TabControl2.Name = "TabControl2"
         Me.TabControl2.SelectedIndex = 0
-        Me.TabControl2.Size = New System.Drawing.Size(1219, 289)
+        Me.TabControl2.Size = New System.Drawing.Size(1144, 317)
         Me.TabControl2.TabIndex = 18
         '
         'tabS1Alerts
@@ -1364,7 +1380,7 @@ Partial Class frmMain
         Me.tabS1Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS1Alerts.Name = "tabS1Alerts"
         Me.tabS1Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS1Alerts.Size = New System.Drawing.Size(1211, 256)
+        Me.tabS1Alerts.Size = New System.Drawing.Size(1136, 284)
         Me.tabS1Alerts.TabIndex = 0
         Me.tabS1Alerts.Text = "S1 Alerts"
         Me.tabS1Alerts.UseVisualStyleBackColor = True
@@ -1489,7 +1505,7 @@ Partial Class frmMain
         Me.tabS2Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS2Alerts.Name = "tabS2Alerts"
         Me.tabS2Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS2Alerts.Size = New System.Drawing.Size(1211, 256)
+        Me.tabS2Alerts.Size = New System.Drawing.Size(1136, 284)
         Me.tabS2Alerts.TabIndex = 1
         Me.tabS2Alerts.Text = "S2 Alerts"
         Me.tabS2Alerts.UseVisualStyleBackColor = True
@@ -1613,7 +1629,7 @@ Partial Class frmMain
         Me.tabS3Alerts.Controls.Add(Me.txtAlertS3FanHigh)
         Me.tabS3Alerts.Location = New System.Drawing.Point(4, 4)
         Me.tabS3Alerts.Name = "tabS3Alerts"
-        Me.tabS3Alerts.Size = New System.Drawing.Size(1211, 256)
+        Me.tabS3Alerts.Size = New System.Drawing.Size(1136, 284)
         Me.tabS3Alerts.TabIndex = 4
         Me.tabS3Alerts.Text = "S3 Alerts"
         Me.tabS3Alerts.UseVisualStyleBackColor = True
@@ -1724,12 +1740,6 @@ Partial Class frmMain
         '
         'tabAlertTypes
         '
-        Me.tabAlertTypes.Controls.Add(Me.chkRebootAntOnError)
-        Me.tabAlertTypes.Controls.Add(Me.chkAlertRebootAntsOnHashAlert)
-        Me.tabAlertTypes.Controls.Add(Me.cmbAlertRebootGovernor)
-        Me.tabAlertTypes.Controls.Add(Me.txtAlertRebootGovernor)
-        Me.tabAlertTypes.Controls.Add(Me.Label8)
-        Me.tabAlertTypes.Controls.Add(Me.chkAlertRebootIfXd)
         Me.tabAlertTypes.Controls.Add(Me.cmbAlertEMailGovernor)
         Me.tabAlertTypes.Controls.Add(Me.txtAlertEMailGovernor)
         Me.tabAlertTypes.Controls.Add(Me.Label2)
@@ -1747,70 +1757,10 @@ Partial Class frmMain
         Me.tabAlertTypes.Controls.Add(Me.txtAlertStartProcessParms)
         Me.tabAlertTypes.Location = New System.Drawing.Point(4, 4)
         Me.tabAlertTypes.Name = "tabAlertTypes"
-        Me.tabAlertTypes.Size = New System.Drawing.Size(1211, 256)
+        Me.tabAlertTypes.Size = New System.Drawing.Size(1136, 284)
         Me.tabAlertTypes.TabIndex = 2
         Me.tabAlertTypes.Text = "Alert Types"
         Me.tabAlertTypes.UseVisualStyleBackColor = True
-        '
-        'chkRebootAntOnError
-        '
-        Me.chkRebootAntOnError.AutoSize = True
-        Me.chkRebootAntOnError.Location = New System.Drawing.Point(522, 69)
-        Me.chkRebootAntOnError.Name = "chkRebootAntOnError"
-        Me.chkRebootAntOnError.Size = New System.Drawing.Size(449, 24)
-        Me.chkRebootAntOnError.TabIndex = 9
-        Me.chkRebootAntOnError.Text = "Attempt to reboot ants that get an ERROR on refreshing"
-        Me.chkRebootAntOnError.UseVisualStyleBackColor = True
-        '
-        'chkAlertRebootAntsOnHashAlert
-        '
-        Me.chkAlertRebootAntsOnHashAlert.AutoSize = True
-        Me.chkAlertRebootAntsOnHashAlert.Checked = True
-        Me.chkAlertRebootAntsOnHashAlert.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAlertRebootAntsOnHashAlert.Location = New System.Drawing.Point(522, 39)
-        Me.chkAlertRebootAntsOnHashAlert.Name = "chkAlertRebootAntsOnHashAlert"
-        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(367, 24)
-        Me.chkAlertRebootAntsOnHashAlert.TabIndex = 8
-        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot Ants that trigger low/high Hash alerts"
-        Me.chkAlertRebootAntsOnHashAlert.UseVisualStyleBackColor = True
-        '
-        'cmbAlertRebootGovernor
-        '
-        Me.cmbAlertRebootGovernor.FormattingEnabled = True
-        Me.cmbAlertRebootGovernor.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours", "Days"})
-        Me.cmbAlertRebootGovernor.Location = New System.Drawing.Point(582, 124)
-        Me.cmbAlertRebootGovernor.Name = "cmbAlertRebootGovernor"
-        Me.cmbAlertRebootGovernor.Size = New System.Drawing.Size(94, 28)
-        Me.cmbAlertRebootGovernor.TabIndex = 26
-        Me.cmbAlertRebootGovernor.Text = "Minutes"
-        '
-        'txtAlertRebootGovernor
-        '
-        Me.txtAlertRebootGovernor.Location = New System.Drawing.Point(520, 125)
-        Me.txtAlertRebootGovernor.Name = "txtAlertRebootGovernor"
-        Me.txtAlertRebootGovernor.Size = New System.Drawing.Size(55, 27)
-        Me.txtAlertRebootGovernor.TabIndex = 25
-        Me.txtAlertRebootGovernor.Text = "30"
-        '
-        'Label8
-        '
-        Me.Label8.Location = New System.Drawing.Point(518, 100)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(320, 28)
-        Me.Label8.TabIndex = 10
-        Me.Label8.Text = "Don't reboot more than once every"
-        '
-        'chkAlertRebootIfXd
-        '
-        Me.chkAlertRebootIfXd.AutoSize = True
-        Me.chkAlertRebootIfXd.Checked = True
-        Me.chkAlertRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAlertRebootIfXd.Location = New System.Drawing.Point(522, 12)
-        Me.chkAlertRebootIfXd.Name = "chkAlertRebootIfXd"
-        Me.chkAlertRebootIfXd.Size = New System.Drawing.Size(316, 24)
-        Me.chkAlertRebootIfXd.TabIndex = 7
-        Me.chkAlertRebootIfXd.Text = "Reboot Ants that trigger XCount alerts"
-        Me.chkAlertRebootIfXd.UseVisualStyleBackColor = True
         '
         'cmbAlertEMailGovernor
         '
@@ -1953,6 +1903,187 @@ Partial Class frmMain
         Me.txtAlertStartProcessParms.Size = New System.Drawing.Size(332, 27)
         Me.txtAlertStartProcessParms.TabIndex = 12
         '
+        'tabReboots
+        '
+        Me.tabReboots.Controls.Add(Me.Label27)
+        Me.tabReboots.Controls.Add(Me.Label26)
+        Me.tabReboots.Controls.Add(Me.Label25)
+        Me.tabReboots.Controls.Add(Me.cmdSaveReboots)
+        Me.tabReboots.Controls.Add(Me.cmbRebootAllAntsAtAlso)
+        Me.tabReboots.Controls.Add(Me.txtRebootAllAntsAtAlso)
+        Me.tabReboots.Controls.Add(Me.cmbRebootAllAntsAt)
+        Me.tabReboots.Controls.Add(Me.txtRebootAllAntsAt)
+        Me.tabReboots.Controls.Add(Me.txtRebootAntsByUptime)
+        Me.tabReboots.Controls.Add(Me.cmbRebootAntsByUptime)
+        Me.tabReboots.Controls.Add(Me.chkRebootAllAntsAtAlso)
+        Me.tabReboots.Controls.Add(Me.chkRebootAllAntsAt)
+        Me.tabReboots.Controls.Add(Me.chkRebootAntsByUptime)
+        Me.tabReboots.Controls.Add(Me.chkRebootAntOnError)
+        Me.tabReboots.Controls.Add(Me.txtAlertRebootGovernor)
+        Me.tabReboots.Controls.Add(Me.chkAlertRebootIfXd)
+        Me.tabReboots.Controls.Add(Me.chkAlertRebootAntsOnHashAlert)
+        Me.tabReboots.Controls.Add(Me.Label8)
+        Me.tabReboots.Controls.Add(Me.cmbAlertRebootGovernor)
+        Me.tabReboots.Location = New System.Drawing.Point(4, 4)
+        Me.tabReboots.Name = "tabReboots"
+        Me.tabReboots.Size = New System.Drawing.Size(1136, 284)
+        Me.tabReboots.TabIndex = 5
+        Me.tabReboots.Text = "Reboots"
+        Me.tabReboots.UseVisualStyleBackColor = True
+        '
+        'cmdSaveReboots
+        '
+        Me.cmdSaveReboots.Location = New System.Drawing.Point(12, 216)
+        Me.cmdSaveReboots.Name = "cmdSaveReboots"
+        Me.cmdSaveReboots.Size = New System.Drawing.Size(121, 32)
+        Me.cmdSaveReboots.TabIndex = 36
+        Me.cmdSaveReboots.Text = "Save Config"
+        Me.cmdSaveReboots.UseVisualStyleBackColor = True
+        '
+        'cmbRebootAllAntsAtAlso
+        '
+        Me.cmbRebootAllAntsAtAlso.FormattingEnabled = True
+        Me.cmbRebootAllAntsAtAlso.Items.AddRange(New Object() {"AM", "PM"})
+        Me.cmbRebootAllAntsAtAlso.Location = New System.Drawing.Point(353, 165)
+        Me.cmbRebootAllAntsAtAlso.Name = "cmbRebootAllAntsAtAlso"
+        Me.cmbRebootAllAntsAtAlso.Size = New System.Drawing.Size(56, 28)
+        Me.cmbRebootAllAntsAtAlso.TabIndex = 35
+        Me.cmbRebootAllAntsAtAlso.Text = "AM"
+        '
+        'txtRebootAllAntsAtAlso
+        '
+        Me.txtRebootAllAntsAtAlso.Location = New System.Drawing.Point(291, 166)
+        Me.txtRebootAllAntsAtAlso.Name = "txtRebootAllAntsAtAlso"
+        Me.txtRebootAllAntsAtAlso.Size = New System.Drawing.Size(55, 27)
+        Me.txtRebootAllAntsAtAlso.TabIndex = 34
+        Me.txtRebootAllAntsAtAlso.Text = "12:00"
+        '
+        'cmbRebootAllAntsAt
+        '
+        Me.cmbRebootAllAntsAt.FormattingEnabled = True
+        Me.cmbRebootAllAntsAt.Items.AddRange(New Object() {"AM", "PM"})
+        Me.cmbRebootAllAntsAt.Location = New System.Drawing.Point(353, 135)
+        Me.cmbRebootAllAntsAt.Name = "cmbRebootAllAntsAt"
+        Me.cmbRebootAllAntsAt.Size = New System.Drawing.Size(56, 28)
+        Me.cmbRebootAllAntsAt.TabIndex = 33
+        Me.cmbRebootAllAntsAt.Text = "AM"
+        '
+        'txtRebootAllAntsAt
+        '
+        Me.txtRebootAllAntsAt.Location = New System.Drawing.Point(291, 136)
+        Me.txtRebootAllAntsAt.Name = "txtRebootAllAntsAt"
+        Me.txtRebootAllAntsAt.Size = New System.Drawing.Size(55, 27)
+        Me.txtRebootAllAntsAt.TabIndex = 32
+        Me.txtRebootAllAntsAt.Text = "12:00"
+        '
+        'txtRebootAntsByUptime
+        '
+        Me.txtRebootAntsByUptime.Location = New System.Drawing.Point(291, 106)
+        Me.txtRebootAntsByUptime.Name = "txtRebootAntsByUptime"
+        Me.txtRebootAntsByUptime.Size = New System.Drawing.Size(55, 27)
+        Me.txtRebootAntsByUptime.TabIndex = 30
+        Me.txtRebootAntsByUptime.Text = "30"
+        '
+        'cmbRebootAntsByUptime
+        '
+        Me.cmbRebootAntsByUptime.FormattingEnabled = True
+        Me.cmbRebootAntsByUptime.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours", "Days"})
+        Me.cmbRebootAntsByUptime.Location = New System.Drawing.Point(353, 105)
+        Me.cmbRebootAntsByUptime.Name = "cmbRebootAntsByUptime"
+        Me.cmbRebootAntsByUptime.Size = New System.Drawing.Size(94, 28)
+        Me.cmbRebootAntsByUptime.TabIndex = 31
+        Me.cmbRebootAntsByUptime.Text = "Minutes"
+        '
+        'chkRebootAllAntsAtAlso
+        '
+        Me.chkRebootAllAntsAtAlso.AutoSize = True
+        Me.chkRebootAllAntsAtAlso.Location = New System.Drawing.Point(12, 169)
+        Me.chkRebootAllAntsAtAlso.Name = "chkRebootAllAntsAtAlso"
+        Me.chkRebootAllAntsAtAlso.Size = New System.Drawing.Size(201, 24)
+        Me.chkRebootAllAntsAtAlso.TabIndex = 29
+        Me.chkRebootAllAntsAtAlso.Text = "Also reboot all Ants at:"
+        Me.chkRebootAllAntsAtAlso.UseVisualStyleBackColor = True
+        '
+        'chkRebootAllAntsAt
+        '
+        Me.chkRebootAllAntsAt.AutoSize = True
+        Me.chkRebootAllAntsAt.Location = New System.Drawing.Point(12, 139)
+        Me.chkRebootAllAntsAt.Name = "chkRebootAllAntsAt"
+        Me.chkRebootAllAntsAt.Size = New System.Drawing.Size(169, 24)
+        Me.chkRebootAllAntsAt.TabIndex = 28
+        Me.chkRebootAllAntsAt.Text = "Reboot all Ants at:"
+        Me.chkRebootAllAntsAt.UseVisualStyleBackColor = True
+        '
+        'chkRebootAntsByUptime
+        '
+        Me.chkRebootAntsByUptime.AutoSize = True
+        Me.chkRebootAntsByUptime.Location = New System.Drawing.Point(12, 109)
+        Me.chkRebootAntsByUptime.Name = "chkRebootAntsByUptime"
+        Me.chkRebootAntsByUptime.Size = New System.Drawing.Size(281, 24)
+        Me.chkRebootAntsByUptime.TabIndex = 27
+        Me.chkRebootAntsByUptime.Text = "Reboot an Ant when Uptime hits: "
+        Me.chkRebootAntsByUptime.UseVisualStyleBackColor = True
+        '
+        'chkRebootAntOnError
+        '
+        Me.chkRebootAntOnError.AutoSize = True
+        Me.chkRebootAntOnError.Location = New System.Drawing.Point(12, 69)
+        Me.chkRebootAntOnError.Name = "chkRebootAntOnError"
+        Me.chkRebootAntOnError.Size = New System.Drawing.Size(449, 24)
+        Me.chkRebootAntOnError.TabIndex = 9
+        Me.chkRebootAntOnError.Text = "Attempt to reboot ants that get an ERROR on refreshing"
+        Me.chkRebootAntOnError.UseVisualStyleBackColor = True
+        '
+        'txtAlertRebootGovernor
+        '
+        Me.txtAlertRebootGovernor.Location = New System.Drawing.Point(508, 37)
+        Me.txtAlertRebootGovernor.Name = "txtAlertRebootGovernor"
+        Me.txtAlertRebootGovernor.Size = New System.Drawing.Size(55, 27)
+        Me.txtAlertRebootGovernor.TabIndex = 25
+        Me.txtAlertRebootGovernor.Text = "30"
+        '
+        'chkAlertRebootIfXd
+        '
+        Me.chkAlertRebootIfXd.AutoSize = True
+        Me.chkAlertRebootIfXd.Checked = True
+        Me.chkAlertRebootIfXd.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertRebootIfXd.Location = New System.Drawing.Point(12, 12)
+        Me.chkAlertRebootIfXd.Name = "chkAlertRebootIfXd"
+        Me.chkAlertRebootIfXd.Size = New System.Drawing.Size(316, 24)
+        Me.chkAlertRebootIfXd.TabIndex = 7
+        Me.chkAlertRebootIfXd.Text = "Reboot Ants that trigger XCount alerts"
+        Me.chkAlertRebootIfXd.UseVisualStyleBackColor = True
+        '
+        'chkAlertRebootAntsOnHashAlert
+        '
+        Me.chkAlertRebootAntsOnHashAlert.AutoSize = True
+        Me.chkAlertRebootAntsOnHashAlert.Checked = True
+        Me.chkAlertRebootAntsOnHashAlert.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkAlertRebootAntsOnHashAlert.Location = New System.Drawing.Point(12, 39)
+        Me.chkAlertRebootAntsOnHashAlert.Name = "chkAlertRebootAntsOnHashAlert"
+        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(367, 24)
+        Me.chkAlertRebootAntsOnHashAlert.TabIndex = 8
+        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot Ants that trigger low/high Hash alerts"
+        Me.chkAlertRebootAntsOnHashAlert.UseVisualStyleBackColor = True
+        '
+        'Label8
+        '
+        Me.Label8.Location = New System.Drawing.Point(506, 12)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(320, 28)
+        Me.Label8.TabIndex = 10
+        Me.Label8.Text = "Don't reboot more than once every"
+        '
+        'cmbAlertRebootGovernor
+        '
+        Me.cmbAlertRebootGovernor.FormattingEnabled = True
+        Me.cmbAlertRebootGovernor.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours", "Days"})
+        Me.cmbAlertRebootGovernor.Location = New System.Drawing.Point(570, 36)
+        Me.cmbAlertRebootGovernor.Name = "cmbAlertRebootGovernor"
+        Me.cmbAlertRebootGovernor.Size = New System.Drawing.Size(94, 28)
+        Me.cmbAlertRebootGovernor.TabIndex = 26
+        Me.cmbAlertRebootGovernor.Text = "Minutes"
+        '
         'tabEmail
         '
         Me.tabEmail.Controls.Add(Me.cmdSendTestEMail)
@@ -1985,7 +2116,7 @@ Partial Class frmMain
         Me.tabEmail.Controls.Add(Me.Label97)
         Me.tabEmail.Location = New System.Drawing.Point(4, 4)
         Me.tabEmail.Name = "tabEmail"
-        Me.tabEmail.Size = New System.Drawing.Size(1211, 256)
+        Me.tabEmail.Size = New System.Drawing.Size(1136, 284)
         Me.tabEmail.TabIndex = 3
         Me.tabEmail.Text = "EMail Config"
         Me.tabEmail.UseVisualStyleBackColor = True
@@ -2237,7 +2368,7 @@ Partial Class frmMain
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(1153, 297)
+        Me.tabLog.Size = New System.Drawing.Size(1153, 325)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -2251,7 +2382,7 @@ Partial Class frmMain
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtLog.Size = New System.Drawing.Size(1208, 288)
+        Me.txtLog.Size = New System.Drawing.Size(1208, 316)
         Me.txtLog.TabIndex = 0
         '
         'cmbRefreshRate
@@ -2259,7 +2390,7 @@ Partial Class frmMain
         Me.cmbRefreshRate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmbRefreshRate.FormattingEnabled = True
         Me.cmbRefreshRate.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
-        Me.cmbRefreshRate.Location = New System.Drawing.Point(995, 342)
+        Me.cmbRefreshRate.Location = New System.Drawing.Point(995, 369)
         Me.cmbRefreshRate.Name = "cmbRefreshRate"
         Me.cmbRefreshRate.Size = New System.Drawing.Size(94, 28)
         Me.cmbRefreshRate.TabIndex = 47
@@ -2268,7 +2399,7 @@ Partial Class frmMain
         'txtRefreshRate
         '
         Me.txtRefreshRate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtRefreshRate.Location = New System.Drawing.Point(933, 343)
+        Me.txtRefreshRate.Location = New System.Drawing.Point(933, 370)
         Me.txtRefreshRate.Name = "txtRefreshRate"
         Me.txtRefreshRate.Size = New System.Drawing.Size(55, 27)
         Me.txtRefreshRate.TabIndex = 46
@@ -2278,7 +2409,7 @@ Partial Class frmMain
         '
         Me.Label16.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(812, 345)
+        Me.Label16.Location = New System.Drawing.Point(812, 372)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(118, 20)
         Me.Label16.TabIndex = 45
@@ -2287,7 +2418,7 @@ Partial Class frmMain
         'cmdPause
         '
         Me.cmdPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdPause.Location = New System.Drawing.Point(692, 339)
+        Me.cmdPause.Location = New System.Drawing.Point(692, 366)
         Me.cmdPause.Name = "cmdPause"
         Me.cmdPause.Size = New System.Drawing.Size(85, 28)
         Me.cmdPause.TabIndex = 3
@@ -2297,7 +2428,7 @@ Partial Class frmMain
         'txtPleaseSupport
         '
         Me.txtPleaseSupport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 340)
+        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 367)
         Me.txtPleaseSupport.Name = "txtPleaseSupport"
         Me.txtPleaseSupport.ReadOnly = True
         Me.txtPleaseSupport.Size = New System.Drawing.Size(501, 27)
@@ -2361,7 +2492,7 @@ Partial Class frmMain
         Me.dataAnts.ReadOnly = True
         Me.dataAnts.RowHeadersVisible = False
         Me.dataAnts.RowTemplate.Height = 24
-        Me.dataAnts.Size = New System.Drawing.Size(1139, 262)
+        Me.dataAnts.Size = New System.Drawing.Size(1139, 266)
         Me.dataAnts.TabIndex = 0
         '
         'lstPools
@@ -2372,14 +2503,42 @@ Partial Class frmMain
         Me.lstPools.ItemHeight = 20
         Me.lstPools.Location = New System.Drawing.Point(6, 7)
         Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 264)
+        Me.lstPools.Size = New System.Drawing.Size(269, 284)
         Me.lstPools.TabIndex = 12
+        '
+        'Label25
+        '
+        Me.Label25.AutoSize = True
+        Me.Label25.Location = New System.Drawing.Point(508, 86)
+        Me.Label25.Name = "Label25"
+        Me.Label25.Size = New System.Drawing.Size(58, 20)
+        Me.Label25.TabIndex = 37
+        Me.Label25.Text = "Notes:"
+        '
+        'Label26
+        '
+        Me.Label26.Location = New System.Drawing.Point(508, 113)
+        Me.Label26.Name = "Label26"
+        Me.Label26.Size = New System.Drawing.Size(449, 67)
+        Me.Label26.TabIndex = 38
+        Me.Label26.Text = "- The reboot on schedule/time logic runs with the refresh logic.  If you click th" & _
+    "e pause button, reboots will be paused as well as refreshes."
+        '
+        'Label27
+        '
+        Me.Label27.Location = New System.Drawing.Point(508, 180)
+        Me.Label27.Name = "Label27"
+        Me.Label27.Size = New System.Drawing.Size(449, 90)
+        Me.Label27.TabIndex = 39
+        Me.Label27.Text = "- Rebooting at a certain time will trigger up to 15 minutes after the time entere" & _
+    "d.  That means you can trigger an immediate reboot of all Ants by entering a val" & _
+    "id time within the last 15 minutes."
         '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1175, 374)
+        Me.ClientSize = New System.Drawing.Size(1175, 401)
         Me.ContextMenuStrip = Me.menuStripMain
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
@@ -2419,6 +2578,8 @@ Partial Class frmMain
         Me.tabS3Alerts.PerformLayout()
         Me.tabAlertTypes.ResumeLayout(False)
         Me.tabAlertTypes.PerformLayout()
+        Me.tabReboots.ResumeLayout(False)
+        Me.tabReboots.PerformLayout()
         Me.tabEmail.ResumeLayout(False)
         Me.tabEmail.PerformLayout()
         Me.tabLog.ResumeLayout(False)
@@ -2639,5 +2800,19 @@ Partial Class frmMain
     Friend WithEvents Label22 As System.Windows.Forms.Label
     Friend WithEvents cmbAntScanStart As System.Windows.Forms.ComboBox
     Friend WithEvents mnuRemoveAnt As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents tabReboots As System.Windows.Forms.TabPage
+    Friend WithEvents cmbRebootAllAntsAtAlso As System.Windows.Forms.ComboBox
+    Friend WithEvents txtRebootAllAntsAtAlso As System.Windows.Forms.TextBox
+    Friend WithEvents cmbRebootAllAntsAt As System.Windows.Forms.ComboBox
+    Friend WithEvents txtRebootAllAntsAt As System.Windows.Forms.TextBox
+    Friend WithEvents txtRebootAntsByUptime As System.Windows.Forms.TextBox
+    Friend WithEvents cmbRebootAntsByUptime As System.Windows.Forms.ComboBox
+    Friend WithEvents chkRebootAllAntsAtAlso As System.Windows.Forms.CheckBox
+    Friend WithEvents chkRebootAllAntsAt As System.Windows.Forms.CheckBox
+    Friend WithEvents chkRebootAntsByUptime As System.Windows.Forms.CheckBox
+    Friend WithEvents cmdSaveReboots As System.Windows.Forms.Button
+    Friend WithEvents Label27 As System.Windows.Forms.Label
+    Friend WithEvents Label26 As System.Windows.Forms.Label
+    Friend WithEvents Label25 As System.Windows.Forms.Label
 
 End Class

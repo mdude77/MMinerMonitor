@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Ant Monitor v3.5"
+    Private Const csVersion As String = "M's Ant Monitor v3.6"
 
     'alert string   
     Private sAlerts As String
@@ -127,6 +127,15 @@ Public Class frmMain
     Private sIPDataResponse As String
     Private sIPToCheck As String
 
+    'for tracking scheduled reboots
+    Private dictScheduledReboots As System.Collections.Generic.Dictionary(Of Integer, Date)
+
+    'for tracking reboot at
+    Private dictRebootAt As System.Collections.Generic.Dictionary(Of Integer, Date)
+
+    'for tracking reboot at also
+    Private dictRebootAtAlso As System.Collections.Generic.Dictionary(Of Integer, Date)
+
 #If DEBUG Then
     Private Const bErrorHandle As Boolean = False
 #Else
@@ -137,7 +146,6 @@ Public Class frmMain
 
         Dim host As System.Net.IPHostEntry
         Dim x As Integer
-        'Dim sTemp As String
         Dim s() As String
         Dim dr As DataRow
         Dim AntType As enAntType
@@ -159,6 +167,10 @@ Public Class frmMain
         wbData(0) = New clsWBData
         wbData(1) = New clsWBData
         wbData(2) = New clsWBData
+
+        dictScheduledReboots = New System.Collections.Generic.Dictionary(Of Integer, Date)
+        dictRebootAt = New System.Collections.Generic.Dictionary(Of Integer, Date)
+        dictRebootAtAlso = New System.Collections.Generic.Dictionary(Of Integer, Date)
 
         AddToLogQueue(csVersion & " starting")
 
@@ -369,11 +381,24 @@ Public Class frmMain
             .AddControl(Me.txtSMTPFromAddress, "SMTPFromAddress")
             .AddControl(Me.chkSMTPSSL, "SMTPUseSSL")
 
+            'reboots
             .AddControl(Me.chkAlertRebootIfXd, "RebootAntIfXd")
             .AddControl(Me.chkAlertRebootAntsOnHashAlert, "RebootAntIfHashAlert")
             .AddControl(Me.chkRebootAntOnError, "RebootAntIfError")
             .AddControl(Me.txtAlertRebootGovernor, "AlertRebootGovernor")
             .AddControl(Me.cmbAlertRebootGovernor, "AlertRebootGovernorValue")
+
+            .AddControl(Me.chkRebootAllAntsAt, "RebootAllAntsAtOnOff")
+            .AddControl(Me.txtRebootAllAntsAt, "RebootAllAntsAtValue")
+            .AddControl(Me.cmbRebootAllAntsAt, "RebootAllAntsAtAMPM")
+
+            .AddControl(Me.chkRebootAllAntsAtAlso, "RebootAllAntsAtAlsoOnOff")
+            .AddControl(Me.txtRebootAllAntsAtAlso, "RebootAllAntsAtAlsoValue")
+            .AddControl(Me.cmbRebootAllAntsAtAlso, "RebootAllAntsAtAlsoAMPM")
+
+            .AddControl(Me.chkRebootAntsByUptime, "RebootAntsByUptimeOnOff")
+            .AddControl(Me.txtRebootAntsByUptime, "RebootAntsByUptimeValue")
+            .AddControl(Me.cmbRebootAntsByUptime, "RebootAntsByUptimeSecMinHour")
 
             'upgrade code
             '.SetControlByRegKeyAnt(Me.chklstAnts)
@@ -489,11 +514,24 @@ Public Class frmMain
             .SetControlByRegKey(Me.txtAlertStartProcessParms)
             .SetControlByRegKey(Me.chkAlertSendEMail)
 
+            'reboots
             .SetControlByRegKey(Me.chkAlertRebootIfXd, True)
             .SetControlByRegKey(Me.chkAlertRebootAntsOnHashAlert)
             .SetControlByRegKey(Me.chkRebootAntOnError)
             .SetControlByRegKey(Me.txtAlertRebootGovernor, 30)
             .SetControlByRegKey(Me.cmbAlertRebootGovernor, "Minutes")
+
+            .SetControlByRegKey(Me.chkRebootAllAntsAt)
+            .SetControlByRegKey(Me.txtRebootAllAntsAt)
+            .SetControlByRegKey(Me.cmbRebootAllAntsAt)
+
+            .SetControlByRegKey(Me.chkRebootAllAntsAtAlso)
+            .SetControlByRegKey(Me.txtRebootAllAntsAtAlso)
+            .SetControlByRegKey(Me.cmbRebootAllAntsAtAlso)
+
+            .SetControlByRegKey(Me.chkRebootAntsByUptime)
+            .SetControlByRegKey(Me.txtRebootAntsByUptime)
+            .SetControlByRegKey(Me.cmbRebootAntsByUptime)
 
             'email settings
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPServer)
@@ -1328,120 +1366,278 @@ Public Class frmMain
 
         'Dim AntData As clsAntRefreshData
         Dim antConfig As stAntConfig
+        Dim antConfigRow As DataRow
         Dim x As Integer
+        Dim tsRebootTime, tsCompare As TimeSpan
+        Dim dRebootAt, dRebootAtAlso As Date
+        Dim s() As String
+        Dim dTemp As Date
+        Dim bGoodToCheckReboot, bRebootAnt, bValidRebootTime, bValidRebootTimeAlso As Boolean
 
         Static dRefreshTime As Date
         Static bRefresh As Boolean
         Static bStarted As Boolean
 
-        iCountDown -= 1
+        Try
+            iCountDown -= 1
 
-        If iCountDown < 0 Then
-            iCountDown = iRefreshRate
-        End If
-
-        If bRefresh = True AndAlso dRefreshTime.AddSeconds(iDisplayRefreshPeriod) < Now Then
-            bRefresh = False
-            Me.dataAnts.Refreshing = False
-
-            Me.dataAnts.Refresh()
-        ElseIf bRefresh = False Then
-            Me.dataAnts.Refresh()
-        End If
-
-        'watchdog timer of sorts of web browsers
-        'they have 2 minutes to finish up, otherwise they're marked as available
-        If wbData(0).IsBusy = True AndAlso wbData(0).StartTime.AddMinutes(2) < Now Then
-            wbData(0).IsBusy = False
-        End If
-
-        If wbData(1).IsBusy = True AndAlso wbData(1).StartTime.AddMinutes(2) < Now Then
-            wbData(1).IsBusy = False
-        End If
-
-        If wbData(2).IsBusy = True AndAlso wbData(2).StartTime.AddMinutes(2) < Now Then
-            wbData(2).IsBusy = False
-        End If
-
-        If iCountDown = 0 Then
-            Me.cmdPause.Enabled = False
-
-            'clear the uptime column to indicate we're refreshing
-            For Each dr As DataRow In Me.ds.Tables(0).Rows
-                dr.Item("UpTime") = "???"
-            Next
-
-            If Me.txtLog.TextLength > 1500000 Then
-                Me.txtLog.Text = Me.txtLog.Text.Substring(InStr(Me.txtLog.TextLength - 1000000, Me.txtLog.Text, vbCrLf) + 1)
+            If iCountDown < 0 Then
+                iCountDown = iRefreshRate
             End If
 
-            AddToLogQueue("Initiated Ant refresh")
+            If bRefresh = True AndAlso dRefreshTime.AddSeconds(iDisplayRefreshPeriod) < Now Then
+                bRefresh = False
+                Me.dataAnts.Refreshing = False
 
-            dRefreshTime = Now
-            bRefresh = True
-
-            If bStarted = True Then
-                Me.dataAnts.Refreshing = True
-            Else
-                bStarted = True
+                Me.dataAnts.Refresh()
+            ElseIf bRefresh = False Then
+                Me.dataAnts.Refresh()
             End If
 
-            For Each dr As DataRow In Me.dsAntConfig.Tables(0).Rows
-                If dr("Active") = "Y" Then
-                    If dr("UseAPI") = "Y" Then
-                        antConfig = GetAntConfigByConfigRow(dr)
+            'watchdog timer of sorts of web browsers
+            'they have 2 minutes to finish up, otherwise they're marked as available
+            If wbData(0).IsBusy = True AndAlso wbData(0).StartTime.AddMinutes(2) < Now Then
+                wbData(0).IsBusy = False
+            End If
 
-                        SyncLock antsToCheckLock
-                            antsToCheckQueue.Enqueue(antConfig)
-                        End SyncLock
-                    Else
-                        'wait for one of the 3 browsers to become available
-                        While wbData(0).IsBusy = True AndAlso wbData(1).IsBusy = True AndAlso wbData(2).IsBusy = True
-                            My.Application.DoEvents()
-                        End While
+            If wbData(1).IsBusy = True AndAlso wbData(1).StartTime.AddMinutes(2) < Now Then
+                wbData(1).IsBusy = False
+            End If
 
-                        'browser logic
-                        'Call GetWebCredentials(AntData.sAnt, sWebUN, sWebPW)
+            If wbData(2).IsBusy = True AndAlso wbData(2).StartTime.AddMinutes(2) < Now Then
+                wbData(2).IsBusy = False
+            End If
 
-                        If wbData(0).IsBusy = False Then
-                            x = 0
-                        ElseIf wbData(1).IsBusy = False Then
-                            x = 1
-                        ElseIf wbData(2).IsBusy = False Then
-                            x = 2
-                        Else
-                            x = 100
-                        End If
+            'reboot checks
+            If (Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False) _
+                OrElse (Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False) _
+                OrElse (Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False) Then
 
-                        If x <> 100 Then
-                            wbData(x).IsBusy = True
-                            wbData(x).StartTime = Now
+                If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False Then
+                    Select Case Me.cmbRebootAntsByUptime.Text
+                        Case "Hours"
+                            tsRebootTime = TimeSpan.FromHours(Val(Me.txtRebootAntsByUptime.Text))
 
-                            wb(x).Tag = dr
+                        Case "Minutes"
+                            tsRebootTime = TimeSpan.FromMinutes(Val(Me.txtRebootAntsByUptime.Text))
 
-                            Select Case dr("Type")
-                                Case "S1", "S3"
-                                    wb(x).Navigate("http://" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+                        Case "Seconds"
+                            tsRebootTime = TimeSpan.FromSeconds(Val(Me.txtRebootAntsByUptime.Text))
 
-                                Case "S2"
-                                    wb(x).Navigate(String.Format("http://{0}:{1}@" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/minerStatus.cgi", dr("WebUsername"), dr("WebPassword")), Nothing, Nothing, GetHeader)
+                        Case "Days"
+                            tsRebootTime = TimeSpan.FromDays(Val(Me.txtRebootAntsByUptime.Text))
 
-                            End Select
+                    End Select
+                End If
 
-                            AddToLogQueue("Submitted " & dr("Name") & " on web browser instance " & x)
-                        End If
+                If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False Then
+                    If Date.TryParse(Me.txtRebootAllAntsAt.Text & " " & Me.cmbRebootAllAntsAt.Text, dTemp) = True Then
+                        dRebootAt = dTemp
 
-                        'Call RefreshGrid(dr)
+                        bValidRebootTime = True
                     End If
                 End If
-            Next
 
-            iCountDown = iRefreshRate
+                If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False Then
+                    If Date.TryParse(Me.txtRebootAllAntsAtAlso.Text & " " & Me.cmbRebootAllAntsAtAlso.Text, dTemp) = True Then
+                        dRebootAtAlso = dTemp
 
-            Me.cmdPause.Enabled = True
-        End If
+                        bValidRebootTimeAlso = True
+                    End If
+                End If
 
-        Me.cmdRefresh.Text = "Refreshing in " & iCountDown
+                'check each responding Ant 
+                For Each dr As DataGridViewRow In Me.dataAnts.Rows
+                    bGoodToCheckReboot = False
+                    bRebootAnt = False
+
+                    If dr.Cells("Uptime").Value <> "???" Then
+                        'get antconfigrow
+                        antConfigRow = FindAntConfig(dr.Cells("ID").Value)
+
+                        s = dr.Cells("Uptime").Value.ToString.Split(" ")
+
+                        'days
+                        tsCompare = TimeSpan.FromDays(Val(s(0).LeftMost(1)))
+
+                        'hours
+                        tsCompare = tsCompare.Add(TimeSpan.FromHours(Val(s(1).LeftMost(1))))
+
+                        'minutes
+                        tsCompare = tsCompare.Add(TimeSpan.FromMinutes(Val(s(2).LeftMost(1))))
+
+                        'seconds
+                        tsCompare = tsCompare.Add(TimeSpan.FromSeconds(Val(s(3).LeftMost(1))))
+
+                        'reboot ants by uptime
+                        If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False Then
+                            If dictScheduledReboots.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
+                                'stop looking for 10 minutes after a reboot
+                                If dTemp.AddMinutes(10) < Now Then
+                                    bGoodToCheckReboot = True
+
+                                    dictScheduledReboots.Remove(dr.Cells("ID").Value)
+                                End If
+                            Else
+                                bGoodToCheckReboot = True
+                            End If
+                        End If
+
+                        If bGoodToCheckReboot = True Then
+                            If tsCompare > tsRebootTime Then
+                                bRebootAnt = True
+
+                                AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's been up more than the specified uptime before rebooting.")
+
+                                dictScheduledReboots.Add(dr.Cells("ID").Value, Now)
+                            End If
+                        End If
+
+                        'reboot all ants at a certain time
+                        If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False AndAlso bValidRebootTime = True Then
+                            'only after the reboot time
+                            If dRebootAt < Now Then
+                                'but within 15 minutes of the time
+                                If dRebootAt.AddMinutes(15) > Now Then
+                                    'and it hasn't been rebooted today already
+                                    If dictRebootAt.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
+                                        If dTemp.Date < Date.Today Then
+                                            'reboot!
+                                            bRebootAnt = True
+
+                                            dictRebootAt(dr.Cells("ID").Value) = Date.Today
+
+                                            AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time.")
+                                        End If
+                                    Else
+                                        'reboot!
+                                        bRebootAnt = True
+
+                                        dictRebootAt.Add(dr.Cells("ID").Value, Date.Today)
+
+                                        AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time.")
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        'reboot all ants at a certain time also
+                        If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False AndAlso bValidRebootTimeAlso = True Then
+                            'only after the reboot time
+                            If dRebootAtAlso < Now Then
+                                'but within 15 minutes of the time
+                                If dRebootAtAlso.AddMinutes(15) > Now Then
+                                    'and it hasn't been rebooted today already
+                                    If dictRebootAtAlso.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
+                                        If dTemp.Date < Date.Today Then
+                                            'reboot!
+                                            bRebootAnt = True
+
+                                            dictRebootAtAlso(dr.Cells("ID").Value) = Date.Today
+
+                                            AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time (also).")
+                                        End If
+                                    Else
+                                        'reboot!
+                                        bRebootAnt = True
+
+                                        dictRebootAtAlso.Add(dr.Cells("ID").Value, Date.Today)
+
+                                        AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time (also).")
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If bRebootAnt = True Then
+                            Call RebootAnt(antConfigRow, False, YNtoBoolean(antConfigRow("RebootViaSSH")), Nothing)
+                        End If
+                    End If
+                Next
+            End If
+
+            If iCountDown = 0 Then
+                Me.cmdPause.Enabled = False
+
+                'clear the uptime column to indicate we're refreshing
+                For Each dr As DataRow In Me.ds.Tables(0).Rows
+                    dr.Item("UpTime") = "???"
+                Next
+
+                If Me.txtLog.TextLength > 1500000 Then
+                    Me.txtLog.Text = Me.txtLog.Text.Substring(InStr(Me.txtLog.TextLength - 1000000, Me.txtLog.Text, vbCrLf) + 1)
+                End If
+
+                AddToLogQueue("Initiated Ant refresh")
+
+                dRefreshTime = Now
+                bRefresh = True
+
+                If bStarted = True Then
+                    Me.dataAnts.Refreshing = True
+                Else
+                    bStarted = True
+                End If
+
+                For Each dr As DataRow In Me.dsAntConfig.Tables(0).Rows
+                    If dr("Active") = "Y" Then
+                        If dr("UseAPI") = "Y" Then
+                            antConfig = GetAntConfigByConfigRow(dr)
+
+                            SyncLock antsToCheckLock
+                                antsToCheckQueue.Enqueue(antConfig)
+                            End SyncLock
+                        Else
+                            'wait for one of the 3 browsers to become available
+                            While wbData(0).IsBusy = True AndAlso wbData(1).IsBusy = True AndAlso wbData(2).IsBusy = True
+                                My.Application.DoEvents()
+                            End While
+
+                            'browser logic
+                            'Call GetWebCredentials(AntData.sAnt, sWebUN, sWebPW)
+
+                            If wbData(0).IsBusy = False Then
+                                x = 0
+                            ElseIf wbData(1).IsBusy = False Then
+                                x = 1
+                            ElseIf wbData(2).IsBusy = False Then
+                                x = 2
+                            Else
+                                x = 100
+                            End If
+
+                            If x <> 100 Then
+                                wbData(x).IsBusy = True
+                                wbData(x).StartTime = Now
+
+                                wb(x).Tag = dr
+
+                                Select Case dr("Type")
+                                    Case "S1", "S3"
+                                        wb(x).Navigate("http://" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+
+                                    Case "S2"
+                                        wb(x).Navigate(String.Format("http://{0}:{1}@" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/minerStatus.cgi", dr("WebUsername"), dr("WebPassword")), Nothing, Nothing, GetHeader)
+
+                                End Select
+
+                                AddToLogQueue("Submitted " & dr("Name") & " on web browser instance " & x)
+                            End If
+
+                            'Call RefreshGrid(dr)
+                        End If
+                    End If
+                Next
+
+                iCountDown = iRefreshRate
+
+                Me.cmdPause.Enabled = True
+            End If
+
+            Me.cmdRefresh.Text = "Refreshing in " & iCountDown
+        Catch ex As Exception When bErrorHandle = True
+            Call AddToLogQueue("Internal error on TimerRefresh: " & ex.Message)
+        End Try
 
     End Sub
 
@@ -3097,7 +3293,9 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub cmbRefreshRate_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles cmbRefreshRate.KeyPress, cmbAlertEMailGovernor.KeyPress
+    Private Sub cmbRefreshRate_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles cmbRefreshRate.KeyPress, _
+        cmbAlertEMailGovernor.KeyPress, cmbAlertRebootGovernor.KeyPress, cmbRebootAllAntsAt.KeyPress, cmbRebootAllAntsAtAlso.KeyPress, _
+        cmbRebootAntsByUptime.KeyPress
 
         e.Handled = True
 
@@ -3105,7 +3303,7 @@ Public Class frmMain
 
     Private Sub NumericOnlyKeyPressHandler(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtRefreshRate.KeyPress, _
         txtAlertEMailGovernor.KeyPress, txtAntAPIPort.KeyPress, txtAntSSHPort.KeyPress, txtAntWebPort.KeyPress, txtAlertS1Temp.KeyPress, txtAlertS2Temp.KeyPress, _
-        txtAlertS3Temp.KeyPress, cmbAntScanStart.KeyPress, cmbAntScanStop.KeyPress
+        txtAlertS3Temp.KeyPress, cmbAntScanStart.KeyPress, cmbAntScanStop.KeyPress, txtRebootAntsByUptime.KeyPress
 
         Select Case e.KeyChar
             Case "0" To "9", vbBack
@@ -3282,7 +3480,8 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click
+    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, _
+        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click, cmdSaveReboots.Click
 
         With ctlsByKey
             .SetRegKeyByControl(Me.chkAlertHighlightField)
@@ -3523,11 +3722,42 @@ Public Class frmMain
                 End If
             End If
 
+            'reboots
             Call .SetRegKeyByControl(Me.chkAlertRebootIfXd)
             Call .SetRegKeyByControl(Me.chkAlertRebootAntsOnHashAlert)
             Call .SetRegKeyByControl(Me.chkRebootAntOnError)
             Call .SetRegKeyByControl(Me.txtAlertRebootGovernor)
             Call .SetRegKeyByControl(Me.cmbAlertRebootGovernor)
+
+            If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = True Then
+                MsgBox("Reboot all Ants at X is enabled, but the related timeframe appears to be zero.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                Me.chkRebootAllAntsAt.Checked = False
+            End If
+
+            Call .SetRegKeyByControl(Me.chkRebootAllAntsAt)
+            Call .SetRegKeyByControl(Me.txtRebootAllAntsAt)
+            Call .SetRegKeyByControl(Me.cmbRebootAllAntsAt)
+
+            If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = True Then
+                MsgBox("Reboot all Ants at also X is enabled, but the related timeframe appears to be zero.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                Me.chkRebootAllAntsAtAlso.Checked = False
+            End If
+
+            Call .SetRegKeyByControl(Me.chkRebootAllAntsAtAlso)
+            Call .SetRegKeyByControl(Me.txtRebootAllAntsAtAlso)
+            Call .SetRegKeyByControl(Me.cmbRebootAllAntsAtAlso)
+
+            If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = True Then
+                MsgBox("Reboot all Ants by Uptime is enabled, but the related timeframe appears to be zero.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                Me.chkRebootAntsByUptime.Checked = False
+            End If
+
+            Call .SetRegKeyByControl(Me.chkRebootAntsByUptime)
+            Call .SetRegKeyByControl(Me.txtRebootAntsByUptime)
+            Call .SetRegKeyByControl(Me.cmbRebootAntsByUptime)
         End With
 
     End Sub
@@ -4333,6 +4563,8 @@ Public Class frmMain
 
     Public Sub AddToLogQueue(ByVal sMsg As String)
 
+        Debug.Print(sMsg)
+
         SyncLock logQueueLock
             logQueue.Enqueue(sMsg)
         End SyncLock
@@ -4551,11 +4783,109 @@ Public Class frmMain
         Next
 
     End Sub
+
+    Private Sub txtRebootAllAntsAt_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtRebootAllAntsAt.KeyPress, _
+        txtRebootAllAntsAtAlso.KeyPress
+
+        Select Case e.KeyChar
+            Case "0" To "9", vbBack, ":"
+                'okay
+
+            Case Else
+                e.Handled = True
+
+        End Select
+
+
+    End Sub
+
+    Private Sub txtRebootAllAntsAt_LostFocus(sender As Object, e As System.EventArgs) Handles txtRebootAllAntsAt.LostFocus, txtRebootAllAntsAtAlso.LostFocus
+
+        Dim txtAny As TextBox
+        Dim d As Date
+
+        txtAny = sender
+
+        If txtAny.Text.IsNullOrEmpty = False Then
+            Select Case txtAny.Name
+                Case "txtRebootAllAntsAt"
+                    If Date.TryParse(txtAny.Text & " " & Me.cmbRebootAllAntsAt.Text, d) = False Then
+                        MsgBox("Invalid value entered:" & vbCrLf & vbCrLf & txtAny.Text, MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                        Me.chkRebootAllAntsAt.Checked = False
+
+                        txtAny.Text = ""
+                    End If
+
+                Case "txtRebootAllAntsAtAlso"
+                    If Date.TryParse(txtAny.Text & " " & Me.cmbRebootAllAntsAtAlso.Text, d) = False Then
+                        MsgBox("Invalid value entered." & vbCrLf & vbCrLf & txtAny.Text, MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                        Me.chkRebootAllAntsAtAlso.Checked = False
+
+                        txtAny.Text = ""
+                    End If
+
+            End Select
+        End If
+
+    End Sub
+
+    Private Sub txtAlertEMailGovernor_LostFocus(sender As Object, e As System.EventArgs) Handles txtRefreshRate.LostFocus, _
+        txtAlertEMailGovernor.LostFocus, txtAntAPIPort.LostFocus, txtAntSSHPort.LostFocus, txtAntWebPort.LostFocus, txtAlertS1Temp.LostFocus, txtAlertS2Temp.LostFocus, _
+        txtAlertS3Temp.LostFocus, cmbAntScanStart.LostFocus, cmbAntScanStop.LostFocus, txtRebootAntsByUptime.LostFocus
+
+        Dim txtAny As TextBox
+
+        txtAny = sender
+
+        If txtAny.Text.IsNullOrEmpty = True Then Exit Sub
+
+        If Val(txtAny.Text) = 0 Then
+            MsgBox("Invalid value entered:" & vbCrLf & vbCrLf & txtAny.Text)
+
+            txtAny.Text = ""
+        End If
+
+    End Sub
+
+    Private Sub chkRebootAntsByUptime_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkRebootAntsByUptime.CheckedChanged, chkRebootAllAntsAt.CheckedChanged, _
+        chkRebootAllAntsAtAlso.CheckedChanged
+
+        Dim chkAny As CheckBox
+        Dim txtAny As TextBox
+
+        chkAny = sender
+
+        If chkAny.Checked = False Then Exit Sub
+
+        Select Case chkAny.Name
+            Case "chkRebootAntsByUptime"
+                txtAny = Me.txtRebootAntsByUptime
+
+            Case "chkRebootAllAntsAt"
+                txtAny = Me.txtRebootAllAntsAt
+
+            Case "chkRebootAllAntsAtAlso"
+                txtAny = Me.txtRebootAllAntsAtAlso
+
+        End Select
+
+        If txtAny.Text.IsNullOrEmpty = True Then
+            MsgBox("You can not enable this until a valid value is entered.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+            txtAny.Focus()
+
+            chkAny.Checked = False
+        End If
+
+    End Sub
+
 End Class
 
 'wrapper around the datagridview to allow disabling the paint event
 'this way you can populate data on the grid without it having to render (paint)
-'when done, set Refreshing back to false and next paint call will clear it up
+'when done, set Refreshing back to false and the next paint call will clear it up
 Public Class dgvWrapper
 
     Inherits DataGridView
