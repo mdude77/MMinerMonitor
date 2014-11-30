@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Ant Monitor v3.6"
+    Private Const csVersion As String = "M's Ant Monitor v3.8"
 
     'alert string   
     Private sAlerts As String
@@ -110,6 +110,7 @@ Public Class frmMain
         S1 = 1
         S2 = 2
         S3 = 3
+        C1 = 4
     End Enum
 
     'pool data for pushing pool data to ants
@@ -137,9 +138,9 @@ Public Class frmMain
     Private dictRebootAtAlso As System.Collections.Generic.Dictionary(Of Integer, Date)
 
 #If DEBUG Then
-    Private Const bErrorHandle As Boolean = False
+    Private bErrorHandle As Boolean = False
 #Else
-    Private Const bErrorHandle As Boolean = True
+    Private bErrorHandle As Boolean = True
 #End If
 
     Private Sub Form1_Load(sender As Object, e As System.EventArgs) Handles Me.Load
@@ -323,40 +324,53 @@ Public Class frmMain
             .AddControl(Me.txtDisplayRefreshInSecs, "DisplayRefreshPeriod")
 
             'alerts
+            'S1
             .AddControl(Me.chkAlertIfS1Temp, "AlertIfS1Temp")
-            .AddControl(Me.chkAlertIfS2Temp, "AlertIfS2Temp")
-            .AddControl(Me.chkAlertIfS3Temp, "AlertIfS3Temp")
             .AddControl(Me.txtAlertS1Temp, "AlertValueS1Temp")
-            .AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
-            .AddControl(Me.txtAlertS3Temp, "AlertValueS3Temp")
-
             .AddControl(Me.chkAlertIfS1FanHigh, "AlertIfS1Fan")
-            .AddControl(Me.chkAlertIfS2FanHigh, "AlertIfS2Fan")
-            .AddControl(Me.chkAlertIfS3FanHigh, "AlertIfS3Fan")
             .AddControl(Me.txtAlertS1FanHigh, "AlertValueS1Fan")
-            .AddControl(Me.txtAlertS2FanHigh, "AlertValueS2Fan")
-            .AddControl(Me.txtAlertS3FanHigh, "AlertValueS3Fan")
-
             .AddControl(Me.chkAlertIfS1FanLow, "AlertIfS1FanLow")
-            .AddControl(Me.chkAlertIfS2FanLow, "AlertIfS2FanLow")
-            .AddControl(Me.chkAlertIfS3FanLow, "AlertIfS3FanLow")
             .AddControl(Me.txtAlertS1FanLow, "AlertValueS1FanLow")
-            .AddControl(Me.txtAlertS2FanLow, "AlertValueS2FanLow")
-            .AddControl(Me.txtAlertS3FanLow, "AlertValueS3FanLow")
-
             .AddControl(Me.chkAlertIfS1Hash, "AlertIfS1Hash")
-            .AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
-            .AddControl(Me.chkAlertIfS3Hash, "AlertIFS3Hash")
             .AddControl(Me.txtAlertS1Hash, "AlertValueS1Hash")
-            .AddControl(Me.txtAlertS2Hash, "AlertValueS2Hash")
-            .AddControl(Me.txtAlertS3Hash, "AlertValueS3Hash")
-
             .AddControl(Me.chkAlertIfS1XCount, "AlertIfS1XCount")
-            .AddControl(Me.chkAlertIfS2XCount, "AlertIFS2XCount")
-            .AddControl(Me.chkAlertIfS3XCount, "AlertIFS3XCount")
             .AddControl(Me.txtAlertS1XCount, "AlertValueS1XCount")
+
+            'S2
+            .AddControl(Me.chkAlertIfS2Temp, "AlertIfS2Temp")
+            .AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
+            .AddControl(Me.chkAlertIfS2FanHigh, "AlertIfS2Fan")
+            .AddControl(Me.txtAlertS2FanHigh, "AlertValueS2Fan")
+            .AddControl(Me.chkAlertIfS2FanLow, "AlertIfS2FanLow")
+            .AddControl(Me.txtAlertS2FanLow, "AlertValueS2FanLow")
+            .AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
+            .AddControl(Me.txtAlertS2Hash, "AlertValueS2Hash")
+            .AddControl(Me.chkAlertIfS2XCount, "AlertIFS2XCount")
             .AddControl(Me.txtAlertS2XCount, "AlertValueS2XCount")
+
+            'S3
+            .AddControl(Me.chkAlertIfS3Temp, "AlertIfS3Temp")
+            .AddControl(Me.txtAlertS3Temp, "AlertValueS3Temp")
+            .AddControl(Me.chkAlertIfS3FanHigh, "AlertIfS3Fan")
+            .AddControl(Me.txtAlertS3FanHigh, "AlertValueS3Fan")
+            .AddControl(Me.chkAlertIfS3FanLow, "AlertIfS3FanLow")
+            .AddControl(Me.txtAlertS3FanLow, "AlertValueS3FanLow")
+            .AddControl(Me.chkAlertIfS3Hash, "AlertIFS3Hash")
+            .AddControl(Me.txtAlertS3Hash, "AlertValueS3Hash")
+            .AddControl(Me.chkAlertIfS3XCount, "AlertIFS3XCount")
             .AddControl(Me.txtAlertS3XCount, "AlertValueS3XCount")
+
+            'C1
+            .AddControl(Me.txtAlertC1Temp, "AlertValueC1Temp")
+            .AddControl(Me.chkAlertIfC1Temp, "AlertIfC1Temp")
+            .AddControl(Me.chkAlertIfC1FanHigh, "AlertIfC1Fan")
+            .AddControl(Me.txtAlertC1FanHigh, "AlertValueC1Fan")
+            .AddControl(Me.chkAlertIfC1FanLow, "AlertIfC1FanLow")
+            .AddControl(Me.txtAlertC1FanLow, "AlertValueC1FanLow")
+            .AddControl(Me.chkAlertIfC1Hash, "AlertIFC1Hash")
+            .AddControl(Me.txtAlertC1Hash, "AlertValueC1Hash")
+            .AddControl(Me.chkAlertIfC1XCount, "AlertIFC1XCount")
+            .AddControl(Me.txtAlertC1XCount, "AlertValueC1XCount")
 
             .AddControl(Me.chkAlertHighlightField, "AlertHighlightField")
             .AddControl(Me.chkAlertShowAnnoyingPopup, "AlertShowAnnoyingPopup")
@@ -400,46 +414,6 @@ Public Class frmMain
             .AddControl(Me.txtRebootAntsByUptime, "RebootAntsByUptimeValue")
             .AddControl(Me.cmbRebootAntsByUptime, "RebootAntsByUptimeSecMinHour")
 
-            'upgrade code
-            '.SetControlByRegKeyAnt(Me.chklstAnts)
-
-            'establish credentials for existing Ants when they aren't already there
-            'For x = 0 To Me.chklstAnts.Items.Count - 1
-            '    Dim sAnt, sDefaultUN, sDefaultPW As String
-
-            '    sAnt = Me.chklstAnts.Items(x)
-
-            '    sDefaultUN = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Username", "root")
-            '    sDefaultPW = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "Password", "root")
-
-            '    If My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", "") Is Nothing Then
-            '        If sAnt.Substring(0, 2) = "S1" OrElse sAnt.Substring(0, 2) = "S3" Then
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
-            '        End If
-
-            '        If sAnt.Substring(0, 2) = "S2" Then
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebUsername", sDefaultUN, Microsoft.Win32.RegistryValueKind.String)
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "WebPassword", sDefaultPW, Microsoft.Win32.RegistryValueKind.String)
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-            '            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
-            '        End If
-            '    End If
-
-            '    'add the port to the end of the Ants if they aren't already there
-            '    sTemp = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "Port", "")
-
-            '    If sTemp.IsNullOrEmpty Then
-            '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sAnt, "Port", 80, Microsoft.Win32.RegistryValueKind.String)
-
-            '        sTemp = "80"
-            '    End If
-
-            '    Me.chklstAnts.Items(x) = Me.chklstAnts.Items(x) & ":" & sTemp
-            'Next
-
             .SetControlByRegKey(Me.txtRefreshRate, "300")
             .SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
             .SetControlByRegKey(Me.chkShowBestShare, True)
@@ -463,8 +437,6 @@ Public Class frmMain
 
             .SetControlByRegKey(Me.chkShowSelectionColumn)
 
-            '.SetControlByRegKey(Me.chkUseAPI, True)
-
             .SetControlByRegKey(Me.trackThreadCount, 5)
             .SetControlByRegKey(Me.txtDisplayRefreshInSecs, "1")
 
@@ -472,39 +444,48 @@ Public Class frmMain
 
             'alerts
             .SetControlByRegKey(Me.chkAlertIfS1Temp)
-            .SetControlByRegKey(Me.chkAlertIfS2Temp)
-            .SetControlByRegKey(Me.chkAlertIfS3Temp)
             .SetControlByRegKey(Me.txtAlertS1Temp)
-            .SetControlByRegKey(Me.txtAlertS2Temp)
-            .SetControlByRegKey(Me.txtAlertS3Temp)
-
             .SetControlByRegKey(Me.chkAlertIfS1FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfS2FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfS3FanHigh)
             .SetControlByRegKey(Me.txtAlertS1FanHigh)
-            .SetControlByRegKey(Me.txtAlertS2FanHigh)
-            .SetControlByRegKey(Me.txtAlertS3FanHigh)
-
             .SetControlByRegKey(Me.chkAlertIfS1FanLow)
-            .SetControlByRegKey(Me.chkAlertIfS2FanLow)
-            .SetControlByRegKey(Me.chkAlertIfS3FanLow)
             .SetControlByRegKey(Me.txtAlertS1FanLow)
-            .SetControlByRegKey(Me.txtAlertS2FanLow)
-            .SetControlByRegKey(Me.txtAlertS3FanLow)
-
             .SetControlByRegKey(Me.chkAlertIfS1Hash)
-            .SetControlByRegKey(Me.chkAlertIfS2Hash)
-            .SetControlByRegKey(Me.chkAlertIfS3Hash)
             .SetControlByRegKey(Me.txtAlertS1Hash)
-            .SetControlByRegKey(Me.txtAlertS2Hash)
-            .SetControlByRegKey(Me.txtAlertS3Hash)
-
             .SetControlByRegKey(Me.chkAlertIfS1XCount)
-            .SetControlByRegKey(Me.chkAlertIfS2XCount)
-            .SetControlByRegKey(Me.chkAlertIfS3XCount)
             .SetControlByRegKey(Me.txtAlertS1XCount)
+
+            .SetControlByRegKey(Me.chkAlertIfS2Temp)
+            .SetControlByRegKey(Me.txtAlertS2Temp)
+            .SetControlByRegKey(Me.chkAlertIfS2FanHigh)
+            .SetControlByRegKey(Me.txtAlertS2FanHigh)
+            .SetControlByRegKey(Me.chkAlertIfS2FanLow)
+            .SetControlByRegKey(Me.txtAlertS2FanLow)
+            .SetControlByRegKey(Me.chkAlertIfS2Hash)
+            .SetControlByRegKey(Me.txtAlertS2Hash)
+            .SetControlByRegKey(Me.chkAlertIfS2XCount)
             .SetControlByRegKey(Me.txtAlertS2XCount)
+
+            .SetControlByRegKey(Me.chkAlertIfS3Temp)
+            .SetControlByRegKey(Me.txtAlertS3Temp)
+            .SetControlByRegKey(Me.chkAlertIfS3FanHigh)
+            .SetControlByRegKey(Me.txtAlertS3FanHigh)
+            .SetControlByRegKey(Me.chkAlertIfS3FanLow)
+            .SetControlByRegKey(Me.txtAlertS3FanLow)
+            .SetControlByRegKey(Me.chkAlertIfS3Hash)
+            .SetControlByRegKey(Me.txtAlertS3Hash)
+            .SetControlByRegKey(Me.chkAlertIfS3XCount)
             .SetControlByRegKey(Me.txtAlertS3XCount)
+
+            .SetControlByRegKey(Me.chkAlertIfC1Temp)
+            .SetControlByRegKey(Me.txtAlertC1Temp)
+            .SetControlByRegKey(Me.chkAlertIfC1FanHigh)
+            .SetControlByRegKey(Me.txtAlertC1FanHigh)
+            .SetControlByRegKey(Me.chkAlertIfC1FanLow)
+            .SetControlByRegKey(Me.txtAlertC1FanLow)
+            .SetControlByRegKey(Me.chkAlertIfC1Hash)
+            .SetControlByRegKey(Me.txtAlertC1Hash)
+            .SetControlByRegKey(Me.chkAlertIfC1XCount)
+            .SetControlByRegKey(Me.txtAlertC1XCount)
 
             .SetControlByRegKey(Me.chkAlertHighlightField, True)
             .SetControlByRegKey(Me.chkAlertShowNotifyPopup, True)
@@ -617,7 +598,7 @@ Public Class frmMain
                         For Each sKey As String In key2.GetSubKeyNames
                             'do some validation before converting them over
                             If sKey.Split(":").Count = 2 AndAlso sKey.Split(".").Count = 4 Then
-                                If sKey.Substring(0, 4) = "S1: " OrElse sKey.Substring(0, 4) = "S2: " OrElse sKey.Substring(0, 4) = "S3: " Then
+                                If sKey.Substring(0, 4) = "S1: " OrElse sKey.Substring(0, 4) = "S2: " OrElse sKey.Substring(0, 4) = "S3: " OrElse sKey.Substring(0, 4) = "C1: " Then
                                     Select Case sKey.Substring(0, 2)
                                         Case "S1"
                                             AntType = enAntType.S1
@@ -628,6 +609,9 @@ Public Class frmMain
                                         Case "S3"
                                             AntType = enAntType.S3
 
+                                        Case "C1"
+                                            AntType = enAntType.C1
+
                                     End Select
 
                                     s = sKey.Split(".")
@@ -637,28 +621,6 @@ Public Class frmMain
                                                     My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sKey, "WebPassword", "root"), _
                                                     , , , , My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "UseAPI", "Y"), _
                                                     My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "UseAPI", "Y"))
-
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "Name", sKey, Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "Type", sKey.Substring(0, 2), Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "IPAddress", sKey.Substring(4), Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "HTTPPort", My.Computer.Registry.GetValue(csRegKey & "Ants\" & sKey, "Port", "80"), Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "WebUsername", My.Computer.Registry.GetValue(csRegKey & "Ants\" & sKey, "WebUsername", "root"), Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "WebPassword", My.Computer.Registry.GetValue(csRegKey & "Ants\" & sKey, "WebPassword", "root"), Microsoft.Win32.RegistryValueKind.String)
-
-                                    'If sKey.Substring(0, 2) = "S2" Then
-                                    '    sTemp = "admin"
-                                    'Else
-                                    '    sTemp = "root"
-                                    'End If
-
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "SSHUsername", My.Computer.Registry.GetValue(csRegKey & "Ants\" & sKey, "SSHUsername", "root"), Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "SSHPassword", My.Computer.Registry.GetValue(csRegKey & "Ants\" & sKey, "SSHPassword", sTemp), Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "Active", "Y", Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "APIPort", "4028", Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "SSHPort", "22", Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "ID", x.ToString, Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "UseAPI", "Y", Microsoft.Win32.RegistryValueKind.String)
-                                    'My.Computer.Registry.SetValue(csRegKey & "\AntsV2\" & x, "RebootViaSSH", "Y", Microsoft.Win32.RegistryValueKind.String)
                                 End If
                             End If
                         Next
@@ -778,6 +740,9 @@ Public Class frmMain
                 Case enAntType.S3
                     My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", "S3", Microsoft.Win32.RegistryValueKind.String)
 
+                Case enAntType.C1
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", "C1", Microsoft.Win32.RegistryValueKind.String)
+
             End Select
 
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "IPAddress", sIPAddress, Microsoft.Win32.RegistryValueKind.String)
@@ -787,7 +752,7 @@ Public Class frmMain
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "SSHUsername", sSSHUserName, Microsoft.Win32.RegistryValueKind.String)
 
             If sSSHPassword.IsNullOrEmpty = True Then
-                If AntType = enAntType.S2 Then
+                If AntType = enAntType.S2 OrElse AntType = enAntType.C1 Then
                     sSSHPassword = "admin"
                 Else
                     sSSHPassword = "root"
@@ -1409,152 +1374,158 @@ Public Class frmMain
             End If
 
             'reboot checks
-            If (Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False) _
-                OrElse (Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False) _
-                OrElse (Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False) Then
+            Try
+                If (Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False) _
+                    OrElse (Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False) _
+                    OrElse (Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False) Then
 
-                If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False Then
-                    Select Case Me.cmbRebootAntsByUptime.Text
-                        Case "Hours"
-                            tsRebootTime = TimeSpan.FromHours(Val(Me.txtRebootAntsByUptime.Text))
+                    If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False Then
+                        Select Case Me.cmbRebootAntsByUptime.Text
+                            Case "Hours"
+                                tsRebootTime = TimeSpan.FromHours(Val(Me.txtRebootAntsByUptime.Text))
 
-                        Case "Minutes"
-                            tsRebootTime = TimeSpan.FromMinutes(Val(Me.txtRebootAntsByUptime.Text))
+                            Case "Minutes"
+                                tsRebootTime = TimeSpan.FromMinutes(Val(Me.txtRebootAntsByUptime.Text))
 
-                        Case "Seconds"
-                            tsRebootTime = TimeSpan.FromSeconds(Val(Me.txtRebootAntsByUptime.Text))
+                            Case "Seconds"
+                                tsRebootTime = TimeSpan.FromSeconds(Val(Me.txtRebootAntsByUptime.Text))
 
-                        Case "Days"
-                            tsRebootTime = TimeSpan.FromDays(Val(Me.txtRebootAntsByUptime.Text))
+                            Case "Days"
+                                tsRebootTime = TimeSpan.FromDays(Val(Me.txtRebootAntsByUptime.Text))
 
-                    End Select
-                End If
-
-                If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False Then
-                    If Date.TryParse(Me.txtRebootAllAntsAt.Text & " " & Me.cmbRebootAllAntsAt.Text, dTemp) = True Then
-                        dRebootAt = dTemp
-
-                        bValidRebootTime = True
+                        End Select
                     End If
-                End If
 
-                If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False Then
-                    If Date.TryParse(Me.txtRebootAllAntsAtAlso.Text & " " & Me.cmbRebootAllAntsAtAlso.Text, dTemp) = True Then
-                        dRebootAtAlso = dTemp
+                    If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False Then
+                        If Date.TryParse(Me.txtRebootAllAntsAt.Text & " " & Me.cmbRebootAllAntsAt.Text, dTemp) = True Then
+                            dRebootAt = dTemp
 
-                        bValidRebootTimeAlso = True
+                            bValidRebootTime = True
+                        End If
                     End If
-                End If
 
-                'check each responding Ant 
-                For Each dr As DataGridViewRow In Me.dataAnts.Rows
-                    bGoodToCheckReboot = False
-                    bRebootAnt = False
+                    If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False Then
+                        If Date.TryParse(Me.txtRebootAllAntsAtAlso.Text & " " & Me.cmbRebootAllAntsAtAlso.Text, dTemp) = True Then
+                            dRebootAtAlso = dTemp
 
-                    If dr.Cells("Uptime").Value <> "???" Then
-                        'get antconfigrow
-                        antConfigRow = FindAntConfig(dr.Cells("ID").Value)
+                            bValidRebootTimeAlso = True
+                        End If
+                    End If
 
-                        s = dr.Cells("Uptime").Value.ToString.Split(" ")
+                    'check each responding Ant 
+                    For Each dr As DataGridViewRow In Me.dataAnts.Rows
+                        bGoodToCheckReboot = False
+                        bRebootAnt = False
 
-                        'days
-                        tsCompare = TimeSpan.FromDays(Val(s(0).LeftMost(1)))
+                        If dr.Cells("Uptime").Value <> "???" AndAlso dr.Cells("Uptime").Value <> "ERROR" Then
+                            'get antconfigrow
+                            antConfigRow = FindAntConfig(dr.Cells("ID").Value)
 
-                        'hours
-                        tsCompare = tsCompare.Add(TimeSpan.FromHours(Val(s(1).LeftMost(1))))
+                            s = dr.Cells("Uptime").Value.ToString.Split(" ")
 
-                        'minutes
-                        tsCompare = tsCompare.Add(TimeSpan.FromMinutes(Val(s(2).LeftMost(1))))
+                            'days
+                            tsCompare = TimeSpan.FromDays(Val(s(0).LeftMost(1)))
 
-                        'seconds
-                        tsCompare = tsCompare.Add(TimeSpan.FromSeconds(Val(s(3).LeftMost(1))))
+                            'hours
+                            tsCompare = tsCompare.Add(TimeSpan.FromHours(Val(s(1).LeftMost(1))))
 
-                        'reboot ants by uptime
-                        If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False Then
-                            If dictScheduledReboots.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
-                                'stop looking for 10 minutes after a reboot
-                                If dTemp.AddMinutes(10) < Now Then
+                            'minutes
+                            tsCompare = tsCompare.Add(TimeSpan.FromMinutes(Val(s(2).LeftMost(1))))
+
+                            'seconds
+                            tsCompare = tsCompare.Add(TimeSpan.FromSeconds(Val(s(3).LeftMost(1))))
+
+                            'reboot ants by uptime
+                            If Me.chkRebootAntsByUptime.Checked = True AndAlso Me.txtRebootAntsByUptime.Text.IsNullOrEmpty = False Then
+                                If dictScheduledReboots.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
+                                    'stop looking for 10 minutes after a reboot
+                                    If dTemp.AddMinutes(10) < Now Then
+                                        bGoodToCheckReboot = True
+
+                                        dictScheduledReboots.Remove(dr.Cells("ID").Value)
+                                    End If
+                                Else
                                     bGoodToCheckReboot = True
-
-                                    dictScheduledReboots.Remove(dr.Cells("ID").Value)
                                 End If
-                            Else
-                                bGoodToCheckReboot = True
                             End If
-                        End If
 
-                        If bGoodToCheckReboot = True Then
-                            If tsCompare > tsRebootTime Then
-                                bRebootAnt = True
+                            If bGoodToCheckReboot = True Then
+                                If tsCompare > tsRebootTime Then
+                                    bRebootAnt = True
 
-                                AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's been up more than the specified uptime before rebooting.")
+                                    AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's been up more than the specified uptime before rebooting.")
 
-                                dictScheduledReboots.Add(dr.Cells("ID").Value, Now)
+                                    dictScheduledReboots.Add(dr.Cells("ID").Value, Now)
+                                End If
                             End If
-                        End If
 
-                        'reboot all ants at a certain time
-                        If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False AndAlso bValidRebootTime = True Then
-                            'only after the reboot time
-                            If dRebootAt < Now Then
-                                'but within 15 minutes of the time
-                                If dRebootAt.AddMinutes(15) > Now Then
-                                    'and it hasn't been rebooted today already
-                                    If dictRebootAt.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
-                                        If dTemp.Date < Date.Today Then
+                            'reboot all ants at a certain time
+                            If Me.chkRebootAllAntsAt.Checked = True AndAlso Me.txtRebootAllAntsAt.Text.IsNullOrEmpty = False AndAlso bValidRebootTime = True Then
+                                'only after the reboot time
+                                If dRebootAt < Now Then
+                                    'but within 15 minutes of the time
+                                    If dRebootAt.AddMinutes(15) > Now Then
+                                        'check to see if we've already rebooted this way today
+                                        If dictRebootAt.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
+                                            'if so, within the last 15 mins?
+                                            If dTemp.AddMinutes(15) < Now Then
+                                                'reboot!
+                                                bRebootAnt = True
+
+                                                dictRebootAt(dr.Cells("ID").Value) = Now
+
+                                                AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time.")
+                                            End If
+                                        Else
                                             'reboot!
                                             bRebootAnt = True
 
-                                            dictRebootAt(dr.Cells("ID").Value) = Date.Today
+                                            dictRebootAt.Add(dr.Cells("ID").Value, Now)
 
                                             AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time.")
                                         End If
-                                    Else
-                                        'reboot!
-                                        bRebootAnt = True
-
-                                        dictRebootAt.Add(dr.Cells("ID").Value, Date.Today)
-
-                                        AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time.")
                                     End If
                                 End If
                             End If
-                        End If
 
-                        'reboot all ants at a certain time also
-                        If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False AndAlso bValidRebootTimeAlso = True Then
-                            'only after the reboot time
-                            If dRebootAtAlso < Now Then
-                                'but within 15 minutes of the time
-                                If dRebootAtAlso.AddMinutes(15) > Now Then
-                                    'and it hasn't been rebooted today already
-                                    If dictRebootAtAlso.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
-                                        If dTemp.Date < Date.Today Then
+                            'reboot all ants at a certain time also
+                            If Me.chkRebootAllAntsAtAlso.Checked = True AndAlso Me.txtRebootAllAntsAtAlso.Text.IsNullOrEmpty = False AndAlso bValidRebootTimeAlso = True Then
+                                'only after the reboot time
+                                If dRebootAtAlso < Now Then
+                                    'but within 15 minutes of the time
+                                    If dRebootAtAlso.AddMinutes(15) > Now Then
+                                        'check to see if we've already rebooted this way today
+                                        If dictRebootAtAlso.TryGetValue(dr.Cells("ID").Value, dTemp) = True Then
+                                            'if so, within the last 15 mins?
+                                            If dTemp.AddMinutes(15) < Now Then
+                                                'reboot!
+                                                bRebootAnt = True
+
+                                                dictRebootAtAlso(dr.Cells("ID").Value) = Now
+
+                                                AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time (also).")
+                                            End If
+                                        Else
                                             'reboot!
                                             bRebootAnt = True
 
-                                            dictRebootAtAlso(dr.Cells("ID").Value) = Date.Today
+                                            dictRebootAtAlso.Add(dr.Cells("ID").Value, Now)
 
                                             AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time (also).")
                                         End If
-                                    Else
-                                        'reboot!
-                                        bRebootAnt = True
-
-                                        dictRebootAtAlso.Add(dr.Cells("ID").Value, Date.Today)
-
-                                        AddToLogQueue("Rebooting " & antConfigRow("Name") & " because it's the scheduled reboot time (also).")
                                     End If
                                 End If
                             End If
-                        End If
 
-                        If bRebootAnt = True Then
-                            Call RebootAnt(antConfigRow, False, YNtoBoolean(antConfigRow("RebootViaSSH")), Nothing)
+                            If bRebootAnt = True Then
+                                Call RebootAnt(antConfigRow, False, YNtoBoolean(antConfigRow("RebootViaSSH")), Nothing)
+                            End If
                         End If
-                    End If
-                Next
-            End If
+                    Next
+                End If
+            Catch ex As Exception When bErrorHandle = True
+                AddToLogQueue("Internal error occurred when processing the reboot on schedule/uptime logic: " & ex.Message)
+            End Try
 
             If iCountDown = 0 Then
                 Me.cmdPause.Enabled = False
@@ -1657,6 +1628,9 @@ Public Class frmMain
             Case "S3"
                 antConfig.AntType = enAntType.S3
 
+            Case "C1"
+                antConfig.AntType = enAntType.C1
+
         End Select
 
         antConfig.sName = dr("Name")
@@ -1751,7 +1725,7 @@ Public Class frmMain
             j = Newtonsoft.Json.Linq.JObject.Parse(AntData.sStats)
 
             For Each ja In j.Property("STATS")
-                If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S2 Then
+                If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S2 OrElse AntData.AntType = enAntType.C1 Then
                     If ja.Count = 4 Then
                         jp1 = ja(0)
                     Else
@@ -1805,15 +1779,25 @@ Public Class frmMain
                 count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
                 count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
 
-                If AntData.AntType = enAntType.S2 Then
+                If AntData.AntType = enAntType.S2 OrElse AntData.AntType = enAntType.C1 Then
                     count(2) = HowManyInString(jp1.Value(Of String)("chain_acs3"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs3"), "x")
                     count(3) = HowManyInString(jp1.Value(Of String)("chain_acs4"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs4"), "x")
-                    count(4) = HowManyInString(jp1.Value(Of String)("chain_acs5"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs5"), "x")
-                    count(5) = HowManyInString(jp1.Value(Of String)("chain_acs6"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs6"), "x")
-                    count(6) = HowManyInString(jp1.Value(Of String)("chain_acs7"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs7"), "x")
-                    count(7) = HowManyInString(jp1.Value(Of String)("chain_acs8"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs8"), "x")
-                    count(8) = HowManyInString(jp1.Value(Of String)("chain_acs9"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs9"), "x")
-                    count(9) = HowManyInString(jp1.Value(Of String)("chain_acs10"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs10"), "x")
+
+                    If AntData.AntType = enAntType.S2 Then
+                        count(4) = HowManyInString(jp1.Value(Of String)("chain_acs5"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs5"), "x")
+                        count(5) = HowManyInString(jp1.Value(Of String)("chain_acs6"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs6"), "x")
+                        count(6) = HowManyInString(jp1.Value(Of String)("chain_acs7"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs7"), "x")
+                        count(7) = HowManyInString(jp1.Value(Of String)("chain_acs8"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs8"), "x")
+                        count(8) = HowManyInString(jp1.Value(Of String)("chain_acs9"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs9"), "x")
+                        count(9) = HowManyInString(jp1.Value(Of String)("chain_acs10"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs10"), "x")
+                    Else
+                        count(4) = 0
+                        count(5) = 0
+                        count(6) = 0
+                        count(7) = 0
+                        count(8) = 0
+                        count(9) = 0
+                    End If
                 Else
                     count(2) = 0
                     count(3) = 0
@@ -1827,12 +1811,18 @@ Public Class frmMain
 
                 dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
 
-                If AntData.AntType = enAntType.S2 Then
-                    dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
+                Select Case AntData.AntType
+                    Case AntData.AntType = enAntType.S2
+                        dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
                                         count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
-                Else
-                    dr.Item("Status") = count(0) & "X " & count(1) & "X "
-                End If
+
+                    Case enAntType.C1
+                        dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X "
+
+                    Case Else
+                        dr.Item("Status") = count(0) & "X " & count(1) & "X "
+
+                End Select
 
                 Exit For
             Next
@@ -1956,34 +1946,7 @@ Public Class frmMain
 
         Try
             AntData.AntType = AntToCheck.AntType
-            'Select Case AntToCheck.AntType
-            '    Case
-            '        AntData.AntType = enAntType.S3
-
-            '    Case "S2"
-            '        AntData.AntType = enAntType.S2
-
-            '    Case "S1"
-            '        AntData.AntType = enAntType.S1
-
-            '    Case Else
-            '        Throw New Exception("Unknown ant type.")
-
-            'End Select
-
-            'sAntIP = sAntToCheck.Substring(4)
-
-            'If sAntIP.Contains(".") Then
-            '    s = sAntIP.Split(".")
-
-            '    sAnt = sAntToCheck.Substring(0, 2) & ":" & s(2) & "." & s(3)
-            'Else
-            '    sAnt = sAntIP
-            'End If
-
-            'AntData.sAnt = sAnt
-            'AntData.sAntIP = sAntToCheck
-
+            
             bStep = 1
 
             sTemp = GetIPData(AntToCheck.sIP, AntToCheck.sAPIPort, "stats")
@@ -2022,93 +1985,6 @@ Public Class frmMain
         End SyncLock
 
     End Sub
-
-    'Private Sub GetWebCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
-
-    '    sAnt = RemoveAntPort(sAnt)
-
-    '    'Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
-    '    '    If key Is Nothing Then
-    '    '        My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\Ants\" & sAnt)
-    '    '    End If
-    '    'End Using
-
-    '    Try
-    '        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt, True)
-    '            sUsername = key.GetValue("WebUsername")
-
-    '            If sUsername.IsNullOrEmpty = True Then
-    '                key.SetValue("WebUsername", "root")
-    '                sUsername = "root"
-    '            End If
-
-    '            sPassword = key.GetValue("WebPassword")
-
-    '            If sPassword.IsNullOrEmpty = True Then
-    '                key.SetValue("WebPassword", "root")
-    '                sPassword = "root"
-    '            End If
-    '        End Using
-    '    Catch ex As Exception When bErrorHandle = True
-    '        sPassword = "root"
-    '        sUsername = "root"
-
-    '        AddToLogQueue("ERROR in GetWebCredentials (assuming default credentials): " & ex.Message)
-    '    End Try
-
-    'End Sub
-
-    'Private Sub GetSSHCredentials(ByVal sAnt As String, ByRef sUsername As String, ByRef sPassword As String)
-
-    '    sAnt = RemoveAntPort(sAnt)
-
-    '    'Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt)
-    '    '    If key Is Nothing Then
-    '    '        My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\Ants\" & sAnt)
-    '    '    End If
-    '    'End Using
-
-    '    Try
-    '        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\Ants\" & sAnt, True)
-    '            sUsername = key.GetValue("SSHUsername")
-
-    '            If sUsername.IsNullOrEmpty = True Then
-    '                key.SetValue("SSHUsername", "root")
-    '                sUsername = "root"
-    '            End If
-
-    '            sPassword = key.GetValue("SSHPassword")
-
-    '            If sPassword.IsNullOrEmpty = True Then
-    '                Select Case sAnt.Substring(0, 2)
-    '                    Case "S1", "S3"
-    '                        key.SetValue("SSHPassword", "root")
-    '                        sPassword = "root"
-
-    '                    Case "S2"
-    '                        key.SetValue("SSHPassword", "admin")
-    '                        sPassword = "admin"
-
-    '                End Select
-    '            End If
-
-    '        End Using
-    '    Catch ex As Exception When bErrorHandle = True
-    '        Select Case sAnt.Substring(0, 2)
-    '            Case "S1", "S3"
-    '                sPassword = "root"
-
-    '            Case "S2"
-    '                sPassword = "admin"
-
-    '        End Select
-
-    '        sUsername = "root"
-
-    '        AddToLogQueue("ERROR in GetSSHCredentials (assuming default credentials): " & ex.Message)
-    '    End Try
-
-    'End Sub
 
     Private Sub HandleAlerts(ByRef drAnt As DataRow, ByRef drAntConfig As DataRow, ByRef wb As WebBrowser)
 
@@ -2422,6 +2298,102 @@ Public Class frmMain
                                     colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
                                     Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S3 XCount Alert")
+
+                                    'use SSH only if using the API, as the web code has its own reboot logic
+                                    If Me.chkAlertRebootIfXd.Checked = True Then
+                                        If drAntConfig("RebootViaSSH") = "Y" Then
+                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                        Else
+                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                    Case "C1"
+                        If Me.chkAlertIfC1Temp.Checked = True Then
+                            bStep = 1
+
+                            x = Val(Me.txtAlertC1Temp.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "C1 Temp Alert")
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfC1FanHigh.Checked = True Then
+                            bStep = 2
+
+                            x = Val(Me.txtAlertC1FanHigh.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "C1 Fan Alert")
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfC1FanLow.Checked = True Then
+                            bStep = 3
+
+                            x = Val(Me.txtAlertC1FanLow.Text)
+
+                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                                iAntAlertCount += 1
+
+                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "C1 Fan Alert")
+                            End If
+                        End If
+
+                        If Me.chkAlertIfC1Hash.Checked = True Then
+                            bStep = 4
+
+                            x = Val(Me.txtAlertC1Hash.Text)
+
+                            If x > 0 Then
+                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "C1 Hash Alert")
+
+                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                                        If drAntConfig("RebootViaSSH") = "Y" Then
+                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                        Else
+                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfC1XCount.Checked = True Then
+                            bStep = 5
+
+                            x = Val(Me.txtAlertC1XCount.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "C1 XCount Alert")
 
                                     'use SSH only if using the API, as the web code has its own reboot logic
                                     If Me.chkAlertRebootIfXd.Checked = True Then
@@ -2860,10 +2832,12 @@ Public Class frmMain
                         Debug.Print("Scan connect failed: " & x)
                     Else
                         Try
-                            y = InStr(sIPDataResponse, """Type"":""S3""}{""STATS")
+                            'y = InStr(sIPDataResponse, """Type"":""S3""}{""STATS")
 
-                            If y <> 0 AndAlso sIPDataResponse.Substring(y + 11, 1) = "{" Then
-                                sIPDataResponse = sIPDataResponse.Insert(y + 11, ",")
+                            x = InStr(sIPDataResponse, "}{")
+
+                            If x <> 0 Then
+                                sIPDataResponse = sIPDataResponse.Insert(x, ",")
                             End If
 
                             j = Newtonsoft.Json.Linq.JObject.Parse(sIPDataResponse)
@@ -2875,12 +2849,19 @@ Public Class frmMain
 
                                 Select Case jp1.Value(Of String)("ID")
                                     Case "BTM0"
-                                        'probably S2
-                                        If HowManyInString(jp1.Value(Of String)("chain_acs1"), " ") = 8 Then
-                                            AntType = enAntType.S2
+                                        'could be S2 or C1
+                                        Select Case HowManyInString(jp1.Value(Of String)("chain_acs1"), " ")
+                                            Case 8
+                                                AntType = enAntType.S2
 
-                                            sAnt = "S2: " & sIPToCheck
-                                        End If
+                                                sAnt = "S2: " & sIPToCheck
+
+                                            Case 2
+                                                AntType = enAntType.C1
+
+                                                sAnt = "C1: " & sIPToCheck
+
+                                        End Select
 
                                     Case "BMM0"
                                         'probably S3
@@ -2904,12 +2885,19 @@ Public Class frmMain
 
                                         Select Case jp1.Value(Of String)("ID")
                                             Case "BTM0"
-                                                'probably S2
-                                                If HowManyInString(jp1.Value(Of String)("chain_acs1"), " ") = 8 Then
-                                                    AntType = enAntType.S2
+                                                'could be S2 or C1
+                                                Select Case HowManyInString(jp1.Value(Of String)("chain_acs1"), " ")
+                                                    Case 8
+                                                        AntType = enAntType.S2
 
-                                                    sAnt = "S2: " & sIPToCheck
-                                                End If
+                                                        sAnt = "S2: " & sIPToCheck
+
+                                                    Case 2
+                                                        AntType = enAntType.C1
+
+                                                        sAnt = "C1: " & sIPToCheck
+
+                                                End Select
 
                                             Case "BMM0"
                                                 'probably S3
@@ -2959,6 +2947,11 @@ Public Class frmMain
                                             Me.optAntS3.Checked = True
 
                                             AddToLogQueue("S3 found at " & sIPToCheck & "!")
+
+                                        Case enAntType.C1
+                                            Me.optAntC1.Checked = True
+
+                                            AddToLogQueue("C1 found at " & sIPToCheck & "!")
 
                                     End Select
 
@@ -3146,8 +3139,8 @@ Public Class frmMain
         Dim AntConfigRow As DataRow
 
         Try
-            If Me.optAntS1.Checked = False AndAlso Me.optAntS2.Checked = False AndAlso Me.optAntS3.Checked = False Then
-                MsgBox("Please specify if this is an S1, S2, or and S3.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+            If Me.optAntS1.Checked = False AndAlso Me.optAntS2.Checked = False AndAlso Me.optAntS3.Checked = False AndAlso Me.optAntC1.Checked = False Then
+                MsgBox("Please specify if this is an S1, S2, S3, or C1.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
                 Exit Sub
             End If
@@ -3177,6 +3170,8 @@ Public Class frmMain
                             Me.txtAntName.Text = "S2: " & Me.txtAntAddress.Text
                         ElseIf Me.optAntS3.Checked = True Then
                             Me.txtAntName.Text = "S3: " & Me.txtAntAddress.Text
+                        ElseIf Me.optAntC1.Checked = True Then
+                            Me.txtAntName.Text = "C1: " & Me.txtAntAddress.Text
                         End If
                     End If
 
@@ -3195,6 +3190,9 @@ Public Class frmMain
                     ElseIf Me.optAntS3.Checked = True Then
                         AntType = enAntType.S3
                         AntConfigRow("Type") = "S3"
+                    ElseIf Me.optAntC1.Checked = True Then
+                        AntType = enAntType.C1
+                        AntConfigRow("Type") = "C1"
                     End If
 
                     ID = AddOrSaveAnt(ID, Me.txtAntName.Text, AntType, Me.txtAntAddress.Text, chkBoxToYN(Me.chkAntActive), _
@@ -3219,47 +3217,6 @@ Public Class frmMain
                     If bAddNewAnt = True Then
                         dsAntConfig.Tables(0).Rows.Add(AntConfigRow)
                     End If
-
-                    'My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "Port", sPort, Microsoft.Win32.RegistryValueKind.String)
-
-                    'If sTemp.Substring(0, 2) = "S1" OrElse sTemp.Substring(0, 2) = "S3" Then
-                    '    If Me.txtAntWebUsername.Text.IsNullOrEmpty = True Then
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '    Else
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", Me.txtAntWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", Me.txtAntWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '    End If
-
-                    '    If Me.txtAntSSHUsername.Text.IsNullOrEmpty = True Then
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '    Else
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", Me.txtAntSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", Me.txtAntSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '    End If
-                    'End If
-
-                    'If sTemp.Substring(0, 2) = "S2" Then
-                    '    If Me.txtAntWebUsername.Text.IsNullOrEmpty = True Then
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '    Else
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebUsername", Me.txtAntWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "WebPassword", Me.txtAntWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '    End If
-
-                    '    If Me.txtAntSSHUsername.Text.IsNullOrEmpty = True Then
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
-                    '    Else
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHUsername", Me.txtAntSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & Me.txtAntAddress.Text, "SSHPassword", Me.txtAntSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-                    '    End If
-                    'End If
-
-                    'Me.chklstAnts.SetItemChecked(Me.chklstAnts.Items.Add(Me.txtAntAddress.Text & ":" & sPort), True)
-                    'Me.txtAntAddress.Text = ""
                 Else
                     MsgBox("This address appears to already be in the list.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
                 End If
@@ -3481,7 +3438,7 @@ Public Class frmMain
     End Sub
 
     Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, _
-        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click, cmdSaveReboots.Click
+        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click, cmdSaveReboots.Click, tabAlertsAndReboots.Click, cmdSaveAlerts6.Click
 
         With ctlsByKey
             .SetRegKeyByControl(Me.chkAlertHighlightField)
@@ -3536,6 +3493,18 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS3Temp)
             .SetRegKeyByControl(Me.txtAlertS3Temp)
 
+            'c1
+            If Me.chkAlertIfC1Temp.Checked = True Then
+                If Me.txtAlertC1Temp.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an C1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfC1Temp.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfC1Temp)
+            .SetRegKeyByControl(Me.txtAlertC1Temp)
+
             's1
             If Me.chkAlertIfS1FanHigh.Checked = True Then
                 If Me.txtAlertS1FanHigh.Text.IsNullOrEmpty Then
@@ -3571,6 +3540,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfS3FanHigh)
             .SetRegKeyByControl(Me.txtAlertS3FanHigh)
+
+            'c1
+            If Me.chkAlertIfC1FanHigh.Checked = True Then
+                If Me.txtAlertC1FanHigh.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an C1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfC1FanHigh.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfC1FanHigh)
+            .SetRegKeyByControl(Me.txtAlertC1FanHigh)
 
             'S1
             If Me.chkAlertIfS1FanLow.Checked = True Then
@@ -3608,6 +3589,18 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS3FanLow)
             .SetRegKeyByControl(Me.txtAlertS3FanLow)
 
+            'C1
+            If Me.chkAlertIfC1FanLow.Checked = True Then
+                If Me.txtAlertC1FanLow.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an C1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfC1FanLow.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfC1FanLow)
+            .SetRegKeyByControl(Me.txtAlertC1FanLow)
+
             's1
             If Me.chkAlertIfS1Hash.Checked = True Then
                 If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then
@@ -3644,6 +3637,18 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS3Hash)
             .SetRegKeyByControl(Me.txtAlertS3Hash)
 
+            'C1
+            If Me.chkAlertIfC1Hash.Checked = True Then
+                If Me.txtAlertC1Hash.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an C1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfC1Hash.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfC1Hash)
+            .SetRegKeyByControl(Me.txtAlertC1Hash)
+
             'S1
             If Me.chkAlertIfS1XCount.Checked = True Then
                 If Me.txtAlertS1XCount.Text.IsNullOrEmpty Then
@@ -3679,6 +3684,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfS3XCount)
             .SetRegKeyByControl(Me.txtAlertS3XCount)
+
+            'c1
+            If Me.chkAlertIfC1XCount.Checked = True Then
+                If Me.txtAlertC1XCount.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an C1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfC1XCount.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfC1XCount)
+            .SetRegKeyByControl(Me.txtAlertC1XCount)
 
             'email notifications
             Call ctlsByKey.SetRegKeyByControl(Me.txtSMTPServer)
@@ -3980,78 +3997,9 @@ Public Class frmMain
 
     End Sub
 
-    'Private Sub chklstAnts_SelectedValueChanged(sender As Object, e As System.EventArgs)
-
-    '    If Me.chklstAnts.SelectedItems.Count <> 1 Then
-    '        Me.cmdSaveAnt.Enabled = False
-    '    Else
-    '        Me.cmdSaveAnt.Enabled = True
-
-    '        Me.txtAntAddress.Text = Me.chklstAnts.SelectedItem.ToString.Substring(4)
-
-    '        Call GetWebCredentials(RemoveAntPort(Me.chklstAnts.SelectedItem.ToString), Me.txtWebUsername.Text, Me.txtWebPassword.Text)
-    '        Call GetSSHCredentials(RemoveAntPort(Me.chklstAnts.SelectedItem.ToString), Me.txtSSHUsername.Text, Me.txtSSHPassword.Text)
-    '    End If
-
-    'End Sub
-
-    'Private Function RemoveAntPort(ByVal sAnt As String) As String
-
-    '    Dim p() As String
-
-    '    If sAnt.Contains(":") = True Then
-    '        p = sAnt.Split(":")
-
-    '        Return p(0) & ":" & p(1)
-    '    Else
-    '        Return sAnt
-    '    End If
-
-    'End Function
-
     Private Sub cmdSaveAnt_Click(sender As Object, e As System.EventArgs) Handles cmdSaveAnt.Click
 
         Call AddOrSaveAntLogic(False, Me.lblAntID.Tag)
-
-        'Dim sTemp As String
-
-        'sTemp = RemoveAntPort(Me.chklstAnts.SelectedItem.ToString)
-
-        'If sTemp.Substring(0, 2) = "S1" OrElse sTemp.Substring(0, 2) = "S3" Then
-        '    If Me.txtAntWebUsername.Text.IsNullOrEmpty = True Then
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
-        '    Else
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", Me.txtAntWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", Me.txtAntWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-        '    End If
-
-        '    If Me.txtAntSSHUsername.Text.IsNullOrEmpty = True Then
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", "root", Microsoft.Win32.RegistryValueKind.String)
-        '    Else
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", Me.txtAntSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", Me.txtAntSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-        '    End If
-        'End If
-
-        'If sTemp.Substring(0, 2) = "S2" Then
-        '    If Me.txtAntWebUsername.Text.IsNullOrEmpty = True Then
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", "root", Microsoft.Win32.RegistryValueKind.String)
-        '    Else
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebUsername", Me.txtAntWebUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "WebPassword", Me.txtAntWebPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-        '    End If
-
-        '    If Me.txtAntSSHUsername.Text.IsNullOrEmpty = True Then
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", "root", Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", "admin", Microsoft.Win32.RegistryValueKind.String)
-        '    Else
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHUsername", Me.txtAntSSHUsername.Text, Microsoft.Win32.RegistryValueKind.String)
-        '        My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sTemp, "SSHPassword", Me.txtAntSSHPassword.Text, Microsoft.Win32.RegistryValueKind.String)
-        '    End If
-        'End If
 
     End Sub
 
@@ -4685,6 +4633,9 @@ Public Class frmMain
                     Case "S3"
                         Me.optAntS3.Checked = True
 
+                    Case "C1"
+                        Me.optAntC1.Checked = True
+
                 End Select
 
                 Me.txtAntSSHUsername.Text = dr.Cells("SSHUsername").Value
@@ -4711,7 +4662,8 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub optAntS1_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optAntS1.CheckedChanged, optAntS2.CheckedChanged, optAntS3.CheckedChanged
+    Private Sub optAntS1_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optAntS1.CheckedChanged, optAntS2.CheckedChanged, _
+                optAntS3.CheckedChanged, optAntC1.CheckedChanged
 
         Dim sTemp As String
         Dim s() As String
@@ -4723,6 +4675,8 @@ Public Class frmMain
                 sTemp = "S2"
             ElseIf Me.optAntS3.Checked = True Then
                 sTemp = "S3"
+            ElseIf Me.optAntC1.Checked = True Then
+                sTemp = "C1"
             Else
                 Exit Sub
             End If
@@ -4731,7 +4685,8 @@ Public Class frmMain
 
             If Me.txtAntName.Text.IsNullOrEmpty Then
                 Me.txtAntName.Text = sTemp & ":" & s(2) & "." & s(3)
-            ElseIf Me.txtAntName.Text.Substring(0, 3) = "S1:" OrElse Me.txtAntName.Text.Substring(0, 3) = "S2:" OrElse Me.txtAntName.Text.Substring(0, 3) = "S3:" Then
+            ElseIf Me.txtAntName.Text.Substring(0, 3) = "S1:" OrElse Me.txtAntName.Text.Substring(0, 3) = "S2:" OrElse _
+                   Me.txtAntName.Text.Substring(0, 3) = "S3:" OrElse Me.txtAntName.Text.Substring(0, 3) = "C1:" Then
                 Me.txtAntName.Text = sTemp & ":" & Me.txtAntName.Text.Substring(3)
             End If
         Catch ex As Exception When bErrorHandle = True
@@ -4833,7 +4788,7 @@ Public Class frmMain
 
     Private Sub txtAlertEMailGovernor_LostFocus(sender As Object, e As System.EventArgs) Handles txtRefreshRate.LostFocus, _
         txtAlertEMailGovernor.LostFocus, txtAntAPIPort.LostFocus, txtAntSSHPort.LostFocus, txtAntWebPort.LostFocus, txtAlertS1Temp.LostFocus, txtAlertS2Temp.LostFocus, _
-        txtAlertS3Temp.LostFocus, cmbAntScanStart.LostFocus, cmbAntScanStop.LostFocus, txtRebootAntsByUptime.LostFocus
+        txtAlertS3Temp.LostFocus, txtRebootAntsByUptime.LostFocus
 
         Dim txtAny As TextBox
 
@@ -4845,6 +4800,22 @@ Public Class frmMain
             MsgBox("Invalid value entered:" & vbCrLf & vbCrLf & txtAny.Text)
 
             txtAny.Text = ""
+        End If
+
+    End Sub
+
+    Private Sub cmbText_LostFocus(sender As Object, e As System.EventArgs) Handles cmbAntScanStart.LostFocus, cmbAntScanStop.LostFocus
+
+        Dim cmbAny As ComboBox
+
+        cmbAny = sender
+
+        If cmbAny.Text.IsNullOrEmpty = True Then Exit Sub
+
+        If Val(cmbAny.Text) = 0 Then
+            MsgBox("Invalid value entered:" & vbCrLf & vbCrLf & cmbAny.Text)
+
+            cmbAny.Text = ""
         End If
 
     End Sub

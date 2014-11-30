@@ -1,3 +1,12 @@
+v3.8
+- Added support for the Antminer C1.  Note that this is API support only, not web support.  
+- This is the version where I sold my last S1.  From this point forward proper S1 support isn't guaranteed.
+- Fixed some minor problems with the scanning logic that detects new Ants.
+
+v3.7
+- Fixed the problem that would cause the application to stop refreshing if it encountered an Ant with a status of ERROR.
+- Fixed the problem that would prevent two reboots from happening on the same day.
+
 v3.6
 - Added the ability to auto reboot your Ants by schedule or by uptime.
 
