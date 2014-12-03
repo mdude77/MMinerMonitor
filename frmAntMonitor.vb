@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Ant Monitor v3.8"
+    Private Const csVersion As String = "M's Ant Monitor v3.9"
 
     'alert string   
     Private sAlerts As String
@@ -2932,6 +2932,20 @@ Public Class frmMain
                                     Me.txtAntAddress.Text = sIPToCheck
                                     Me.txtAntName.Text = ""
 
+                                    Me.txtAntSSHUsername.Text = "root"
+
+                                    Select Case AntType
+                                        Case enAntType.S1, enAntType.S3
+                                            Me.txtAntSSHPassword.Text = "root"
+
+                                        Case enAntType.S2, enAntType.C1
+                                            Me.txtAntSSHPassword.Text = "admin"
+
+                                    End Select
+
+                                    Me.txtAntWebPassword.Text = "root"
+                                    Me.txtAntWebUsername.Text = "root"
+
                                     Select Case AntType
                                         Case enAntType.S1
                                             Me.optAntS1.Checked = True
@@ -3905,78 +3919,88 @@ Public Class frmMain
 
         AntConfigRow = FindAntConfig(Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value)
 
-        If AntConfigRow("UseAPI") <> "Y" Then Exit Sub
-
-        '0 - reboot one
-        '1 - reboot multiple
-        '2 - remove from list
-        '3 - shutdown s2
-        '4 - update pools
-        mnuAntMenu.Items(0).Text = "Reboot " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
-        mnuAntMenu.Items(0).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
-
-        'reboot multiple
-        If Me.dataAnts.SelectedRows.Count = 0 Then
-            mnuAntMenu.Items(1).Visible = False
-        Else
-            mnuAntMenu.Items(1).Visible = True
-
-            mnuAntMenu.Items(1).Tag = New System.Collections.Generic.List(Of Integer)
-            colAnts = mnuAntMenu.Items(1).Tag
-
-            x = 0
-
-            For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
-                colAnts.Add(dr.Cells("ID").Value)
-
-                x += 1
-            Next
-
-            If x > 1 Then
-                mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ants)"
-            Else
-                mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ant)"
-            End If
-        End If
-
         'remove from list
         mnuAntMenu.Items(2).Text = "Remove " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
         mnuAntMenu.Items(2).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
         mnuAntMenu.Items(2).Visible = True
 
-        'shutdown s2
-        If AntConfigRow("Type") = "S2" Then
-            mnuAntMenu.Items(3).Text = "Shutdown " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
-            mnuAntMenu.Items(3).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
-            mnuAntMenu.Items(3).Visible = True
-        End If
+        If AntConfigRow Is Nothing Then
+            mnuAntMenu.Items(0).Visible = False
+            mnuAntMenu.Items(1).Visible = False
+            mnuAntMenu.Items(3).Visible = False
+        Else
+            If AntConfigRow("UseAPI") <> "Y" Then Exit Sub
 
-        'update pools
-        If Me.lblPools1.Tag IsNot Nothing Then
-            mnuAntMenu.Items(4).Tag = New System.Collections.Generic.List(Of Integer)
-            colAnts = mnuAntMenu.Items(4).Tag
+            mnuAntMenu.Items(0).Visible = True
 
-            x = 0
+            '0 - reboot one
+            '1 - reboot multiple
+            '2 - remove from list
+            '3 - shutdown s2
+            '4 - update pools
+            mnuAntMenu.Items(0).Text = "Reboot " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
+            mnuAntMenu.Items(0).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
 
+            'reboot multiple
             If Me.dataAnts.SelectedRows.Count = 0 Then
-                colAnts.Add(Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value)
-
-                x = 1
+                mnuAntMenu.Items(1).Visible = False
             Else
+                mnuAntMenu.Items(1).Visible = True
+
+                mnuAntMenu.Items(1).Tag = New System.Collections.Generic.List(Of Integer)
+                colAnts = mnuAntMenu.Items(1).Tag
+
+                x = 0
+
                 For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
                     colAnts.Add(dr.Cells("ID").Value)
 
                     x += 1
                 Next
+
+                If x > 1 Then
+                    mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ants)"
+                Else
+                    mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ant)"
+                End If
             End If
 
-            If x > 1 Then
-                mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Ants)"
+            'shutdown s2
+            If AntConfigRow("Type") = "S2" Then
+                mnuAntMenu.Items(3).Text = "Shutdown " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
+                mnuAntMenu.Items(3).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
+                mnuAntMenu.Items(3).Visible = True
             Else
-                mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Ant)"
+                mnuAntMenu.Items(3).Visible = False
             End If
 
-            mnuAntMenu.Items(4).Visible = True
+            'update pools
+            If Me.lblPools1.Tag IsNot Nothing Then
+                mnuAntMenu.Items(4).Tag = New System.Collections.Generic.List(Of Integer)
+                colAnts = mnuAntMenu.Items(4).Tag
+
+                x = 0
+
+                If Me.dataAnts.SelectedRows.Count = 0 Then
+                    colAnts.Add(Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value)
+
+                    x = 1
+                Else
+                    For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
+                        colAnts.Add(dr.Cells("ID").Value)
+
+                        x += 1
+                    Next
+                End If
+
+                If x > 1 Then
+                    mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Ants)"
+                Else
+                    mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Ant)"
+                End If
+
+                mnuAntMenu.Items(4).Visible = True
+            End If
         End If
 
         e.ContextMenuStrip = mnuAntMenu
