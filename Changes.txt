@@ -1,3 +1,11 @@
+v4.0
+- Added support for Spondoolies' SP20.
+- Fixed more problems with the Scanning code.
+- Added the ability to get unsupported miner info that can be reported to the author for additional miner support.
+- Fixed the problem with the "reboot on error" getting inadvertently turned on.  It wasn't happening during startup, but in the Ant config.
+- Fixed a logging problem with manually rebooting a miner.  It would display a number instead of the miner's name.
+- Added support for Antminer S4 miners.
+
 v3.9
 - Fixed the problem with auto detected Ants not properly defaulting to the SSH password for their Ant type.
 - Fixed some problems with the "right click" menu not working properly, especially if Ant was no longer valid in the config.

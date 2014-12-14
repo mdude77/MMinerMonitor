@@ -1,4 +1,4 @@
-﻿Imports MAntMonitor.Extensions
+﻿Imports MMinerMonitor.Extensions
 
 Public Class frmMain
 
@@ -21,13 +21,13 @@ Public Class frmMain
     Private RebootInfo, EMailAlertInfo As System.Collections.Generic.Dictionary(Of String, Date)
 
     'the dataset that holds the grid data
-    Private ds, dsAntConfig As DataSet
+    Private ds, dsMinerConfig As DataSet
 
     'location of the configuration settings in the registry
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Ant Monitor v3.9"
+    Private Const csVersion As String = "M's Miner Monitor v4.0b2"
 
     'alert string   
     Private sAlerts As String
@@ -44,27 +44,167 @@ Public Class frmMain
     'used to prevent controls from firing before the app is fully started
     Private bStarted As Boolean
 
-    'whether or not we're using the API instead of webscraping
-    'Private bUseAPI As Boolean
+    Private Class clsSupportedMinerInfo
+
+        'supported miner types
+        Public Enum enSupportedMinerTypes
+            AntMinerS1 = 1
+            AntMinerS2 = 2
+            AntMinerS3 = 3
+            AntMinerS4 = 4
+            AntMinerC1 = 5
+            SpondoolieSP20 = 6
+        End Enum
+
+        Public Class clsMinerInfo
+            Private sShortName As String
+            Private sLongName As String
+            Private xMinerType As clsSupportedMinerInfo.enSupportedMinerTypes
+
+            Public ReadOnly Property ShortName As String
+                Get
+                    Return Me.sShortName
+                End Get
+            End Property
+
+            Public ReadOnly Property LongName As String
+                Get
+                    Return Me.sLongName
+                End Get
+            End Property
+
+            Public ReadOnly Property MinerType As clsSupportedMinerInfo.enSupportedMinerTypes
+                Get
+                    Return Me.xMinerType
+                End Get
+            End Property
+
+            Public Sub New(ByVal MinerType As clsSupportedMinerInfo.enSupportedMinerTypes)
+
+                Me.xMinerType = MinerType
+
+                Select Case MinerType
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1
+                        Me.sShortName = "C1"
+                        Me.sLongName = "Antminer C1"
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1
+                        Me.sShortName = "S1"
+                        Me.sLongName = "Antminer S1"
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
+                        Me.sShortName = "S2"
+                        Me.sLongName = "Antminer S2"
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3
+                        Me.sShortName = "S3"
+                        Me.sLongName = "Antminer S3"
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                        Me.sShortName = "S4"
+                        Me.sLongName = "Antminer S4"
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                        Me.sShortName = "SP"
+                        Me.sLongName = "Spondoolie SP20"
+
+                End Select
+
+            End Sub
+        End Class
+
+        Public AntMinerS1 As clsMinerInfo
+        Public AntMinerS2 As clsMinerInfo
+        Public AntMinerS3 As clsMinerInfo
+        Public AntMinerS4 As clsMinerInfo
+        Public AntMinerC1 As clsMinerInfo
+        Public AntMinerSP20 As clsMinerInfo
+
+        Public SupportedMinerCollection As System.Collections.Generic.List(Of clsMinerInfo)
+
+        Public Sub New()
+
+            AntMinerC1 = New clsMinerInfo(enSupportedMinerTypes.AntMinerC1)
+            AntMinerS1 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS1)
+            AntMinerS2 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS2)
+            AntMinerS3 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS3)
+            AntMinerS4 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS4)
+            AntMinerSP20 = New clsMinerInfo(enSupportedMinerTypes.SpondoolieSP20)
+
+            SupportedMinerCollection = New System.Collections.Generic.List(Of clsMinerInfo)
+            SupportedMinerCollection.Add(Me.AntMinerS1)
+            SupportedMinerCollection.Add(Me.AntMinerS2)
+            SupportedMinerCollection.Add(Me.AntMinerS3)
+            SupportedMinerCollection.Add(Me.AntMinerS4)
+            SupportedMinerCollection.Add(Me.AntMinerC1)
+            SupportedMinerCollection.Add(Me.AntMinerSP20)
+
+        End Sub
+
+        Public Function GetMinerObjectByShortName(ByVal sShortName As String) As clsMinerInfo
+
+            Dim mi As clsMinerInfo
+
+            For Each mi In Me.SupportedMinerCollection
+                If mi.ShortName.ToLower = sShortName.ToLower Then
+                    Return mi
+                End If
+            Next
+
+            Throw New Exception("Internal error: No match on ShortName in GetMinerObjectByShortName: " & sShortName)
+
+        End Function
+
+        Public Function GetMinerObjectByLongName(ByVal sLongName As String) As clsMinerInfo
+
+            Dim mi As clsMinerInfo
+
+            For Each mi In Me.SupportedMinerCollection
+                If mi.LongName.ToLower = sLongName.ToLower Then
+                    Return mi
+                End If
+            Next
+
+            Throw New Exception("Internal error: No match on LongName in GetMinerObjectByLongName: " & sLongName)
+
+        End Function
+
+        Public Function GetMinerObjectByType(ByVal minerType As clsSupportedMinerInfo.enSupportedMinerTypes) As clsMinerInfo
+
+            Dim mi As clsMinerInfo
+
+            For Each mi In Me.SupportedMinerCollection
+                If mi.MinerTYpe = minerType Then
+                    Return mi
+                End If
+            Next
+
+            Throw New Exception("Internal error: No match on MinerType in GetMinerObjectByType: " & minerType)
+
+        End Function
+
+    End Class
+
+    Private SupportedMinerInfo As clsSupportedMinerInfo
 
     'log queue from other threads
     Private Shared logQueue As System.Collections.Generic.Queue(Of String)
     Private Shared logQueueLock As Object
 
     'queue of ants to check
-    Private Shared antsToCheckQueue As System.Collections.Generic.Queue(Of stAntConfig)
-    Private Shared antsToCheckLock As Object
+    Private Shared minersToCheckQueue As System.Collections.Generic.Queue(Of stMinerConfig)
+    Private Shared minersToCheckLock As Object
 
     'data coming back from the worker threads with Ant refresh data
-    Private Shared AntRefreshDataQueue As System.Collections.Generic.Queue(Of clsAntRefreshData)
-    Private Shared AntRefreshLock As Object
+    Private Shared MinerRefreshDataQueue As System.Collections.Generic.Queue(Of clsMinerRefreshData)
+    Private Shared MinerRefreshLock As Object
 
     'display refresh period after ant refresh is initiated
     Private iDisplayRefreshPeriod As Integer
 
     'object populated by the worker threads that is passed back to the UI thread for grid population
-    Private Class clsAntRefreshData
-        Public AntType As enAntType
+    Private Class clsMinerRefreshData
+        Public MinerType As clsSupportedMinerInfo.enSupportedMinerTypes
         Public ID As Integer
         Public sStats As String
         Public sSummary As String
@@ -75,10 +215,10 @@ Public Class frmMain
     End Class
 
     'ant data from the config
-    Private Structure stAntConfig
+    Private Structure stMinerConfig
         Dim sName As String
         Dim sIP As String
-        Dim AntType As enAntType
+        Dim MinerType As clsSupportedMinerInfo.enSupportedMinerTypes
         Dim sAPIPort As String
         Dim sHTTPPort As String
         Dim sSSHPort As String
@@ -98,20 +238,12 @@ Public Class frmMain
 
     Private Class clsThreadHandler
         Public bBusy As Boolean
-        Public AntToCheck As stAntConfig
+        Public MinerToCheck As stMinerConfig
         Public bGotWork As Boolean
     End Class
 
     'set to true when shutting down
     Private bShutDown As Boolean
-
-    'ant types
-    Private Enum enAntType
-        S1 = 1
-        S2 = 2
-        S3 = 3
-        C1 = 4
-    End Enum
 
     'pool data for pushing pool data to ants
     Private Class clsPoolData
@@ -127,6 +259,10 @@ Public Class frmMain
     'for Ant scanning on another thread
     Private sIPDataResponse As String
     Private sIPToCheck As String
+
+    'for get miner info on another thread
+    Private sIPToGetInfo As String
+    Private Shared listOfGetInfoResponse As System.Collections.Generic.List(Of String)
 
     'for tracking scheduled reboots
     Private dictScheduledReboots As System.Collections.Generic.Dictionary(Of Integer, Date)
@@ -149,7 +285,7 @@ Public Class frmMain
         Dim x As Integer
         Dim s() As String
         Dim dr As DataRow
-        Dim AntType As enAntType
+        Dim MinerInfo As clsSupportedMinerInfo.clsMinerInfo
 
         bStarted = True
 
@@ -159,11 +295,13 @@ Public Class frmMain
         logQueue = New System.Collections.Generic.Queue(Of String)
         logQueueLock = New Object
 
-        antsToCheckQueue = New System.Collections.Generic.Queue(Of stAntConfig)
-        antsToCheckLock = New Object
+        SupportedMinerInfo = New clsSupportedMinerInfo
 
-        AntRefreshDataQueue = New System.Collections.Generic.Queue(Of clsAntRefreshData)
-        AntRefreshLock = New Object
+        minersToCheckQueue = New System.Collections.Generic.Queue(Of stMinerConfig)
+        minersToCheckLock = New Object
+
+        MinerRefreshDataQueue = New System.Collections.Generic.Queue(Of clsMinerRefreshData)
+        MinerRefreshLock = New Object
 
         wbData(0) = New clsWBData
         wbData(1) = New clsWBData
@@ -190,6 +328,10 @@ Public Class frmMain
             Me.cmbAntScanStop.Items.Add(x)
         Next
 
+        For Each SupportMiner As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
+            Me.cmbMinerType.Items.Add(SupportMiner.LongName)
+        Next
+
         RebootInfo = New System.Collections.Generic.Dictionary(Of String, Date)
         EMailAlertInfo = New System.Collections.Generic.Dictionary(Of String, Date)
 
@@ -198,7 +340,7 @@ Public Class frmMain
 
         With ds
             .Tables.Add()
-            Me.dataAnts.DataSource = .Tables(0)
+            Me.dataMiners.DataSource = .Tables(0)
 
             With .Tables(0).Columns
                 .Add("Name")
@@ -228,21 +370,21 @@ Public Class frmMain
             End With
         End With
 
-        Me.dataAnts.Columns("PoolData").Visible = False
-        Me.dataAnts.Columns("PoolData2").Visible = False
-        'Me.dataAnts.Columns("IPAddress").Visible = False
-        Me.dataAnts.Columns("Type").Visible = False
+        Me.dataMiners.Columns("PoolData").Visible = False
+        Me.dataMiners.Columns("PoolData2").Visible = False
+        'Me.dataMiners.Columns("IPAddress").Visible = False
+        Me.dataMiners.Columns("Type").Visible = False
 
-        Me.dataAnts.Columns("HWE%").ToolTipText = "Hardware Error Percentage"
-        Me.dataAnts.Columns("Diff").ToolTipText = "Difficulty Ant is using.  For web scraping, it's the value from all 3 pools."
-        Me.dataAnts.Columns("HFan").ToolTipText = "Highest Fan Speed"
-        Me.dataAnts.Columns("Rej%").ToolTipText = "Reject Percentage"
-        Me.dataAnts.Columns("HTemp").ToolTipText = "Highest Temperature across all blades"
-        Me.dataAnts.Columns("Freq").ToolTipText = "Frequency Ant is running at"
-        Me.dataAnts.Columns("XCount").ToolTipText = "Number of Xs this Ant has"
-        Me.dataAnts.Columns("ACount").ToolTipText = "Alert count for this Ant"
+        Me.dataMiners.Columns("HWE%").ToolTipText = "Hardware Error Percentage"
+        Me.dataMiners.Columns("Diff").ToolTipText = "Difficulty Miner is using.  For web scraping, it's the value from all 3 pools."
+        Me.dataMiners.Columns("HFan").ToolTipText = "Highest Fan Speed"
+        Me.dataMiners.Columns("Rej%").ToolTipText = "Reject Percentage"
+        Me.dataMiners.Columns("HTemp").ToolTipText = "Highest Temperature across all blades"
+        Me.dataMiners.Columns("Freq").ToolTipText = "Frequency Miner is running at"
+        Me.dataMiners.Columns("XCount").ToolTipText = "Number of Xs this Miner has"
+        Me.dataMiners.Columns("ACount").ToolTipText = "Alert count for this Miner"
 
-        With Me.dataAnts
+        With Me.dataMiners
             .Columns("ACount").Width = 74
             .Columns("Blocks").Width = 65
             .Columns("Diff").Width = 48
@@ -264,12 +406,12 @@ Public Class frmMain
 
         ctlsByKey = New ControlsByRegistry(csRegKey)
 
-        Call SetGridSizes("\Columns\dataAnts", Me.dataAnts)
-        Call SetGridColumnPositions("\Columns\" & Me.dataAnts.Name & "_DisplayIndex", Me.dataAnts)
+        Call SetGridSizes("\Columns\dataMiners", Me.dataMiners)
+        Call SetGridColumnPositions("\Columns\" & Me.dataMiners.Name & "_DisplayIndex", Me.dataMiners)
 
         'handles saving of column widths and column locations
-        AddHandler Me.dataAnts.ColumnWidthChanged, AddressOf Me.dataGrid_ColumnWidthChanged
-        AddHandler Me.dataAnts.ColumnDisplayIndexChanged, AddressOf Me.dataAnts_ColumnDisplayIndexChanged
+        AddHandler Me.dataMiners.ColumnWidthChanged, AddressOf Me.dataGrid_ColumnWidthChanged
+        AddHandler Me.dataMiners.ColumnDisplayIndexChanged, AddressOf Me.dataMiners_ColumnDisplayIndexChanged
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey)
             If key Is Nothing Then
@@ -360,6 +502,18 @@ Public Class frmMain
             .AddControl(Me.chkAlertIfS3XCount, "AlertIFS3XCount")
             .AddControl(Me.txtAlertS3XCount, "AlertValueS3XCount")
 
+            'S4
+            .AddControl(Me.chkAlertIfS4Temp, "AlertIfS4Temp")
+            .AddControl(Me.txtAlertS4Temp, "AlertValueS4Temp")
+            .AddControl(Me.chkAlertIfS4FanHigh, "AlertIfS4Fan")
+            .AddControl(Me.txtAlertS4FanHigh, "AlertValueS4Fan")
+            .AddControl(Me.chkAlertIfS4FanLow, "AlertIfS4FanLow")
+            .AddControl(Me.txtAlertS4FanLow, "AlertValueS4FanLow")
+            .AddControl(Me.chkAlertIfS4Hash, "AlertIFS4Hash")
+            .AddControl(Me.txtAlertS4Hash, "AlertValueS4Hash")
+            .AddControl(Me.chkAlertIfS4XCount, "AlertIFS4XCount")
+            .AddControl(Me.txtAlertS4XCount, "AlertValueS4XCount")
+
             'C1
             .AddControl(Me.txtAlertC1Temp, "AlertValueC1Temp")
             .AddControl(Me.chkAlertIfC1Temp, "AlertIfC1Temp")
@@ -371,6 +525,12 @@ Public Class frmMain
             .AddControl(Me.txtAlertC1Hash, "AlertValueC1Hash")
             .AddControl(Me.chkAlertIfC1XCount, "AlertIFC1XCount")
             .AddControl(Me.txtAlertC1XCount, "AlertValueC1XCount")
+
+            'SP
+            .AddControl(Me.txtAlertSPTemp, "AlertValueSPTemp")
+            .AddControl(Me.chkAlertIfSPTemp, "AlertIfSPTemp")
+            .AddControl(Me.chkAlertIfSPHash, "AlertIFSPHash")
+            .AddControl(Me.txtAlertSPHash, "AlertValueSPHash")
 
             .AddControl(Me.chkAlertHighlightField, "AlertHighlightField")
             .AddControl(Me.chkAlertShowAnnoyingPopup, "AlertShowAnnoyingPopup")
@@ -443,6 +603,7 @@ Public Class frmMain
             Call txtDisplayRefreshInSecs_Leave(sender, e)
 
             'alerts
+            'S1
             .SetControlByRegKey(Me.chkAlertIfS1Temp)
             .SetControlByRegKey(Me.txtAlertS1Temp)
             .SetControlByRegKey(Me.chkAlertIfS1FanHigh)
@@ -454,6 +615,7 @@ Public Class frmMain
             .SetControlByRegKey(Me.chkAlertIfS1XCount)
             .SetControlByRegKey(Me.txtAlertS1XCount)
 
+            'S2
             .SetControlByRegKey(Me.chkAlertIfS2Temp)
             .SetControlByRegKey(Me.txtAlertS2Temp)
             .SetControlByRegKey(Me.chkAlertIfS2FanHigh)
@@ -465,6 +627,7 @@ Public Class frmMain
             .SetControlByRegKey(Me.chkAlertIfS2XCount)
             .SetControlByRegKey(Me.txtAlertS2XCount)
 
+            'S3
             .SetControlByRegKey(Me.chkAlertIfS3Temp)
             .SetControlByRegKey(Me.txtAlertS3Temp)
             .SetControlByRegKey(Me.chkAlertIfS3FanHigh)
@@ -476,6 +639,19 @@ Public Class frmMain
             .SetControlByRegKey(Me.chkAlertIfS3XCount)
             .SetControlByRegKey(Me.txtAlertS3XCount)
 
+            'S4
+            .SetControlByRegKey(Me.chkAlertIfS4Temp)
+            .SetControlByRegKey(Me.txtAlertS4Temp)
+            .SetControlByRegKey(Me.chkAlertIfS4FanHigh)
+            .SetControlByRegKey(Me.txtAlertS4FanHigh)
+            .SetControlByRegKey(Me.chkAlertIfS4FanLow)
+            .SetControlByRegKey(Me.txtAlertS4FanLow)
+            .SetControlByRegKey(Me.chkAlertIfS4Hash)
+            .SetControlByRegKey(Me.txtAlertS4Hash)
+            .SetControlByRegKey(Me.chkAlertIfS4XCount)
+            .SetControlByRegKey(Me.txtAlertS4XCount)
+
+            'C1
             .SetControlByRegKey(Me.chkAlertIfC1Temp)
             .SetControlByRegKey(Me.txtAlertC1Temp)
             .SetControlByRegKey(Me.chkAlertIfC1FanHigh)
@@ -486,6 +662,12 @@ Public Class frmMain
             .SetControlByRegKey(Me.txtAlertC1Hash)
             .SetControlByRegKey(Me.chkAlertIfC1XCount)
             .SetControlByRegKey(Me.txtAlertC1XCount)
+
+            'SP
+            .SetControlByRegKey(Me.chkAlertIfSPTemp)
+            .SetControlByRegKey(Me.txtAlertSPTemp)
+            .SetControlByRegKey(Me.chkAlertIfSPHash)
+            .SetControlByRegKey(Me.txtAlertSPHash)
 
             .SetControlByRegKey(Me.chkAlertHighlightField, True)
             .SetControlByRegKey(Me.chkAlertShowNotifyPopup, True)
@@ -543,9 +725,9 @@ Public Class frmMain
         End Using
 
         'config
-        dsAntConfig = New DataSet
+        dsMinerConfig = New DataSet
 
-        With dsAntConfig
+        With dsMinerConfig
             .Tables.Add()
             Me.dataAntConfig.DataSource = .Tables(0)
 
@@ -585,7 +767,7 @@ Public Class frmMain
             .Columns("Type").Width = 46
         End With
 
-        'load Ants into the config
+        'load Miners into the config
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\AntsV2")
             If key Is Nothing Then
                 My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\AntsV2")
@@ -598,25 +780,14 @@ Public Class frmMain
                         For Each sKey As String In key2.GetSubKeyNames
                             'do some validation before converting them over
                             If sKey.Split(":").Count = 2 AndAlso sKey.Split(".").Count = 4 Then
-                                If sKey.Substring(0, 4) = "S1: " OrElse sKey.Substring(0, 4) = "S2: " OrElse sKey.Substring(0, 4) = "S3: " OrElse sKey.Substring(0, 4) = "C1: " Then
-                                    Select Case sKey.Substring(0, 2)
-                                        Case "S1"
-                                            AntType = enAntType.S1
+                                If sKey.Substring(0, 4) = "S1: " OrElse sKey.Substring(0, 4) = "S2: " OrElse sKey.Substring(0, 4) = "S3: " OrElse _
+                                    sKey.Substring(0, 4) = "C1: " OrElse sKey.Substring(0, 4) = "SP: " Then
 
-                                        Case "S2"
-                                            AntType = enAntType.S2
-
-                                        Case "S3"
-                                            AntType = enAntType.S3
-
-                                        Case "C1"
-                                            AntType = enAntType.C1
-
-                                    End Select
+                                    MinerInfo = SupportedMinerInfo.GetMinerObjectByShortName(sKey.Substring(0, 2))
 
                                     s = sKey.Split(".")
 
-                                    Call AddOrSaveAnt(-1, sKey.Substring(0, 3) & s(2) & "." & s(3), AntType, sKey.Substring(4), , My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sKey, "Port", "80"), _
+                                    Call AddOrSaveMiner(-1, sKey.Substring(0, 3) & s(2) & "." & s(3), MinerInfo, sKey.Substring(4), , My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sKey, "Port", "80"), _
                                                     My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sKey, "WebUsername", "root"), _
                                                     My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Ants\" & sKey, "WebPassword", "root"), _
                                                     , , , , My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey, "UseAPI", "Y"), _
@@ -631,7 +802,7 @@ Public Class frmMain
 
         Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\AntsV2")
             For Each sKey As String In key.GetSubKeyNames
-                dr = Me.dsAntConfig.Tables(0).NewRow
+                dr = Me.dsMinerConfig.Tables(0).NewRow
 
                 dr("Name") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "Name", "")
                 dr("Type") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "Type", "")
@@ -653,7 +824,7 @@ Public Class frmMain
                 dr("UseAPI") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "UseAPI", "")
                 dr("RebootViaSSH") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "RebootViaSSH", "")
 
-                dsAntConfig.Tables(0).Rows.Add(dr)
+                dsMinerConfig.Tables(0).Rows.Add(dr)
             Next
         End Using
 
@@ -661,7 +832,7 @@ Public Class frmMain
         Call SetGridColumnPositions("\Columns\" & Me.dataAntConfig.Name & "_DisplayIndex", Me.dataAntConfig)
 
         AddHandler Me.dataAntConfig.ColumnWidthChanged, AddressOf Me.dataGrid_ColumnWidthChanged
-        AddHandler Me.dataAntConfig.ColumnDisplayIndexChanged, AddressOf Me.dataAnts_ColumnDisplayIndexChanged
+        AddHandler Me.dataAntConfig.ColumnDisplayIndexChanged, AddressOf Me.dataMiners_ColumnDisplayIndexChanged
 
         Call CalcRefreshRate()
 
@@ -712,7 +883,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Function AddOrSaveAnt(ByVal ID As Integer, ByVal sAntName As String, ByVal AntType As enAntType, ByVal sIPAddress As String, _
+    Private Function AddOrSaveMiner(ByVal ID As Integer, ByVal sAntName As String, ByVal MinerInfo As clsSupportedMinerInfo.clsMinerInfo, ByVal sIPAddress As String, _
                           Optional ByVal sActive As String = "Y", Optional ByVal sHTTPPort As String = "80", _
                           Optional ByVal sWebUserName As String = "root", Optional ByVal sWebPassword As String = "root", _
                           Optional ByVal sSSHUserName As String = "root", Optional ByVal sSSHPassword As String = "", _
@@ -729,22 +900,7 @@ Public Class frmMain
             End If
 
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Name", sAntName, Microsoft.Win32.RegistryValueKind.String)
-
-            Select Case AntType
-                Case enAntType.S1
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", "S1", Microsoft.Win32.RegistryValueKind.String)
-
-                Case enAntType.S2
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", "S2", Microsoft.Win32.RegistryValueKind.String)
-
-                Case enAntType.S3
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", "S3", Microsoft.Win32.RegistryValueKind.String)
-
-                Case enAntType.C1
-                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", "C1", Microsoft.Win32.RegistryValueKind.String)
-
-            End Select
-
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "Type", MinerInfo.ShortName, Microsoft.Win32.RegistryValueKind.String)
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "IPAddress", sIPAddress, Microsoft.Win32.RegistryValueKind.String)
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "HTTPPort", sHTTPPort, Microsoft.Win32.RegistryValueKind.String)
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "WebUsername", sWebUserName, Microsoft.Win32.RegistryValueKind.String)
@@ -752,7 +908,10 @@ Public Class frmMain
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "SSHUsername", sSSHUserName, Microsoft.Win32.RegistryValueKind.String)
 
             If sSSHPassword.IsNullOrEmpty = True Then
-                If AntType = enAntType.S2 OrElse AntType = enAntType.C1 Then
+                If MinerInfo.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2 OrElse _
+                   MinerInfo.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1 OrElse _
+                   MinerInfo.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4 Then
+
                     sSSHPassword = "admin"
                 Else
                     sSSHPassword = "root"
@@ -796,7 +955,7 @@ Public Class frmMain
     Private Sub CheckForWork()
 
         While bShutDown = False
-            While antsToCheckQueue.Count = 0 AndAlso bShutDown = False
+            While minersToCheckQueue.Count = 0 AndAlso bShutDown = False
                 System.Threading.Thread.Sleep(10)
             End While
 
@@ -804,14 +963,14 @@ Public Class frmMain
                 Exit While
             End If
 
-            SyncLock antsToCheckLock
+            SyncLock minersToCheckLock
                 For x As Integer = 0 To workerThread.Count - 2
                     If ThreadHandlers(x).bBusy = False AndAlso ThreadHandlers(x).bGotWork = False Then
                         ThreadHandlers(x).bBusy = True
-                        ThreadHandlers(x).AntToCheck = antsToCheckQueue.Dequeue
+                        ThreadHandlers(x).MinerToCheck = minersToCheckQueue.Dequeue
                         ThreadHandlers(x).bGotWork = True
 
-                        If antsToCheckQueue.Count = 0 Then
+                        If minersToCheckQueue.Count = 0 Then
                             Exit For
                         End If
                     End If
@@ -832,10 +991,10 @@ Public Class frmMain
             ThreadHandlers(iThread).bBusy = True
 
 #If DEBUG Then
-            AddToLogQueue("Thread " & iThread & ": " & ThreadHandlers(iThread).AntToCheck.sName)
+            AddToLogQueue("Thread " & iThread & ": " & ThreadHandlers(iThread).MinerToCheck.sName)
 #End If
 
-            Call GetAntDataViaAPI(ThreadHandlers(iThread).AntToCheck)
+            Call GetMinerDataViaAPI(ThreadHandlers(iThread).MinerToCheck)
 
             ThreadHandlers(iThread).bGotWork = False
             ThreadHandlers(iThread).bBusy = False
@@ -843,16 +1002,16 @@ Public Class frmMain
 
     End Sub
 
-    Private Function FindAntConfig(ByVal ID As Integer) As DataRow
+    Private Function FindMinerConfig(ByVal ID As Integer) As DataRow
 
-        For Each dr As DataRow In Me.dsAntConfig.Tables(0).Rows
+        For Each dr As DataRow In Me.dsMinerConfig.Tables(0).Rows
             If dr("ID").ToString = ID Then
                 Return dr
             End If
         Next
 
         'should never happen
-        AddToLogQueue("Ant " & ID & " not found in config!")
+        AddToLogQueue("Miner " & ID & " not found in config!")
 
         Return Nothing
 
@@ -1053,7 +1212,7 @@ Public Class frmMain
                         If (count(0) <> 0 OrElse count(1) <> 0 OrElse count(2) <> 0 OrElse count(3) <> 0 OrElse count(4) <> 0 OrElse count(5) <> 0 _
                             OrElse count(6) <> 0 OrElse count(7) <> 0 OrElse count(8) <> 0 OrElse count(9) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
                             'only reboot once every x minutes
-                            Call RebootAnt(antConfigRow, False, False, wb)
+                            Call RebootMiner(antConfigRow, False, False, wb)
                         End If
                     End If
                 ElseIf wb.Url.AbsoluteUri.Contains("/reboot.html") = True Then
@@ -1179,7 +1338,7 @@ Public Class frmMain
                         End If
 
                         If (count(0) <> 0 OrElse count(1) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
-                            Call RebootAnt(antConfigRow, False, False, wb)
+                            Call RebootMiner(antConfigRow, False, False, wb)
                         End If
                     End If
                 Else
@@ -1210,26 +1369,26 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub RebootViaReboot(ByRef antConfigRow As DataRow, ByRef wb As WebBrowser)
+    'Private Sub RebootViaReboot(ByRef antConfigRow As DataRow, ByRef wb As WebBrowser)
 
-        'Dim sWebUN, sWebPW As String
+    '    'Dim sWebUN, sWebPW As String
 
-        If TryGovernor(RebootInfo, antConfigRow("ID"), Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 60 * 30) = True Then
-            AddToLogQueue("REBOOTING " & antConfigRow("Name"))
+    '    If TryGovernor(RebootInfo, antConfigRow("ID"), Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 60 * 30) = True Then
+    '        AddToLogQueue("REBOOTING " & antConfigRow("Name"))
 
-            Select Case antConfigRow("Type")
-                Case "S1", "S3"
-                    wb.Navigate("http://" & antConfigRow("IP") & ":" & antConfigRow("HTTPPort") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
+    '        Select Case antConfigRow("Type")
+    '            Case "S1", "S3"
+    '                wb.Navigate("http://" & antConfigRow("IP") & ":" & antConfigRow("HTTPPort") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
 
-                Case "S2"
-                    wb.Navigate(String.Format("http://{0}:{1}@" & antConfigRow("IP") & ":" & antConfigRow("HTTPPort") & "/reboot.html", antConfigRow("WebUsername"), antConfigRow("WebPassword"), Nothing, Nothing, GetHeader))
+    '            Case "S2"
+    '                wb.Navigate(String.Format("http://{0}:{1}@" & antConfigRow("IP") & ":" & antConfigRow("HTTPPort") & "/reboot.html", antConfigRow("WebUsername"), antConfigRow("WebPassword"), Nothing, Nothing, GetHeader))
 
-            End Select
-        Else
-            AddToLogQueue("Need to reboot " & antConfigRow("Name") & " but it hasn't been long enough since last reboot")
-        End If
+    '        End Select
+    '    Else
+    '        AddToLogQueue("Need to reboot " & antConfigRow("Name") & " but it hasn't been long enough since last reboot")
+    '    End If
 
-    End Sub
+    'End Sub
 
     Private Sub wbFinished(ByRef wb As WebBrowser)
 
@@ -1329,8 +1488,8 @@ Public Class frmMain
 
     Private Sub TimerRefresh_Tick(sender As Object, e As System.EventArgs) Handles TimerRefresh.Tick
 
-        'Dim AntData As clsAntRefreshData
-        Dim antConfig As stAntConfig
+        'Dim AntData As clsMinerRefreshData
+        Dim antConfig As stMinerConfig
         Dim antConfigRow As DataRow
         Dim x As Integer
         Dim tsRebootTime, tsCompare As TimeSpan
@@ -1352,11 +1511,11 @@ Public Class frmMain
 
             If bRefresh = True AndAlso dRefreshTime.AddSeconds(iDisplayRefreshPeriod) < Now Then
                 bRefresh = False
-                Me.dataAnts.Refreshing = False
+                Me.dataMiners.Refreshing = False
 
-                Me.dataAnts.Refresh()
+                Me.dataMiners.Refresh()
             ElseIf bRefresh = False Then
-                Me.dataAnts.Refresh()
+                Me.dataMiners.Refresh()
             End If
 
             'watchdog timer of sorts of web browsers
@@ -1413,13 +1572,13 @@ Public Class frmMain
                     End If
 
                     'check each responding Ant 
-                    For Each dr As DataGridViewRow In Me.dataAnts.Rows
+                    For Each dr As DataGridViewRow In Me.dataMiners.Rows
                         bGoodToCheckReboot = False
                         bRebootAnt = False
 
                         If dr.Cells("Uptime").Value <> "???" AndAlso dr.Cells("Uptime").Value <> "ERROR" Then
                             'get antconfigrow
-                            antConfigRow = FindAntConfig(dr.Cells("ID").Value)
+                            antConfigRow = FindMinerConfig(dr.Cells("ID").Value)
 
                             s = dr.Cells("Uptime").Value.ToString.Split(" ")
 
@@ -1518,7 +1677,7 @@ Public Class frmMain
                             End If
 
                             If bRebootAnt = True Then
-                                Call RebootAnt(antConfigRow, False, YNtoBoolean(antConfigRow("RebootViaSSH")), Nothing)
+                                Call RebootMiner(antConfigRow, False, YNtoBoolean(antConfigRow("RebootViaSSH")), Nothing)
                             End If
                         End If
                     Next
@@ -1545,18 +1704,18 @@ Public Class frmMain
                 bRefresh = True
 
                 If bStarted = True Then
-                    Me.dataAnts.Refreshing = True
+                    Me.dataMiners.Refreshing = True
                 Else
                     bStarted = True
                 End If
 
-                For Each dr As DataRow In Me.dsAntConfig.Tables(0).Rows
+                For Each dr As DataRow In Me.dsMinerConfig.Tables(0).Rows
                     If dr("Active") = "Y" Then
                         If dr("UseAPI") = "Y" Then
-                            antConfig = GetAntConfigByConfigRow(dr)
+                            antConfig = GetMinerConfigByConfigRow(dr)
 
-                            SyncLock antsToCheckLock
-                                antsToCheckQueue.Enqueue(antConfig)
+                            SyncLock minersToCheckLock
+                                minersToCheckQueue.Enqueue(antConfig)
                             End SyncLock
                         Else
                             'wait for one of the 3 browsers to become available
@@ -1612,39 +1771,25 @@ Public Class frmMain
 
     End Sub
 
-    Private Function GetAntConfigByConfigRow(ByRef dr As DataRow) As stAntConfig
+    Private Function GetMinerConfigByConfigRow(ByRef dr As DataRow) As stMinerConfig
 
-        Dim antConfig As stAntConfig
+        Dim MinerConfig As stMinerConfig
 
-        antConfig = New stAntConfig
+        MinerConfig = New stMinerConfig
 
-        Select Case dr("Type")
-            Case "S1"
-                antConfig.AntType = enAntType.S1
+        MinerConfig.MinerType = Me.SupportedMinerInfo.GetMinerObjectByShortName(dr("Type")).MinerType
+        MinerConfig.sName = dr("Name")
+        MinerConfig.ID = dr("ID")
+        MinerConfig.sAPIPort = dr("APIPort")
+        MinerConfig.sHTTPPort = dr("HTTPPort")
+        MinerConfig.sIP = dr("IPAddress")
+        MinerConfig.sSSHPassword = dr("SSHPassword")
+        MinerConfig.sSSHPort = dr("SSHPort")
+        MinerConfig.sSSHUsername = dr("SSHUsername")
+        MinerConfig.sWebPassword = dr("WebPassword")
+        MinerConfig.sWebUsername = dr("WebUsername")
 
-            Case "S2"
-                antConfig.AntType = enAntType.S2
-
-            Case "S3"
-                antConfig.AntType = enAntType.S3
-
-            Case "C1"
-                antConfig.AntType = enAntType.C1
-
-        End Select
-
-        antConfig.sName = dr("Name")
-        antConfig.ID = dr("ID")
-        antConfig.sAPIPort = dr("APIPort")
-        antConfig.sHTTPPort = dr("HTTPPort")
-        antConfig.sIP = dr("IPAddress")
-        antConfig.sSSHPassword = dr("SSHPassword")
-        antConfig.sSSHPort = dr("SSHPort")
-        antConfig.sSSHUsername = dr("SSHUsername")
-        antConfig.sWebPassword = dr("WebPassword")
-        antConfig.sWebUsername = dr("WebUsername")
-
-        Return antConfig
+        Return MinerConfig
 
     End Function
 
@@ -1679,10 +1824,10 @@ Public Class frmMain
 
     'refresh by API
     'this runs on the UI thread
-    Private Sub RefreshGrid(ByRef AntData As clsAntRefreshData)
+    Private Sub RefreshGrid(ByRef MinerData As clsMinerRefreshData)
 
         'Dim bAntFound As Boolean
-        Dim AntConfig As DataRow
+        Dim MinerConfig As DataRow
         Dim dr As DataRow
         Dim j, jp1 As Newtonsoft.Json.Linq.JObject
         Dim ja As Newtonsoft.Json.Linq.JArray
@@ -1698,129 +1843,165 @@ Public Class frmMain
 
         sbTemp = New System.Text.StringBuilder
 
-        Debug.Print("Refreshing " & AntData.sAntIP)
+        Debug.Print("Refreshing " & MinerData.sAntIP)
 
         Try
-            dr = FindDisplayAntByID(AntData.ID)
+            dr = FindDisplayAntByID(MinerData.ID)
 
-            AntConfig = FindAntConfig(AntData.ID)
+            MinerConfig = FindMinerConfig(MinerData.ID)
 
-            'For Each dr In ds.Tables(0).Rows
-            '    If dr.Item("Name") = AntData.sAnt Then
-            '        bAntFound = True
-
-            '        Exit For
-            '    End If
-            'Next
-
-            'If bAntFound = False Then
-            '    dr = ds.Tables(0).NewRow
-            'End If
-
-            dr.Item("Name") = AntConfig("Name")
-            'dr.Item("IPAddress") = AntData.sAntIP
+            dr.Item("Name") = MinerConfig("Name")
 
             bStep = 1
 
-            j = Newtonsoft.Json.Linq.JObject.Parse(AntData.sStats)
+            '#If DEBUG Then
+            '            MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1418083020,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 3.12.0""}],""STATS"":[{""STATS"":0,""ID"":""BMM0"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":18,""frequency"":""225"",""voltage"":5,""hwv1"":7,""hwv2"":0,""hwv3"":0,""hwv4"":3,""fan_num"":2,""fan1"":1200,""fan2"":780,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":35,""temp2"":30,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":32,""temp_max"":38,""Device Hardware%"":0.0006,""no_matching_work"":13,""chain_acn1"":16,""chain_acn2"":16,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":65534,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooooo ooooooo- "",""chain_acs2"":""ooooo-oo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""},{""STATS"":1,""ID"":""POOL0"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15},{""STATS"":2,""ID"":""POOL1"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15}],""id"":1}", "}{", "},{")
+            '#End If
+
+            j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sStats)
 
             For Each ja In j.Property("STATS")
-                If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S2 OrElse AntData.AntType = enAntType.C1 Then
-                    If ja.Count = 4 Then
+                Select Case MinerData.MinerType
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                        If ja.Count = 4 Then
+                            jp1 = ja(0)
+                        Else
+                            jp1 = ja(1)
+                        End If
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
                         jp1 = ja(0)
-                    Else
-                        jp1 = ja(1)
-                    End If
-                Else
-                    jp1 = ja(0)
-                End If
 
-                ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
+                End Select
 
-                dr.Item("Uptime") = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
-                dr.Item("HWE%") = jp1.Value(Of String)("Device Hardware%") & "%"
+                Select Case MinerData.MinerType
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
 
-                dr.Item("HFan") = GetHighValue(jp1.Value(Of Integer)("fan1"), jp1.Value(Of Integer)("fan2"), jp1.Value(Of Integer)("fan3"), jp1.Value(Of Integer)("fan4"))
+                        ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
 
-                sbTemp.Clear()
+                        dr.Item("Uptime") = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
+                        dr.Item("HWE%") = jp1.Value(Of String)("Device Hardware%") & "%"
 
-                For x = 1 To jp1.Value(Of Integer)("fan_num")
-                    sbTemp.Append(jp1.Value(Of Integer)("fan" & x))
+                        dr.Item("HFan") = GetHighValue(jp1.Value(Of Integer)("fan1"), jp1.Value(Of Integer)("fan2"), jp1.Value(Of Integer)("fan3"), jp1.Value(Of Integer)("fan4"))
 
-                    If x <> jp1.Value(Of Integer)("fan_num") Then
-                        sbTemp.Append(" ")
-                    End If
-                Next
+                        sbTemp.Clear()
 
-                dr.Item("Fans") = sbTemp.ToString
+                        For x = 1 To jp1.Value(Of Integer)("fan_num")
+                            sbTemp.Append(jp1.Value(Of Integer)("fan" & x))
 
-                sbTemp.Clear()
+                            If x <> jp1.Value(Of Integer)("fan_num") Then
+                                sbTemp.Append(" ")
+                            End If
+                        Next
 
-                iTemp = 0
+                        dr.Item("Fans") = sbTemp.ToString
 
-                For x = 1 To jp1.Value(Of Integer)("temp_num")
-                    sbTemp.Append(jp1.Value(Of Integer)("temp" & x))
+                        sbTemp.Clear()
 
-                    If jp1.Value(Of Integer)("temp" & x) > iTemp Then
-                        iTemp = jp1.Value(Of Integer)("temp" & x)
-                    End If
+                        iTemp = 0
 
-                    If x <> jp1.Value(Of Integer)("temp_num") Then
-                        sbTemp.Append(" ")
-                    End If
-                Next
+                        For x = 1 To jp1.Value(Of Integer)("temp_num")
+                            sbTemp.Append(jp1.Value(Of Integer)("temp" & x))
 
-                dr.Item("HTemp") = iTemp
+                            If jp1.Value(Of Integer)("temp" & x) > iTemp Then
+                                iTemp = jp1.Value(Of Integer)("temp" & x)
+                            End If
 
-                dr.Item("Temps") = sbTemp.ToString
+                            If x <> jp1.Value(Of Integer)("temp_num") Then
+                                sbTemp.Append(" ")
+                            End If
+                        Next
 
-                dr.Item("Freq") = Val(jp1.Value(Of String)("frequency"))
+                        dr.Item("HTemp") = iTemp
 
-                count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
-                count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
+                        dr.Item("Temps") = sbTemp.ToString
 
-                If AntData.AntType = enAntType.S2 OrElse AntData.AntType = enAntType.C1 Then
-                    count(2) = HowManyInString(jp1.Value(Of String)("chain_acs3"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs3"), "x")
-                    count(3) = HowManyInString(jp1.Value(Of String)("chain_acs4"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs4"), "x")
+                        dr.Item("Freq") = Val(jp1.Value(Of String)("frequency"))
 
-                    If AntData.AntType = enAntType.S2 Then
-                        count(4) = HowManyInString(jp1.Value(Of String)("chain_acs5"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs5"), "x")
-                        count(5) = HowManyInString(jp1.Value(Of String)("chain_acs6"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs6"), "x")
-                        count(6) = HowManyInString(jp1.Value(Of String)("chain_acs7"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs7"), "x")
-                        count(7) = HowManyInString(jp1.Value(Of String)("chain_acs8"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs8"), "x")
-                        count(8) = HowManyInString(jp1.Value(Of String)("chain_acs9"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs9"), "x")
-                        count(9) = HowManyInString(jp1.Value(Of String)("chain_acs10"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs10"), "x")
-                    Else
-                        count(4) = 0
-                        count(5) = 0
-                        count(6) = 0
-                        count(7) = 0
-                        count(8) = 0
-                        count(9) = 0
-                    End If
-                Else
-                    count(2) = 0
-                    count(3) = 0
-                    count(4) = 0
-                    count(5) = 0
-                    count(6) = 0
-                    count(7) = 0
-                    count(8) = 0
-                    count(9) = 0
-                End If
+                        count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
+                        count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
 
-                dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
+                        If MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2 OrElse _
+                           MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1 OrElse _
+                           MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4 Then
 
-                Select Case AntData.AntType
-                    Case AntData.AntType = enAntType.S2
-                        dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
-                                        count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
+                            count(2) = HowManyInString(jp1.Value(Of String)("chain_acs3"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs3"), "x")
+                            count(3) = HowManyInString(jp1.Value(Of String)("chain_acs4"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs4"), "x")
 
-                    Case enAntType.C1
-                        dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X "
+                            If MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2 Then
+                                count(4) = HowManyInString(jp1.Value(Of String)("chain_acs5"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs5"), "x")
+                                count(5) = HowManyInString(jp1.Value(Of String)("chain_acs6"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs6"), "x")
+                                count(6) = HowManyInString(jp1.Value(Of String)("chain_acs7"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs7"), "x")
+                                count(7) = HowManyInString(jp1.Value(Of String)("chain_acs8"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs8"), "x")
+                                count(8) = HowManyInString(jp1.Value(Of String)("chain_acs9"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs9"), "x")
+                                count(9) = HowManyInString(jp1.Value(Of String)("chain_acs10"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs10"), "x")
+                            Else
+                                count(4) = 0
+                                count(5) = 0
+                                count(6) = 0
+                                count(7) = 0
+                                count(8) = 0
+                                count(9) = 0
+                            End If
+                        Else
+                            count(2) = 0
+                            count(3) = 0
+                            count(4) = 0
+                            count(5) = 0
+                            count(6) = 0
+                            count(7) = 0
+                            count(8) = 0
+                            count(9) = 0
+                        End If
 
-                    Case Else
-                        dr.Item("Status") = count(0) & "X " & count(1) & "X "
+                        dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
+
+                        Select Case MinerData.MinerType
+                            Case MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
+                                dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
+                                                count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
+
+                            Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                                dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X "
+
+                            Case Else
+                                dr.Item("Status") = count(0) & "X " & count(1) & "X "
+
+                        End Select
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                        ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
+
+                        dr.Item("Uptime") = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
+
+                        iTemp = 0
+
+                        count(0) = jp1.Value(Of Integer)("Temperature front")
+                        count(1) = jp1.Value(Of Integer)("Temperature rear top")
+                        count(2) = jp1.Value(Of Integer)("Temperature rear bot")
+
+                        If count(1) > count(0) Then
+                            If count(2) > count(1) Then
+                                iTemp = count(2)
+                            Else
+                                iTemp = count(1)
+                            End If
+                        Else
+                            iTemp = count(0)
+                        End If
+
+                        dr.Item("HTemp") = iTemp
+
+                        dr.Item("Temps") = count(0).ToString & " " & count(1).ToString & " " & count(2).ToString
+
+                        dr.Item("Freq") = DBNull.Value
+                        dr.Item("HFan") = DBNull.Value
+                        dr.Item("Fans") = ""
+                        dr.Item("XCount") = ""
+                        dr.Item("Status") = ""
 
                 End Select
 
@@ -1829,23 +2010,48 @@ Public Class frmMain
 
             bStep = 2
 
-            j = Newtonsoft.Json.Linq.JObject.Parse(AntData.sSummary)
+            '#If DEBUG Then
+            '            MinerData.sSummary = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":11,""Msg"":""Summary"",""Description"":""cgminer 4.6.1""}],""SUMMARY"":[{""Elapsed"":163672,""GHS 5s"":2251.62,""GHS av"":2188.60,""Found Blocks"":0,""Getworks"":17423,""Accepted"":39024,""Rejected"":1393,""Hardware Errors"":84,""Utility"":14.31,""Discarded"":190245,""Stale"":0,""Get Failures"":0,""Local Work"":111561705,""Remote Failures"":0,""Network Blocks"":263,""Total MH"":358211780173.0000,""Work Utility"":30574.35,""Difficulty Accepted"":79921152.00000000,""Difficulty Rejected"":2852864.00000000,""Difficulty Stale"":0.00000000,""Best Share"":0,""Device Hardware%"":0.0001,""Device Rejected%"":3.4206,""Pool Rejected%"":3.4466,""Pool Stale%"":0.0000,""Last getwork"":1418065090}],""id"":1}"
+            '#End If
+            j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sSummary)
 
             For Each ja In j.Property("SUMMARY")
-                For Each jp1 In ja
-                    dr.Item("GH/s(5s)") = Val(jp1.Value(Of String)("GHS 5s"))
-                    dr.Item("GH/s(avg)") = Val(jp1.Value(Of String)("GHS av"))
+                Select Case MinerData.MinerType
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
 
-                    dr.Item("Rej%") = jp1.Value(Of String)("Pool Rejected%")
-                    dr.Item("Stale%") = Format(jp1.Value(Of Integer)("Stale") / (jp1.Value(Of Integer)("Accepted") + jp1.Value(Of Integer)("Stale")) * 100, "##0.###")
+                        For Each jp1 In ja
+                            dr.Item("GH/s(5s)") = Val(jp1.Value(Of String)("GHS 5s"))
+                            dr.Item("GH/s(avg)") = Val(jp1.Value(Of String)("GHS av"))
 
-                    dr.Item("Blocks") = jp1.Value(Of String)("Found Blocks")
-                Next
+                            dr.Item("Rej%") = jp1.Value(Of String)("Pool Rejected%")
+                            dr.Item("Stale%") = Format(jp1.Value(Of Integer)("Stale") / (jp1.Value(Of Integer)("Accepted") + jp1.Value(Of Integer)("Stale")) * 100, "##0.###")
+
+                            dr.Item("Blocks") = jp1.Value(Of String)("Found Blocks")
+                        Next
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                        For Each jp1 In ja
+                            dr.Item("HWE%") = jp1.Value(Of String)("Device Hardware%") & "%"
+
+                            dr.Item("GH/s(5s)") = Val(Format(Val(jp1.Value(Of String)("MHS 5s")) / 1000, "#.##"))
+                            dr.Item("GH/s(avg)") = Val(Format(Val(jp1.Value(Of String)("MHS av")) / 1000, "#.##"))
+
+                            dr.Item("Rej%") = jp1.Value(Of String)("Pool Rejected%")
+                            dr.Item("Stale%") = jp1.Value(Of String)("Pool Stale%")
+
+                            dr.Item("Blocks") = jp1.Value(Of String)("Found Blocks")
+                        Next
+                End Select
             Next
 
             bStep = 3
 
-            j = Newtonsoft.Json.Linq.JObject.Parse(AntData.sPools)
+            '#If DEBUG Then
+            '            MinerData.sPools = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":7,""Msg"":""3 Pool(s)"",""Description"":""cgminer 4.6.1""}],""POOLS"":[{""POOL"":0,""URL"":""stratum+tcp://pool.com:3335"",""Status"":""Alive"",""Priority"":0,""Quota"":1,""Long Poll"":""N"",""Getworks"":17420,""Accepted"":39023,""Rejected"":1393,""Discarded"":190245,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""0:00:03"",""Diff"":""2.05K"",""Diff1 Shares"":83402560,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":79919104.00000000,""Difficulty Rejected"":2852864.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":2048.00000000,""Has Stratum"":true,""Stratum Active"":true,""Stratum URL"":""pool.com"",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":3.4467,""Pool Stale%"":0.0000},{""POOL"":1,""URL"":""stratum+tcp://pool.com:3335"",""Status"":""Alive"",""Priority"":1,""Quota"":1,""Long Poll"":""N"",""Getworks"":1,""Accepted"":1,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""45:27:53"",""Diff"":""2.05K"",""Diff1 Shares"":128,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":2048.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":2048.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000},{""POOL"":2,""URL"":""stratum+tcp://pool.com:3333"",""Status"":""Alive"",""Priority"":2,""Quota"":1,""Long Poll"":""N"",""Getworks"":2,""Accepted"":0,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""0"",""Diff"":""16"",""Diff1 Shares"":0,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":0.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":0.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000}],""id"":1}"
+            '#End If
+            j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sPools)
 
             dBestShare = 0
 
@@ -1862,36 +2068,75 @@ Public Class frmMain
 
             For Each ja In j.Property("POOLS")
                 For Each jp1 In ja
-                    If jp1.Value(Of Double)("Best Share") > dBestShare Then
-                        dBestShare = jp1.Value(Of Double)("Best Share")
-                    End If
+                    Select Case MinerData.MinerType
+                        Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, _
+                             clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, _
+                             clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
 
-                    Select Case jp1.Value(Of String)("Status")
-                        Case "Alive"
-                            If sbTemp.ToString.Contains("U") = False Then
-                                dr.Item("Diff") = Format(jp1.Value(Of Double)("Last Share Difficulty"), "#,###,###")
+                            If jp1.Value(Of Double)("Best Share") > dBestShare Then
+                                dBestShare = jp1.Value(Of Double)("Best Share")
                             End If
 
-                            sbTemp.Append("U")
+                            Select Case jp1.Value(Of String)("Status")
+                                Case "Alive"
+                                    If sbTemp.ToString.Contains("U") = False Then
+                                        dr.Item("Diff") = Format(jp1.Value(Of Double)("Last Share Difficulty"), "#,###,###")
+                                    End If
 
-                        Case "Dead"
-                            sbTemp.Append("D")
+                                    sbTemp.Append("U")
 
-                        Case Else
-                            sbTemp.Append("U")
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                                Case Else
+                                    sbTemp.Append("U")
+
+                            End Select
+
+                            If sbTemp2.Length <> 0 Then
+                                sbTemp2.Append(vbCrLf)
+                            End If
+
+                            sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
+
+                            pd.URL = jp1.Value(Of String)("URL")
+                            pd.UID = jp1.Value(Of String)("User")
+
+                            pdl.Add(pd)
+
+                        Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                            If jp1.Value(Of Double)("Best Share") > dBestShare Then
+                                dBestShare = jp1.Value(Of Double)("Best Share")
+                            End If
+
+                            Select Case jp1.Value(Of String)("Status")
+                                Case "Alive"
+                                    If sbTemp.ToString.Contains("U") = False Then
+                                        dr.Item("Diff") = Format(jp1.Value(Of Double)("Last Share Difficulty"), "#,###,###")
+                                    End If
+
+                                    sbTemp.Append("U")
+
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                                Case Else
+                                    sbTemp.Append("U")
+
+                            End Select
+
+                            If sbTemp2.Length <> 0 Then
+                                sbTemp2.Append(vbCrLf)
+                            End If
+
+                            sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
+
+                            pd.URL = jp1.Value(Of String)("URL")
+                            pd.UID = jp1.Value(Of String)("User")
+
+                            pdl.Add(pd)
 
                     End Select
-
-                    If sbTemp2.Length <> 0 Then
-                        sbTemp2.Append(vbCrLf)
-                    End If
-
-                    sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
-
-                    pd.URL = jp1.Value(Of String)("URL")
-                    pd.UID = jp1.Value(Of String)("User")
-
-                    pdl.Add(pd)
                 Next
 
                 Exit For
@@ -1902,86 +2147,76 @@ Public Class frmMain
             dr.Item("PoolData") = sbTemp2.ToString
 
             If dr("ID") = -1 Then
-                dr("ID") = AntConfig("ID")
+                dr("ID") = MinerConfig("ID")
 
                 ds.Tables(0).Rows.Add(dr)
             End If
 
-            Call HandleAlerts(dr, AntConfig, Nothing)
+            Call HandleAlerts(dr, MinerConfig, Nothing)
 
             Call RefreshTitle()
         Catch ex As Exception When bErrorHandle = True
             dr.Item("Uptime") = "ERROR"
 
-            AddToLogQueue("ERROR when querying " & AntConfig("Name") & " (step " & bStep & "): " & ex.Message)
+            AddToLogQueue("ERROR when querying " & MinerConfig("Name") & " (step " & bStep & "): " & ex.Message)
 
             If Me.chkRebootAntOnError.Checked = True Then
-                AddToLogQueue("Attempting to reboot " & AntConfig("Name") & " via the web because the API query errored out.")
+                AddToLogQueue("Attempting to reboot " & MinerConfig("Name") & " via the web because the API query errored out.")
 
-                Call RebootAnt(AntConfig, False, YNtoBoolean(AntConfig("RebootViaSSH")), Nothing)
+                Call RebootMiner(MinerConfig, False, YNtoBoolean(MinerConfig("RebootViaSSH")), Nothing)
             End If
         End Try
 
     End Sub
 
-    ''initiates refresh via the browser controls
-    'Private Sub RefreshGrid(ByRef AntConfigRow As DataRow)
-
-
-    'End Sub
-
     'this is what does the work to get the data from the Ants via the API
     'it then passes it back to the UI thread for display
-    Private Sub GetAntDataViaAPI(ByRef AntToCheck As stAntConfig)
+    Private Sub GetMinerDataViaAPI(ByRef MinerToCheck As stMinerConfig)
 
         Dim sTemp As String
         Dim x As Integer
         Dim bStep As Byte
         'Dim s() As String
-        Dim AntData As clsAntRefreshData
+        Dim MinerData As clsMinerRefreshData
 
-        AntData = New clsAntRefreshData
+        MinerData = New clsMinerRefreshData
 
         If bShutDown = True Then Exit Sub
 
         Try
-            AntData.AntType = AntToCheck.AntType
-            
+            MinerData.MinerType = MinerToCheck.MinerType
+
             bStep = 1
 
-            sTemp = GetIPData(AntToCheck.sIP, AntToCheck.sAPIPort, "stats")
+            sTemp = GetIPData(MinerToCheck.sIP, MinerToCheck.sAPIPort, "stats")
 
-            'If AntData.AntType = enAntType.S3 OrElse AntData.AntType = enAntType.S1 Then
             'fix mangled JSON
             x = InStr(sTemp, "}{")
 
             If x <> 0 Then
-                AntData.sStats = sTemp.Insert(x, ",")
+                MinerData.sStats = sTemp.Insert(x, ",")
             Else
-                AntData.sStats = sTemp
+                MinerData.sStats = sTemp
             End If
-            '          Else
-            '            AntData.sStats = sTemp
-            '           End If
 
             bStep = 2
 
-            AntData.sSummary = GetIPData(AntToCheck.sIP, AntToCheck.sAPIPort, "summary")
+            MinerData.sSummary = GetIPData(MinerToCheck.sIP, MinerToCheck.sAPIPort, "summary")
 
             bStep = 3
 
-            AntData.sPools = GetIPData(AntToCheck.sIP, AntToCheck.sAPIPort, "pools")
+            MinerData.sPools = GetIPData(MinerToCheck.sIP, MinerToCheck.sAPIPort, "pools")
 
-            AntData.ID = AntToCheck.ID
+            MinerData.ID = MinerToCheck.ID
         Catch ex As Exception
-            AntData.bError = True
-            AntData.ex = ex
+            MinerData.bError = True
+            MinerData.ex = ex
 
-            AddToLogQueue("ERROR when querying " & AntToCheck.sIP & " (step " & bStep & "): " & ex.Message)
+            AddToLogQueue("ERROR when querying " & MinerToCheck.sIP & " (step " & bStep & "): " & ex.Message)
         End Try
 
-        SyncLock AntRefreshLock
-            AntRefreshDataQueue.Enqueue(AntData)
+        SyncLock MinerRefreshLock
+            MinerRefreshDataQueue.Enqueue(MinerData)
         End SyncLock
 
     End Sub
@@ -1997,7 +2232,7 @@ Public Class frmMain
 
         'alert logic
         Try
-            For Each dr In Me.dataAnts.Rows
+            For Each dr In Me.dataMiners.Rows
                 If dr.Cells("ID").Value.ToString = drAnt.Item("ID").ToString Then
                     bFound = True
 
@@ -2084,9 +2319,9 @@ Public Class frmMain
 
                                     If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2109,9 +2344,9 @@ Public Class frmMain
                                     'use SSH only if using the API, as the web code has its own reboot logic
                                     If Me.chkAlertRebootIfXd.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2181,9 +2416,9 @@ Public Class frmMain
 
                                     If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2206,9 +2441,9 @@ Public Class frmMain
                                     'use SSH only if using the API, as the web code has its own reboot logic
                                     If Me.chkAlertRebootIfXd.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2277,9 +2512,9 @@ Public Class frmMain
 
                                     If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2302,9 +2537,105 @@ Public Class frmMain
                                     'use SSH only if using the API, as the web code has its own reboot logic
                                     If Me.chkAlertRebootIfXd.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                    Case "S4"
+                        If Me.chkAlertIfS4Temp.Checked = True Then
+                            bStep = 1
+
+                            x = Val(Me.txtAlertS4Temp.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S4 Temp Alert")
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfS4FanHigh.Checked = True Then
+                            bStep = 2
+
+                            x = Val(Me.txtAlertS4FanHigh.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S4 Fan Alert")
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfS4FanLow.Checked = True Then
+                            bStep = 3
+
+                            x = Val(Me.txtAlertS4FanLow.Text)
+
+                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                                iAntAlertCount += 1
+
+                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S4 Fan Alert")
+                            End If
+                        End If
+
+                        If Me.chkAlertIfS4Hash.Checked = True Then
+                            bStep = 4
+
+                            x = Val(Me.txtAlertS4Hash.Text)
+
+                            If x > 0 Then
+                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S4 Hash Alert")
+
+                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                                        If drAntConfig("RebootViaSSH") = "Y" Then
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
+                                        Else
+                                            Call RebootMiner(drAntConfig, False, False, wb)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfS4XCount.Checked = True Then
+                            bStep = 5
+
+                            x = Val(Me.txtAlertS4XCount.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S4 XCount Alert")
+
+                                    'use SSH only if using the API, as the web code has its own reboot logic
+                                    If Me.chkAlertRebootIfXd.Checked = True Then
+                                        If drAntConfig("RebootViaSSH") = "Y" Then
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
+                                        Else
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2373,9 +2704,9 @@ Public Class frmMain
 
                                     If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2398,9 +2729,50 @@ Public Class frmMain
                                     'use SSH only if using the API, as the web code has its own reboot logic
                                     If Me.chkAlertRebootIfXd.Checked = True Then
                                         If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootAnt(drAntConfig, False, True, Nothing)
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
                                         Else
-                                            Call RebootAnt(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drAntConfig, False, False, wb)
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                    Case "SP"
+                        If Me.chkAlertIfSPTemp.Checked = True Then
+                            bStep = 1
+
+                            x = Val(Me.txtAlertSPTemp.Text)
+
+                            If x > 0 Then
+                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "SP Temp Alert")
+                                End If
+                            End If
+                        End If
+
+                        If Me.chkAlertIfSPHash.Checked = True Then
+                            bStep = 4
+
+                            x = Val(Me.txtAlertSPHash.Text)
+
+                            If x > 0 Then
+                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                                    iAntAlertCount += 1
+
+                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "SP Hash Alert")
+
+                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                                        If drAntConfig("RebootViaSSH") = "Y" Then
+                                            Call RebootMiner(drAntConfig, False, True, Nothing)
+                                        Else
+                                            Call RebootMiner(drAntConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
@@ -2427,7 +2799,7 @@ Public Class frmMain
 
             iAlertCount = 0
 
-            For Each dr In Me.dataAnts.Rows
+            For Each dr In Me.dataMiners.Rows
                 If IsDBNull(dr.Cells("Uptime").Value) = False AndAlso dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
                     iAlertCount += dr.Cells("ACount").Value
                 End If
@@ -2445,14 +2817,14 @@ Public Class frmMain
     End Sub
 
     ''' <summary>
-    ''' Returns the seconds value of a drop down/text box combo for a governor rate
+    ''' Return s the seconds value of a drop down/text box combo for a governor rate
     ''' </summary>
     ''' <param name="dictList">The dictionary the data is in</param>
     ''' <param name="sKey">The key to search for in the dictionary</param>
     ''' <param name="cmbValueType">Seconds, Minutes, Hours, Days</param>
     ''' <param name="txtValue">Actual value, ie, 60</param>
     ''' <param name="iDefault">Which value to use if the end result is zero</param>
-    ''' <returns>True if the action needs to be performed</returns>
+    ''' <Return s>True if the action needs to be performed</Return s>
     ''' <remarks>Will update the dictionary as necessary</remarks>
     Private Function TryGovernor(ByRef dictList As Dictionary(Of String, Date), ByVal sKey As String, ByVal cmbValueType As ComboBox, ByVal txtValue As TextBox, ByVal iDefault As Integer) As Boolean
 
@@ -2495,28 +2867,28 @@ Public Class frmMain
     End Function
 
     'called by any routine to attempt to reboot an Ant, based on the governor
-    Private Sub RebootAnt(ByRef AntConfigRow As DataRow, ByVal bRebootNow As Boolean, ByVal bUseSSH As Boolean, ByRef wbToUse As WebBrowser)
+    Private Sub RebootMiner(ByRef MinerConfigRow As DataRow, ByVal bRebootNow As Boolean, ByVal bUseSSH As Boolean, ByRef wbToUse As WebBrowser)
 
         Dim t As Threading.Thread
         Dim x As Integer
 
-        If TryGovernor(RebootInfo, AntConfigRow("ID"), Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 30 * 60) = True Then
+        If TryGovernor(RebootInfo, MinerConfigRow("ID"), Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 30 * 60) = True Then
             bRebootNow = True
         Else
             If bRebootNow = False Then
-                AddToLogQueue("Need to reboot " & AntConfigRow("Name") & " but it hasn't been long enough since last reboot")
+                AddToLogQueue("Need to reboot " & MinerConfigRow("Name") & " but it hasn't been long enough since last reboot")
             End If
         End If
 
         If bRebootNow = True Then
             If bUseSSH = True Then
-                t = New Threading.Thread(AddressOf Me._RebootAntBySSH)
+                t = New Threading.Thread(AddressOf Me._RebootMinerBySSH)
 
-                AddToLogQueue("REBOOTING " & AntConfigRow("Name") & " via SSH")
+                AddToLogQueue("REBOOTING " & MinerConfigRow("Name") & " via SSH")
 
-                t.Start(GetAntConfigByConfigRow(AntConfigRow))
+                t.Start(GetMinerConfigByConfigRow(MinerConfigRow))
             Else
-                AddToLogQueue("REBOOTING " & AntConfigRow("Name") & " via Web")
+                AddToLogQueue("REBOOTING " & MinerConfigRow("Name") & " via Web")
 
                 If wbToUse Is Nothing Then
                     While wbData(0).IsBusy = True AndAlso wbData(1).IsBusy = True AndAlso wbData(2).IsBusy = True
@@ -2524,8 +2896,6 @@ Public Class frmMain
                     End While
 
                     'browser logic
-                    'Call GetWebCredentials(AntData.sAnt, sWebUN, sWebPW)
-
                     If wbData(0).IsBusy = False Then
                         x = 0
                     ElseIf wbData(1).IsBusy = False Then
@@ -2541,16 +2911,16 @@ Public Class frmMain
                         wbData(x).StartTime = Now
 
                         wbToUse = wb(x)
-                        wbToUse.Tag = AntConfigRow
+                        wbToUse.Tag = MinerConfigRow
                     End If
                 End If
 
-                Select Case AntConfigRow("Type")
+                Select Case MinerConfigRow("Type")
                     Case "S1", "S3"
-                        wbToUse.Navigate("http://" & AntConfigRow("IPAddress") & ":" & AntConfigRow("HTTPPort") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
+                        wbToUse.Navigate("http://" & MinerConfigRow("IPAddress") & ":" & MinerConfigRow("HTTPPort") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
 
-                    Case "S2"
-                        wbToUse.Navigate(String.Format("http://{0}:{1}@" & AntConfigRow("IPAddress") & ":" & AntConfigRow("HTTPPort") & "/reboot.html", AntConfigRow("WebUsername"), AntConfigRow("WebPassword"), Nothing, Nothing, GetHeader))
+                    Case "S2", "S4"
+                        wbToUse.Navigate(String.Format("http://{0}:{1}@" & MinerConfigRow("IPAddress") & ":" & MinerConfigRow("HTTPPort") & "/reboot.html", MinerConfigRow("WebUsername"), MinerConfigRow("WebPassword"), Nothing, Nothing, GetHeader))
 
                 End Select
             End If
@@ -2559,7 +2929,7 @@ Public Class frmMain
     End Sub
 
     'does the actual rebooting on a separate thread
-    Private Sub _RebootAntBySSH(ByVal AntConfig As stAntConfig)
+    Private Sub _RebootMinerBySSH(ByVal MinerConfig As stMinerConfig)
 
         Dim ssh As Renci.SshNet.SshClient
         Dim sshCommand As Renci.SshNet.SshCommand
@@ -2570,16 +2940,16 @@ Public Class frmMain
 
             'Call GetSSHCredentials(sAnt, sUN, sPW)
 
-            ssh = New Renci.SshNet.SshClient(AntConfig.sIP, AntConfig.sSSHPort, AntConfig.sSSHUsername, AntConfig.sSSHPassword)
+            ssh = New Renci.SshNet.SshClient(MinerConfig.sIP, MinerConfig.sSSHPort, MinerConfig.sSSHUsername, MinerConfig.sSSHPassword)
             ssh.Connect()
 
             sshCommand = ssh.CreateCommand("/sbin/reboot")
             sshCommand.Execute()
 
             If sshCommand.Error.IsNullOrEmpty = False Then
-                AddToLogQueue("Reboot of " & AntConfig.sName & " appears to have failed: " & sshCommand.Error)
+                AddToLogQueue("Reboot of " & MinerConfig.sName & " appears to have failed: " & sshCommand.Error)
             Else
-                AddToLogQueue("Reboot of " & AntConfig.sName & " appears to have succeeded")
+                AddToLogQueue("Reboot of " & MinerConfig.sName & " appears to have succeeded")
             End If
 
             ssh.Disconnect()
@@ -2587,7 +2957,7 @@ Public Class frmMain
 
             sshCommand.Dispose()
         Catch ex As Exception
-            AddToLogQueue("Reboot of " & AntConfig.sName & " FAILED: " & ex.Message)
+            AddToLogQueue("Reboot of " & MinerConfig.sName & " FAILED: " & ex.Message)
         End Try
 
     End Sub
@@ -2653,6 +3023,20 @@ Public Class frmMain
     Private Sub GetIPDataOnOtherThread()
 
         sIPDataResponse = GetIPData(sIPToCheck, "4028", "stats")
+
+    End Sub
+
+    Private Sub GetInfoDataOnOtherThread()
+
+        Dim s, s1, s2 As String
+
+        s = GetIPData(sIPToGetInfo, "4028", "stats")
+        s1 = GetIPData(sIPToGetInfo, "4028", "pools")
+        s2 = GetIPData(sIPToGetInfo, "4028", "summary")
+
+        listOfGetInfoResponse.Add(s)
+        listOfGetInfoResponse.Add(s1)
+        listOfGetInfoResponse.Add(s2)
 
     End Sub
 
@@ -2783,8 +3167,8 @@ Public Class frmMain
         Dim dStart As Date
         Dim j, jp1 As Newtonsoft.Json.Linq.JObject
         Dim ja As Newtonsoft.Json.Linq.JArray
-        Dim AntType As enAntType
-        Dim sAnt As String
+        Dim MinerType As clsSupportedMinerInfo.enSupportedMinerTypes
+        Dim sMiner As String
         Dim bFound As Boolean
 
         Static bStopRequested As Boolean
@@ -2834,50 +3218,65 @@ Public Class frmMain
                         Try
                             'y = InStr(sIPDataResponse, """Type"":""S3""}{""STATS")
 
-                            x = InStr(sIPDataResponse, "}{")
+                            '#If DEBUG Then
+                            'sIPDataResponse = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.6.1""}],""STATS"":[{""CGMiner"":""4.6.1"",""Miner"":""3.4.3.0"",""CompileTime"":"""",""Type"":""""}{""STATS"":0,""ID"":""BTM0"",""Elapsed"":163672,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":2251.62,""GHS av"":2188.60,""baud"":115200,""miner_count"":4,""asic_count"":8,""timeout"":7,""frequency"":""218.75"",""voltage"":""0.725"",""hwv1"":3,""hwv2"":4,""hwv3"":3,""hwv4"":0,""fan_num"":4,""fan1"":3960,""fan2"":3960,""fan3"":3840,""fan4"":3840,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":4,""temp1"":51,""temp2"":52,""temp3"":52,""temp4"":49,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":51,""temp_max"":52,""Device Hardware%"":0.0001,""no_matching_work"":84,""chain_acn1"":40,""chain_acn2"":40,""chain_acn3"":40,""chain_acn4"":40,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":0,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs2"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs3"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs4"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}"
+                            '#End If
 
-                            If x <> 0 Then
-                                sIPDataResponse = sIPDataResponse.Insert(x, ",")
+                            y = InStr(sIPDataResponse, "}{")
+
+                            If y <> 0 Then
+                                sIPDataResponse = sIPDataResponse.Insert(y, ",")
                             End If
 
                             j = Newtonsoft.Json.Linq.JObject.Parse(sIPDataResponse)
 
-                            AntType = 0
+                            MinerType = 0
 
                             For Each ja In j.Property("STATS")
                                 jp1 = ja(0)
 
                                 Select Case jp1.Value(Of String)("ID")
                                     Case "BTM0"
-                                        'could be S2 or C1
+                                        'could be S2, C1, or S4
                                         Select Case HowManyInString(jp1.Value(Of String)("chain_acs1"), " ")
                                             Case 8
-                                                AntType = enAntType.S2
+                                                MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
 
-                                                sAnt = "S2: " & sIPToCheck
+                                                sMiner = SupportedMinerInfo.AntMinerS2.ShortName & ": " & sIPToCheck
 
                                             Case 2
-                                                AntType = enAntType.C1
+                                                MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1
 
-                                                sAnt = "C1: " & sIPToCheck
+                                                sMiner = SupportedMinerInfo.AntMinerC1.ShortName & ": " & sIPToCheck
+
+                                            Case 6
+                                                MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+
+                                                sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
 
                                         End Select
 
                                     Case "BMM0"
                                         'probably S3
                                         If HowManyInString(jp1.Value(Of String)("chain_acs1"), " ") = 1 Then
-                                            AntType = enAntType.S3
+                                            MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3
 
-                                            sAnt = "S3: " & sIPToCheck
+                                            sMiner = SupportedMinerInfo.AntMinerS3.ShortName & ": " & sIPToCheck
                                         End If
 
                                     Case "ANT0"
                                         'probably S1
                                         If HowManyInString(jp1.Value(Of String)("chain_acs1"), " ") = 3 Then
-                                            AntType = enAntType.S1
+                                            MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1
 
-                                            sAnt = "S1: " & sIPToCheck
+                                            sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
                                         End If
+
+                                    Case "S300"
+                                        'Spondoolie of some sort
+                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+
+                                        sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
 
                                     Case ""
                                         'might be an S3 on second node of the array
@@ -2885,42 +3284,47 @@ Public Class frmMain
 
                                         Select Case jp1.Value(Of String)("ID")
                                             Case "BTM0"
-                                                'could be S2 or C1
+                                                'could be S2, S4 or C1
                                                 Select Case HowManyInString(jp1.Value(Of String)("chain_acs1"), " ")
                                                     Case 8
-                                                        AntType = enAntType.S2
+                                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
 
-                                                        sAnt = "S2: " & sIPToCheck
+                                                        sMiner = SupportedMinerInfo.AntMinerS2.ShortName & ": " & sIPToCheck
 
                                                     Case 2
-                                                        AntType = enAntType.C1
+                                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1
 
-                                                        sAnt = "C1: " & sIPToCheck
+                                                        sMiner = SupportedMinerInfo.AntMinerC1.ShortName & ": " & sIPToCheck
+
+                                                    Case 6
+                                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+
+                                                        sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
 
                                                 End Select
 
                                             Case "BMM0"
                                                 'probably S3
                                                 If HowManyInString(jp1.Value(Of String)("chain_acs1"), " ") = 2 Then
-                                                    AntType = enAntType.S3
+                                                    MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3
 
-                                                    sAnt = "S3: " & sIPToCheck
+                                                    sMiner = SupportedMinerInfo.AntMinerS3.ShortName & ": " & sIPToCheck
                                                 End If
 
                                             Case "ANT0"
                                                 'probably S1
                                                 If HowManyInString(jp1.Value(Of String)("chain_acs1"), " ") = 3 Then
-                                                    AntType = enAntType.S1
+                                                    MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1
 
-                                                    sAnt = "S1: " & sIPToCheck
+                                                    sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
                                                 End If
 
                                         End Select
                                 End Select
                             Next
 
-                            If AntType <> 0 Then
-                                For Each dr As DataRow In Me.dsAntConfig.Tables(0).Rows
+                            If MinerType <> 0 Then
+                                For Each dr As DataRow In Me.dsMinerConfig.Tables(0).Rows
                                     If dr("IPAddress") = sIPToCheck Then
                                         bFound = True
 
@@ -2934,42 +3338,31 @@ Public Class frmMain
 
                                     Me.txtAntSSHUsername.Text = "root"
 
-                                    Select Case AntType
-                                        Case enAntType.S1, enAntType.S3
+                                    Select Case MinerType
+                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3
                                             Me.txtAntSSHPassword.Text = "root"
+                                            Me.txtAntWebPassword.Text = "root"
+                                            Me.txtAntWebUsername.Text = "root"
 
-                                        Case enAntType.S2, enAntType.C1
+                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, _
+                                             clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
                                             Me.txtAntSSHPassword.Text = "admin"
+                                            Me.txtAntWebPassword.Text = "root"
+                                            Me.txtAntWebUsername.Text = "root"
+
+                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                                            Me.txtAntWebPassword.Text = ""
+                                            Me.txtAntWebUsername.Text = ""
+                                            Me.txtAntSSHUsername.Text = ""
+                                            Me.txtAntSSHPassword.Text = ""
 
                                     End Select
 
-                                    Me.txtAntWebPassword.Text = "root"
-                                    Me.txtAntWebUsername.Text = "root"
+                                    Me.cmbMinerType.Text = SupportedMinerInfo.GetMinerObjectByType(MinerType).LongName
 
-                                    Select Case AntType
-                                        Case enAntType.S1
-                                            Me.optAntS1.Checked = True
+                                    AddToLogQueue(Me.cmbMinerType.Text & " found at " & sIPToCheck & "!")
 
-                                            AddToLogQueue("S1 found at " & sIPToCheck & "!")
-
-                                        Case enAntType.S2
-                                            Me.optAntS2.Checked = True
-
-                                            AddToLogQueue("S2 found at " & sIPToCheck & "!")
-
-                                        Case enAntType.S3
-                                            Me.optAntS3.Checked = True
-
-                                            AddToLogQueue("S3 found at " & sIPToCheck & "!")
-
-                                        Case enAntType.C1
-                                            Me.optAntC1.Checked = True
-
-                                            AddToLogQueue("C1 found at " & sIPToCheck & "!")
-
-                                    End Select
-
-                                    Call AddOrSaveAntLogic(True, -1)
+                                    Call AddOrSaveMinerLogic(True, -1)
                                 End If
                             End If
                         Catch ex As Exception
@@ -2978,67 +3371,7 @@ Public Class frmMain
                     End If
                 Next
 
-                'sLocalNet = Me.cmbLocalIPs.Text.Substring(0, Microsoft.VisualBasic.InStrRev(Me.cmbLocalIPs.Text, "."))
-
-                '    wc = New eWebClient
-                '    wc.Credentials = New System.Net.NetworkCredential(Me.txtWebUsername.Text, Me.txtWebPassword.Text)
-
-                '    Me.cmdScan.Text = "STOP!"
-
-                '    Me.ProgressBar1.Minimum = 1
-                '    Me.ProgressBar1.Maximum = 254
-                '    Me.ProgressBar1.Visible = True
-                '    My.Application.DoEvents()
-
-                '    For x = 1 To 255
-                '        If bStopRequested = True Then
-                '            bStopRequested = False
-
-                '            Me.cmdScan.Text = "Scan"
-
-                '            Exit For
-                '        End If
-
-                '        Me.ProgressBar1.Value = x
-                '        Me.ToolTip1.SetToolTip(Me.ProgressBar1, sLocalNet & x.ToString)
-
-                '        If sLocalNet & x.ToString <> Me.cmbLocalIPs.Text Then
-                '            Try
-                '                Debug.Print(x)
-
-                '                My.Application.DoEvents()
-
-                '                sResponse = wc.DownloadString("http://" & sLocalNet & x.ToString)
-
-                '                If sResponse.Contains("href=""/cgi-bin/luci"">LuCI - Lua Configuration Interface</a>") = True Then
-                '                    wc.DownloadFile("http://" & sLocalNet & x.ToString & "/luci-static/resources/icons/antminer_logo.png", My.Computer.FileSystem.SpecialDirectories.Temp & "\ant.png")
-
-                '                    My.Computer.FileSystem.DeleteFile(My.Computer.FileSystem.SpecialDirectories.Temp & "\ant.png")
-
-                '                    Me.chklstAnts.SetItemChecked("S1: " & Me.chklstAnts.Items.Add(sLocalNet & x.ToString), True)
-
-                '                    AddToLogQueue("S1 found at " & sLocalNet & x.ToString & "!")
-
-                '                    My.Application.DoEvents()
-                '                End If
-
-                '                If sResponse.Contains("<tr><td width=""33%"">Miner Type</td><td id=""ant_minertype""></td></tr>") Then
-                '                    wc.DownloadFile("http://" & sLocalNet & x.ToString & "/images/antminer_logo.png", My.Computer.FileSystem.SpecialDirectories.Temp & "\ant.png")
-
-                '                    My.Computer.FileSystem.DeleteFile(My.Computer.FileSystem.SpecialDirectories.Temp & "\ant.png")
-
-                '                    Me.chklstAnts.SetItemChecked("S2: " & Me.chklstAnts.Items.Add(sLocalNet & x.ToString), True)
-
-                '                    Call AddToLogQueue("S2 found at " & sLocalNet & x.ToString & "!")
-
-                '                    My.Application.DoEvents()
-                '                End If
-
-                '                Debug.Print(sResponse)
-                '            Catch ex As Exception
-                '            End Try
-                '        End If
-                '    Next
+                bStopRequested = False
             Else
                 bStopRequested = True
             End If
@@ -3050,7 +3383,6 @@ Public Class frmMain
             Me.cmdScan.Enabled = True
             Me.Cursor = Cursors.Default
             Me.cmdScan.Text = "Scan"
-            'Me.lblScanning.Visible = False
         End Try
 
     End Sub
@@ -3065,7 +3397,7 @@ Public Class frmMain
     '        w = MyBase.GetWebRequest(address)
     '        w.Timeout = 5000
 
-    '        Return w
+    '        Return  w
     '    End Function
 
     'End Class
@@ -3121,7 +3453,7 @@ Public Class frmMain
 
     Private Sub cmdAddAnt_Click(sender As Object, e As System.EventArgs) Handles cmdAddAnt.Click
 
-        Call AddOrSaveAntLogic(True, -1)
+        Call AddOrSaveMinerLogic(True, -1)
 
     End Sub
 
@@ -3145,16 +3477,21 @@ Public Class frmMain
 
     End Function
 
-    Private Sub AddOrSaveAntLogic(ByVal bAddNewAnt As Boolean, ByVal ID As Integer)
+    Private Sub AddOrSaveMinerLogic(ByVal bAddNewAnt As Boolean, ByVal ID As Integer)
 
         'Dim sTemp As String
         Dim bAntFound As Boolean
-        Dim AntType As enAntType
-        Dim AntConfigRow As DataRow
+        'Dim MinerType As clsSupportedMinerInfo.enSupportedMinerTypes
+        Dim MinerConfigRow As DataRow
+        Dim MinerInfo As clsSupportedMinerInfo.clsMinerInfo
 
         Try
-            If Me.optAntS1.Checked = False AndAlso Me.optAntS2.Checked = False AndAlso Me.optAntS3.Checked = False AndAlso Me.optAntC1.Checked = False Then
-                MsgBox("Please specify if this is an S1, S2, S3, or C1.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+            If Me.cmbMinerType.Text.IsNullOrEmpty = True Then
+                MsgBox("Please specify the miner type.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                Me.cmbMinerType.DroppedDown = True
+
+                Me.cmbMinerType.Focus()
 
                 Exit Sub
             End If
@@ -3163,7 +3500,7 @@ Public Class frmMain
                 Me.txtAntAddress.Text = Me.txtAntAddress.Text.ToLower.Replace("http://", "")
 
                 If bAddNewAnt = True Then
-                    For Each dr As DataRow In Me.dsAntConfig.Tables(0).Rows
+                    For Each dr As DataRow In Me.dsMinerConfig.Tables(0).Rows
                         If dr("IPAddress") = Me.txtAntAddress.Text Then
                             If dr("HTTPPort") = Me.txtAntWebPort.Text Then
                                 If MsgBox("This address/port combination seems to already exist.  Are you sure you want to add it?", MsgBoxStyle.Question Or MsgBoxStyle.YesNo) = MsgBoxResult.No Then
@@ -3177,59 +3514,41 @@ Public Class frmMain
                 End If
 
                 If bAntFound = False Then
+                    MinerInfo = SupportedMinerInfo.GetMinerObjectByLongName(Me.cmbMinerType.Text)
+
                     If Me.txtAntName.Text.IsNullOrEmpty = True Then
-                        If Me.optAntS1.Checked = True Then
-                            Me.txtAntName.Text = "S1: " & Me.txtAntAddress.Text
-                        ElseIf Me.optAntS2.Checked = True Then
-                            Me.txtAntName.Text = "S2: " & Me.txtAntAddress.Text
-                        ElseIf Me.optAntS3.Checked = True Then
-                            Me.txtAntName.Text = "S3: " & Me.txtAntAddress.Text
-                        ElseIf Me.optAntC1.Checked = True Then
-                            Me.txtAntName.Text = "C1: " & Me.txtAntAddress.Text
-                        End If
+                        Me.txtAntName.Text = MinerInfo.ShortName & ": " & Me.txtAntAddress.Text
                     End If
 
                     If bAddNewAnt = True Then
-                        AntConfigRow = dsAntConfig.Tables(0).NewRow
+                        MinerConfigRow = dsMinerConfig.Tables(0).NewRow
                     Else
-                        AntConfigRow = FindAntConfig(ID)
+                        MinerConfigRow = FindMinerConfig(ID)
                     End If
 
-                    If Me.optAntS1.Checked = True Then
-                        AntType = enAntType.S1
-                        AntConfigRow("Type") = "S1"
-                    ElseIf Me.optAntS2.Checked = True Then
-                        AntType = enAntType.S2
-                        AntConfigRow("Type") = "S2"
-                    ElseIf Me.optAntS3.Checked = True Then
-                        AntType = enAntType.S3
-                        AntConfigRow("Type") = "S3"
-                    ElseIf Me.optAntC1.Checked = True Then
-                        AntType = enAntType.C1
-                        AntConfigRow("Type") = "C1"
-                    End If
+                    MinerConfigRow("Type") = MinerInfo.ShortName
 
-                    ID = AddOrSaveAnt(ID, Me.txtAntName.Text, AntType, Me.txtAntAddress.Text, chkBoxToYN(Me.chkAntActive), _
-                                   Me.txtAntWebPort.Text, Me.txtAntWebUsername.Text, Me.txtAntWebPassword.Text, _
-                                   Me.txtAntSSHUsername.Text, Me.txtAntSSHPassword.Text, Me.txtAntAPIPort.Text, _
-                                   Me.txtAntSSHPort.Text, chkBoxToYN(Me.chkAntUseAPI), chkBoxToYN(Me.chkAntRebootViaSSH))
+                    ID = AddOrSaveMiner(ID, Me.txtAntName.Text, MinerInfo, Me.txtAntAddress.Text, chkBoxToYN(Me.chkAntActive), _
+                                    Me.txtAntWebPort.Text, Me.txtAntWebUsername.Text, Me.txtAntWebPassword.Text, _
+                                    Me.txtAntSSHUsername.Text, Me.txtAntSSHPassword.Text, Me.txtAntAPIPort.Text, _
+                                    Me.txtAntSSHPort.Text, chkBoxToYN(Me.chkAntUseAPI), chkBoxToYN(Me.chkAntRebootViaSSH))
 
-                    AntConfigRow("Name") = Me.txtAntName.Text
-                    AntConfigRow("IPAddress") = Me.txtAntAddress.Text
-                    AntConfigRow("Active") = chkBoxToYN(Me.chkAntActive)
-                    AntConfigRow("HTTPPort") = Me.txtAntWebPort.Text
-                    AntConfigRow("WebUsername") = Me.txtAntWebUsername.Text
-                    AntConfigRow("WebPassword") = Me.txtAntWebPassword.Text
-                    AntConfigRow("SSHPort") = Me.txtAntSSHPort.Text
-                    AntConfigRow("SSHUsername") = Me.txtAntSSHUsername.Text
-                    AntConfigRow("SSHPassword") = Me.txtAntSSHPassword.Text
-                    AntConfigRow("UseAPI") = chkBoxToYN(Me.chkAntUseAPI)
-                    AntConfigRow("APIPort") = Me.txtAntAPIPort.Text
-                    AntConfigRow("RebootViaSSH") = chkBoxToYN(Me.chkAntRebootViaSSH)
-                    AntConfigRow("ID") = ID
+                    MinerConfigRow("Name") = Me.txtAntName.Text
+                    MinerConfigRow("IPAddress") = Me.txtAntAddress.Text
+                    MinerConfigRow("Active") = chkBoxToYN(Me.chkAntActive)
+                    MinerConfigRow("HTTPPort") = Me.txtAntWebPort.Text
+                    MinerConfigRow("WebUsername") = Me.txtAntWebUsername.Text
+                    MinerConfigRow("WebPassword") = Me.txtAntWebPassword.Text
+                    MinerConfigRow("SSHPort") = Me.txtAntSSHPort.Text
+                    MinerConfigRow("SSHUsername") = Me.txtAntSSHUsername.Text
+                    MinerConfigRow("SSHPassword") = Me.txtAntSSHPassword.Text
+                    MinerConfigRow("UseAPI") = chkBoxToYN(Me.chkAntUseAPI)
+                    MinerConfigRow("APIPort") = Me.txtAntAPIPort.Text
+                    MinerConfigRow("RebootViaSSH") = chkBoxToYN(Me.chkAntRebootViaSSH)
+                    MinerConfigRow("ID") = ID
 
                     If bAddNewAnt = True Then
-                        dsAntConfig.Tables(0).Rows.Add(AntConfigRow)
+                        dsMinerConfig.Tables(0).Rows.Add(MinerConfigRow)
                     End If
                 Else
                     MsgBox("This address appears to already be in the list.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
@@ -3273,8 +3592,9 @@ Public Class frmMain
     End Sub
 
     Private Sub NumericOnlyKeyPressHandler(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtRefreshRate.KeyPress, _
-        txtAlertEMailGovernor.KeyPress, txtAntAPIPort.KeyPress, txtAntSSHPort.KeyPress, txtAntWebPort.KeyPress, txtAlertS1Temp.KeyPress, txtAlertS2Temp.KeyPress, _
-        txtAlertS3Temp.KeyPress, cmbAntScanStart.KeyPress, cmbAntScanStop.KeyPress, txtRebootAntsByUptime.KeyPress
+        txtAlertEMailGovernor.KeyPress, txtAntAPIPort.KeyPress, txtAntSSHPort.KeyPress, txtAntWebPort.KeyPress, txtAlertS1Temp.KeyPress, _
+        txtAlertS2Temp.KeyPress, txtAlertS3Temp.KeyPress, txtAlertS4Temp.KeyPress, txtAlertSPTemp.KeyPress, cmbAntScanStart.KeyPress, _
+        cmbAntScanStop.KeyPress, txtRebootAntsByUptime.KeyPress
 
         Select Case e.KeyChar
             Case "0" To "9", vbBack
@@ -3327,58 +3647,58 @@ Public Class frmMain
 
         Select Case chkAny.Name
             Case "chkShowUptime"
-                Me.dataAnts.Columns("Uptime").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Uptime").Visible = chkAny.Checked
 
             Case "chkShowGHs5s"
-                Me.dataAnts.Columns("GH/s(5s)").Visible = chkAny.Checked
+                Me.dataMiners.Columns("GH/s(5s)").Visible = chkAny.Checked
 
             Case "chkShowGHsAvg"
-                Me.dataAnts.Columns("GH/s(avg)").Visible = chkAny.Checked
+                Me.dataMiners.Columns("GH/s(avg)").Visible = chkAny.Checked
 
             Case "chkShowBlocks"
-                Me.dataAnts.Columns("Blocks").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Blocks").Visible = chkAny.Checked
 
             Case "chkShowHWE"
-                Me.dataAnts.Columns("HWE%").Visible = chkAny.Checked
+                Me.dataMiners.Columns("HWE%").Visible = chkAny.Checked
 
             Case "chkShowBestShare"
-                Me.dataAnts.Columns("BestShare").Visible = chkAny.Checked
+                Me.dataMiners.Columns("BestShare").Visible = chkAny.Checked
 
             Case "chkShowPools"
-                Me.dataAnts.Columns("Pools").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Pools").Visible = chkAny.Checked
 
             Case "chkShowFans"
-                Me.dataAnts.Columns("Fans").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Fans").Visible = chkAny.Checked
 
             Case "chkShowTemps"
-                Me.dataAnts.Columns("Temps").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Temps").Visible = chkAny.Checked
 
             Case "chkShowStatus"
-                Me.dataAnts.Columns("Status").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Status").Visible = chkAny.Checked
 
             Case "chkShowFreqs"
-                Me.dataAnts.Columns("Freq").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Freq").Visible = chkAny.Checked
 
             Case "chkShowHighFan"
-                Me.dataAnts.Columns("HFan").Visible = chkAny.Checked
+                Me.dataMiners.Columns("HFan").Visible = chkAny.Checked
 
             Case "chkShowHighTemp"
-                Me.dataAnts.Columns("HTemp").Visible = chkAny.Checked
+                Me.dataMiners.Columns("HTemp").Visible = chkAny.Checked
 
             Case "chkShowXCount"
-                Me.dataAnts.Columns("XCount").Visible = chkAny.Checked
+                Me.dataMiners.Columns("XCount").Visible = chkAny.Checked
 
             Case "chkShowRej"
-                Me.dataAnts.Columns("Rej%").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Rej%").Visible = chkAny.Checked
 
             Case "chkShowStale"
-                Me.dataAnts.Columns("Stale%").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Stale%").Visible = chkAny.Checked
 
             Case "chkShowDifficulty"
-                Me.dataAnts.Columns("Diff").Visible = chkAny.Checked
+                Me.dataMiners.Columns("Diff").Visible = chkAny.Checked
 
             Case "chkShowACount"
-                Me.dataAnts.Columns("ACount").Visible = chkAny.Checked
+                Me.dataMiners.Columns("ACount").Visible = chkAny.Checked
 
             Case Else
                 MsgBox(chkAny.Name & " not found!", MsgBoxStyle.Critical Or MsgBoxStyle.OkOnly)
@@ -3386,22 +3706,6 @@ Public Class frmMain
         End Select
 
     End Sub
-
-    'Private Sub optAddS1_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optAntS1.CheckedChanged, optAntS2.CheckedChanged
-
-    '    Dim opt As RadioButton
-
-    '    opt = sender
-
-    '    If opt.Checked = True Then
-    '        If opt.Name = "optAddS1" Then
-    '            optAntS2.Checked = False
-    '        Else
-    '            optAntS1.Checked = False
-    '        End If
-    '    End If
-
-    'End Sub
 
     Private Sub NotifyIcon1_DoubleClick(sender As Object, e As System.EventArgs) Handles NotifyIcon1.DoubleClick
 
@@ -3431,19 +3735,6 @@ Public Class frmMain
 
     End Sub
 
-    'Private Sub txtAlertS1Temp_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtAlertS1Temp.KeyPress, txtAlertS2Temp.KeyPress
-
-    '    Select Case e.KeyChar
-    '        Case "0" To "9", vbBack
-    '            'good
-
-    '        Case Else
-    '            e.Handled = True
-
-    '    End Select
-
-    'End Sub
-
     Private Sub mnuShow_Click(sender As Object, e As System.EventArgs) Handles mnuShow.Click
 
         Me.Show()
@@ -3452,7 +3743,8 @@ Public Class frmMain
     End Sub
 
     Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, _
-        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click, cmdSaveReboots.Click, tabAlertsAndReboots.Click, cmdSaveAlerts6.Click
+        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click, cmdSaveReboots.Click, tabAlertsAndReboots.Click, cmdSaveAlerts6.Click, _
+        cmdSaveAlerts7.Click, cmdSaveAlerts8.Click
 
         With ctlsByKey
             .SetRegKeyByControl(Me.chkAlertHighlightField)
@@ -3507,6 +3799,18 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS3Temp)
             .SetRegKeyByControl(Me.txtAlertS3Temp)
 
+            's4
+            If Me.chkAlertIfS4Temp.Checked = True Then
+                If Me.txtAlertS4Temp.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S4 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS4Temp.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS4Temp)
+            .SetRegKeyByControl(Me.txtAlertS4Temp)
+
             'c1
             If Me.chkAlertIfC1Temp.Checked = True Then
                 If Me.txtAlertC1Temp.Text.IsNullOrEmpty Then
@@ -3518,6 +3822,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfC1Temp)
             .SetRegKeyByControl(Me.txtAlertC1Temp)
+
+            'sp
+            If Me.chkAlertIfSPTemp.Checked = True Then
+                If Me.txtAlertSPTemp.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an SP temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfSPTemp.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfSPTemp)
+            .SetRegKeyByControl(Me.txtAlertSPTemp)
 
             's1
             If Me.chkAlertIfS1FanHigh.Checked = True Then
@@ -3554,6 +3870,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfS3FanHigh)
             .SetRegKeyByControl(Me.txtAlertS3FanHigh)
+
+            'S4
+            If Me.chkAlertIfS4FanHigh.Checked = True Then
+                If Me.txtAlertS4FanHigh.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S4 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS4FanHigh.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS4FanHigh)
+            .SetRegKeyByControl(Me.txtAlertS4FanHigh)
 
             'c1
             If Me.chkAlertIfC1FanHigh.Checked = True Then
@@ -3603,6 +3931,18 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS3FanLow)
             .SetRegKeyByControl(Me.txtAlertS3FanLow)
 
+            'S4
+            If Me.chkAlertIfS4FanLow.Checked = True Then
+                If Me.txtAlertS4FanLow.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S4 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS4FanLow.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS4FanLow)
+            .SetRegKeyByControl(Me.txtAlertS4FanLow)
+
             'C1
             If Me.chkAlertIfC1FanLow.Checked = True Then
                 If Me.txtAlertC1FanLow.Text.IsNullOrEmpty Then
@@ -3651,6 +3991,18 @@ Public Class frmMain
             .SetRegKeyByControl(Me.chkAlertIfS3Hash)
             .SetRegKeyByControl(Me.txtAlertS3Hash)
 
+            'S4
+            If Me.chkAlertIfS4Hash.Checked = True Then
+                If Me.txtAlertS4Hash.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S4 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS4Hash.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS4Hash)
+            .SetRegKeyByControl(Me.txtAlertS4Hash)
+
             'C1
             If Me.chkAlertIfC1Hash.Checked = True Then
                 If Me.txtAlertC1Hash.Text.IsNullOrEmpty Then
@@ -3662,6 +4014,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfC1Hash)
             .SetRegKeyByControl(Me.txtAlertC1Hash)
+
+            'SP
+            If Me.chkAlertIfSPHash.Checked = True Then
+                If Me.txtAlertSPHash.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an SP hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfSPHash.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfSPHash)
+            .SetRegKeyByControl(Me.txtAlertSPHash)
 
             'S1
             If Me.chkAlertIfS1XCount.Checked = True Then
@@ -3698,6 +4062,18 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.chkAlertIfS3XCount)
             .SetRegKeyByControl(Me.txtAlertS3XCount)
+
+            'S4
+            If Me.chkAlertIfS4XCount.Checked = True Then
+                If Me.txtAlertS4XCount.Text.IsNullOrEmpty Then
+                    MsgBox("Please specify an S4 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+                    Me.chkAlertIfS4XCount.Checked = False
+                End If
+            End If
+
+            .SetRegKeyByControl(Me.chkAlertIfS4XCount)
+            .SetRegKeyByControl(Me.txtAlertS4XCount)
 
             'c1
             If Me.chkAlertIfC1XCount.Checked = True Then
@@ -3896,7 +4272,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub dataAnts_ColumnDisplayIndexChanged(sender As Object, e As System.Windows.Forms.DataGridViewColumnEventArgs)
+    Private Sub dataMiners_ColumnDisplayIndexChanged(sender As Object, e As System.Windows.Forms.DataGridViewColumnEventArgs)
 
         Dim dt As DataGridView
 
@@ -3909,7 +4285,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub dataAnts_CellContextMenuStripNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventArgs) Handles dataAnts.CellContextMenuStripNeeded
+    Private Sub dataMiners_CellContextMenuStripNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventArgs) Handles dataMiners.CellContextMenuStripNeeded
 
         Dim colAnts As System.Collections.Generic.List(Of Integer)
         Dim x As Integer
@@ -3917,11 +4293,11 @@ Public Class frmMain
 
         If e.RowIndex = -1 Then Exit Sub
 
-        AntConfigRow = FindAntConfig(Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value)
+        AntConfigRow = FindMinerConfig(Me.dataMiners.Rows(e.RowIndex).Cells("ID").Value)
 
         'remove from list
-        mnuAntMenu.Items(2).Text = "Remove " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
-        mnuAntMenu.Items(2).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
+        mnuAntMenu.Items(2).Text = "Remove " & Me.dataMiners.Rows(e.RowIndex).Cells("Name").Value
+        mnuAntMenu.Items(2).Tag = Me.dataMiners.Rows(e.RowIndex).Cells("ID").Value
         mnuAntMenu.Items(2).Visible = True
 
         If AntConfigRow Is Nothing Then
@@ -3936,13 +4312,13 @@ Public Class frmMain
             '0 - reboot one
             '1 - reboot multiple
             '2 - remove from list
-            '3 - shutdown s2
+            '3 - shutdown s2/s4
             '4 - update pools
-            mnuAntMenu.Items(0).Text = "Reboot " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
-            mnuAntMenu.Items(0).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
+            mnuAntMenu.Items(0).Text = "Reboot " & Me.dataMiners.Rows(e.RowIndex).Cells("Name").Value
+            mnuAntMenu.Items(0).Tag = Me.dataMiners.Rows(e.RowIndex).Cells("ID").Value
 
             'reboot multiple
-            If Me.dataAnts.SelectedRows.Count = 0 Then
+            If Me.dataMiners.SelectedRows.Count = 0 Then
                 mnuAntMenu.Items(1).Visible = False
             Else
                 mnuAntMenu.Items(1).Visible = True
@@ -3952,23 +4328,23 @@ Public Class frmMain
 
                 x = 0
 
-                For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
+                For Each dr As DataGridViewRow In Me.dataMiners.SelectedRows
                     colAnts.Add(dr.Cells("ID").Value)
 
                     x += 1
                 Next
 
                 If x > 1 Then
-                    mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ants)"
+                    mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Miners)"
                 Else
-                    mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Ant)"
+                    mnuAntMenu.Items(1).Text = "Reboot Multiple (" & x & " Miner)"
                 End If
             End If
 
-            'shutdown s2
-            If AntConfigRow("Type") = "S2" Then
-                mnuAntMenu.Items(3).Text = "Shutdown " & Me.dataAnts.Rows(e.RowIndex).Cells("Name").Value
-                mnuAntMenu.Items(3).Tag = Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value
+            'shutdown s2/s4
+            If AntConfigRow("Type") = "S2" OrElse AntConfigRow("Type") = "S4" Then
+                mnuAntMenu.Items(3).Text = "Shutdown " & Me.dataMiners.Rows(e.RowIndex).Cells("Name").Value
+                mnuAntMenu.Items(3).Tag = Me.dataMiners.Rows(e.RowIndex).Cells("ID").Value
                 mnuAntMenu.Items(3).Visible = True
             Else
                 mnuAntMenu.Items(3).Visible = False
@@ -3981,12 +4357,12 @@ Public Class frmMain
 
                 x = 0
 
-                If Me.dataAnts.SelectedRows.Count = 0 Then
-                    colAnts.Add(Me.dataAnts.Rows(e.RowIndex).Cells("ID").Value)
+                If Me.dataMiners.SelectedRows.Count = 0 Then
+                    colAnts.Add(Me.dataMiners.Rows(e.RowIndex).Cells("ID").Value)
 
                     x = 1
                 Else
-                    For Each dr As DataGridViewRow In Me.dataAnts.SelectedRows
+                    For Each dr As DataGridViewRow In Me.dataMiners.SelectedRows
                         colAnts.Add(dr.Cells("ID").Value)
 
                         x += 1
@@ -3994,9 +4370,9 @@ Public Class frmMain
                 End If
 
                 If x > 1 Then
-                    mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Ants)"
+                    mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Miner)"
                 Else
-                    mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Ant)"
+                    mnuAntMenu.Items(4).Text = "Update Pools (" & x & " Miner)"
                 End If
 
                 mnuAntMenu.Items(4).Visible = True
@@ -4007,23 +4383,23 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub dataAnts_CellToolTipTextNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellToolTipTextNeededEventArgs) Handles dataAnts.CellToolTipTextNeeded
+    Private Sub dataMiners_CellToolTipTextNeeded(sender As Object, e As System.Windows.Forms.DataGridViewCellToolTipTextNeededEventArgs) Handles dataMiners.CellToolTipTextNeeded
 
-        If e.ColumnIndex = Me.dataAnts.Columns("Pools").Index AndAlso e.RowIndex <> -1 Then
-            e.ToolTipText = Me.dataAnts.Rows(e.RowIndex).Cells("PoolData").Value.ToString
+        If e.ColumnIndex = Me.dataMiners.Columns("Pools").Index AndAlso e.RowIndex <> -1 Then
+            e.ToolTipText = Me.dataMiners.Rows(e.RowIndex).Cells("PoolData").Value.ToString
         End If
 
     End Sub
 
     Private Sub chkShowSelectionColumn_Click(sender As Object, e As System.EventArgs) Handles chkShowSelectionColumn.Click
 
-        Me.dataAnts.RowHeadersVisible = Me.chkShowSelectionColumn.Checked
+        Me.dataMiners.RowHeadersVisible = Me.chkShowSelectionColumn.Checked
 
     End Sub
 
     Private Sub cmdSaveAnt_Click(sender As Object, e As System.EventArgs) Handles cmdSaveAnt.Click
 
-        Call AddOrSaveAntLogic(False, Me.lblAntID.Tag)
+        Call AddOrSaveMinerLogic(False, Me.lblMinerID.Tag)
 
     End Sub
 
@@ -4033,10 +4409,10 @@ Public Class frmMain
         Dim AntConfigRow As DataRow
 
         t = sender
-        AntConfigRow = FindAntConfig(t.Tag)
+        AntConfigRow = FindMinerConfig(t.Tag)
 
-        Call AddToLogQueue("Reboot of " & t.Tag.ToString & " requested")
-        Call RebootAnt(AntConfigRow, True, YNtoBoolean(AntConfigRow("RebootViaSSH")), Nothing)
+        Call AddToLogQueue("Reboot of " & AntConfigRow("Name") & " requested")
+        Call RebootMiner(AntConfigRow, True, YNtoBoolean(AntConfigRow("RebootViaSSH")), Nothing)
 
     End Sub
 
@@ -4091,9 +4467,9 @@ Public Class frmMain
         c = t.Tag
 
         For Each ID As Integer In c
-            AntConfigRow = FindAntConfig(ID)
+            AntConfigRow = FindMinerConfig(ID)
             Call AddToLogQueue("Reboot of " & AntConfigRow("Name") & " requested")
-            Call RebootAnt(AntConfigRow, True, YNtoBoolean(AntConfigRow("RebootViaSSH")), Nothing)
+            Call RebootMiner(AntConfigRow, True, YNtoBoolean(AntConfigRow("RebootViaSSH")), Nothing)
         Next
 
     End Sub
@@ -4109,11 +4485,11 @@ Public Class frmMain
 
         th = New Threading.Thread(AddressOf Me._ShutdownAnt)
 
-        th.Start(GetAntConfigByConfigRow(FindAntConfig(ID)))
+        th.Start(GetMinerConfigByConfigRow(FindMinerConfig(ID)))
 
     End Sub
 
-    Private Sub _ShutdownAnt(ByVal AntConfig As stAntConfig)
+    Private Sub _ShutdownAnt(ByVal AntConfig As stMinerConfig)
 
         Dim ssh As Renci.SshNet.SshClient
         Dim sshCommand As Renci.SshNet.SshCommand
@@ -4273,7 +4649,7 @@ Public Class frmMain
         Next
 
         'go through each ant
-        For Each dr As DataGridViewRow In Me.dataAnts.Rows
+        For Each dr As DataGridViewRow In Me.dataMiners.Rows
             pdl2 = dr.Cells("PoolData2").Value
 
             'go through each pool for each ant
@@ -4387,12 +4763,12 @@ Public Class frmMain
         For Each ID As Integer In c
             th = New Threading.Thread(AddressOf _UpdatePools)
 
-            th.Start(GetAntConfigByConfigRow(FindAntConfig(ID)))
+            th.Start(GetMinerConfigByConfigRow(FindMinerConfig(ID)))
         Next
 
     End Sub
 
-    Private Sub _UpdatePools(ByVal AntConfig As stAntConfig)
+    Private Sub _UpdatePools(ByVal AntConfig As stMinerConfig)
 
         Dim ssh As Renci.SshNet.SshClient
         Dim sshCommand As Renci.SshNet.SshCommand
@@ -4485,9 +4861,9 @@ Public Class frmMain
         Me.timerDoStuff.Enabled = False
 
         Try
-            While AntRefreshDataQueue.Count <> 0
-                SyncLock AntRefreshLock
-                    Call RefreshGrid(AntRefreshDataQueue.Dequeue)
+            While MinerRefreshDataQueue.Count <> 0
+                SyncLock MinerRefreshLock
+                    Call RefreshGrid(MinerRefreshDataQueue.Dequeue)
                 End SyncLock
 
                 My.Application.DoEvents()
@@ -4518,7 +4894,7 @@ Public Class frmMain
         x = 0
 
         Try
-            For Each dg As DataGridViewRow In Me.dataAnts.Rows
+            For Each dg As DataGridViewRow In Me.dataMiners.Rows
                 If IsDBNull(dg.Cells("Uptime").Value) = False AndAlso dg.Cells("Uptime").Value <> "ERROR" AndAlso dg.Cells("Uptime").Value <> "???" Then
                     x += 1
 
@@ -4613,7 +4989,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub txtIPRangeToScan_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtIPRangeToScan.KeyPress
+    Private Sub txtIPRangeToScan_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtIPRangeToScan.KeyPress, txtIPToGetInfo.KeyPress
 
         Select Case e.KeyChar
             Case "0" To "9", vbBack, "."
@@ -4647,20 +5023,7 @@ Public Class frmMain
                 Me.txtAntAddress.Text = dr.Cells("IPAddress").Value
                 Me.txtAntName.Text = dr.Cells("Name").Value
 
-                Select Case dr.Cells("Type").Value
-                    Case "S1"
-                        Me.optAntS1.Checked = True
-
-                    Case "S2"
-                        Me.optAntS2.Checked = True
-
-                    Case "S3"
-                        Me.optAntS3.Checked = True
-
-                    Case "C1"
-                        Me.optAntC1.Checked = True
-
-                End Select
+                Me.cmbMinerType.Text = SupportedMinerInfo.GetMinerObjectByShortName(dr.Cells("Type").Value).LongName
 
                 Me.txtAntSSHUsername.Text = dr.Cells("SSHUsername").Value
                 Me.txtAntSSHPassword.Text = dr.Cells("SSHPassword").Value
@@ -4672,13 +5035,13 @@ Public Class frmMain
 
                 Me.chkAntUseAPI.Checked = YNtoBoolean(dr.Cells("UseAPI").Value)
                 Me.txtAntAPIPort.Text = dr.Cells("APIPort").Value
-                Me.chkRebootAntOnError.Checked = YNtoBoolean(dr.Cells("RebootViaSSH").Value)
+                Me.chkAntRebootViaSSH.Checked = YNtoBoolean(dr.Cells("RebootViaSSH").Value)
                 Me.chkAntActive.Checked = YNtoBoolean(dr.Cells("Active").Value)
 
-                Me.lblAntID.Text = "ID #" & dr.Cells("ID").Value
-                Me.lblAntID.Tag = dr.Cells("ID").Value
+                Me.lblMinerID.Text = "ID #" & dr.Cells("ID").Value
+                Me.lblMinerID.Tag = dr.Cells("ID").Value
             Else
-                Me.lblAntID.Tag = -1
+                Me.lblMinerID.Tag = -1
             End If
         Catch ex As Exception When bErrorHandle = True
             AddToLogQueue("An error occurred when displaying the config for an Ant: " & ex.Message)
@@ -4686,32 +5049,39 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub optAntS1_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles optAntS1.CheckedChanged, optAntS2.CheckedChanged, _
-                optAntS3.CheckedChanged, optAntC1.CheckedChanged
+    Private Sub cmbMinerType_LostFocus(sender As Object, e As System.EventArgs) Handles cmbMinerType.LostFocus
 
-        Dim sTemp As String
-        Dim s() As String
-
-        Try
-            If Me.optAntS1.Checked = True Then
-                sTemp = "S1"
-            ElseIf Me.optAntS2.Checked = True Then
-                sTemp = "S2"
-            ElseIf Me.optAntS3.Checked = True Then
-                sTemp = "S3"
-            ElseIf Me.optAntC1.Checked = True Then
-                sTemp = "C1"
-            Else
+        For Each MinerInfo As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
+            If Me.cmbMinerType.Text.ToLower = MinerInfo.LongName.ToLower Then
                 Exit Sub
             End If
+        Next
+
+        MsgBox("Invalid value entered.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+        Me.cmbMinerType.Text = ""
+
+    End Sub
+
+    Private Sub cmbMinerType_SelectedValueChanged(sender As Object, e As System.EventArgs) Handles cmbMinerType.SelectedValueChanged
+
+        Dim s() As String
+        Dim sTemp As String
+        Dim MinerInfo As clsSupportedMinerInfo.clsMinerInfo
+
+        Try
+            sTemp = SupportedMinerInfo.GetMinerObjectByLongName(Me.cmbMinerType.Text).ShortName
 
             s = Me.txtAntAddress.Text.Split(".")
 
             If Me.txtAntName.Text.IsNullOrEmpty Then
                 Me.txtAntName.Text = sTemp & ":" & s(2) & "." & s(3)
-            ElseIf Me.txtAntName.Text.Substring(0, 3) = "S1:" OrElse Me.txtAntName.Text.Substring(0, 3) = "S2:" OrElse _
-                   Me.txtAntName.Text.Substring(0, 3) = "S3:" OrElse Me.txtAntName.Text.Substring(0, 3) = "C1:" Then
-                Me.txtAntName.Text = sTemp & ":" & Me.txtAntName.Text.Substring(3)
+            Else
+                For Each MinerInfo In SupportedMinerInfo.SupportedMinerCollection
+                    If Me.txtAntName.Text.Substring(0, 3).ToLower = MinerInfo.ShortName.ToLower & ":" Then
+                        Me.txtAntName.Text = sTemp & ":" & Me.txtAntName.Text.Substring(3)
+                    End If
+                Next
             End If
         Catch ex As Exception When bErrorHandle = True
         End Try
@@ -4722,9 +5092,7 @@ Public Class frmMain
 
         Me.txtAntName.Text = ""
         Me.txtAntAddress.Text = ""
-        Me.optAntS1.Checked = False
-        Me.optAntS2.Checked = False
-        Me.optAntS3.Checked = False
+        Me.cmbMinerType.Text = ""
 
         Me.txtAntAddress.Focus()
 
@@ -4750,7 +5118,7 @@ Public Class frmMain
     Private Sub mnuRemoveAnt_Click(sender As System.Object, e As System.EventArgs) Handles mnuRemoveAnt.Click
 
         Dim t As ToolStripMenuItem
-        
+
         t = sender
 
         For Each dr As DataRow In Me.ds.Tables(0).Rows
@@ -4811,8 +5179,8 @@ Public Class frmMain
     End Sub
 
     Private Sub txtAlertEMailGovernor_LostFocus(sender As Object, e As System.EventArgs) Handles txtRefreshRate.LostFocus, _
-        txtAlertEMailGovernor.LostFocus, txtAntAPIPort.LostFocus, txtAntSSHPort.LostFocus, txtAntWebPort.LostFocus, txtAlertS1Temp.LostFocus, txtAlertS2Temp.LostFocus, _
-        txtAlertS3Temp.LostFocus, txtRebootAntsByUptime.LostFocus
+        txtAlertEMailGovernor.LostFocus, txtAntAPIPort.LostFocus, txtAntSSHPort.LostFocus, txtAntWebPort.LostFocus, txtAlertS1Temp.LostFocus, _
+        txtAlertS2Temp.LostFocus, txtAlertS3Temp.LostFocus, txtAlertS4Temp.LostFocus, txtAlertSPTemp.LostFocus, txtRebootAntsByUptime.LostFocus
 
         Dim txtAny As TextBox
 
@@ -4873,6 +5241,62 @@ Public Class frmMain
 
             chkAny.Checked = False
         End If
+
+    End Sub
+
+    Private Sub cmdGetMinerInfo_Click(sender As System.Object, e As System.EventArgs) Handles cmdGetMinerInfo.Click
+
+        Dim t As Threading.Thread
+        Dim dStart As Date
+        Dim frmInfo As frmGetMinerInfo
+
+        Try
+            If Me.txtIPToGetInfo.Text.IsNullOrEmpty = True Then
+                MsgBox("Please enter an exact IP address to get information on.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                Me.txtIPToGetInfo.Focus()
+
+                Exit Sub
+            End If
+
+            Me.cmdGetMinerInfo.Enabled = False
+
+            listOfGetInfoResponse = New System.Collections.Generic.List(Of String)
+
+            sIPToGetInfo = Me.txtIPToGetInfo.Text
+
+            t = New Threading.Thread(AddressOf Me.GetInfoDataOnOtherThread)
+
+            t.Start()
+
+            dStart = Now
+
+            'wait 30 seconds max
+            While listOfGetInfoResponse.Count <> 3 AndAlso dStart.AddSeconds(30) > Now
+                My.Application.DoEvents()
+            End While
+
+            Debug.Print(listOfGetInfoResponse.Count)
+
+            If listOfGetInfoResponse.Count <> 3 Then
+                If t.IsAlive Then t.Abort()
+
+                MsgBox("Unable to get a response from " & Me.txtIPToGetInfo.Text & ".", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+            Else
+                frmInfo = New frmGetMinerInfo
+                frmInfo.Show()
+
+                frmInfo.txt1.Text = "STATS:" & vbCrLf & listOfGetInfoResponse(0)
+                frmInfo.txt2.Text = "POOLS:" & vbCrLf & listOfGetInfoResponse(1)
+                frmInfo.txt3.Text = "SUMMARY:" & vbCrLf & listOfGetInfoResponse(2)
+
+                Clipboard.SetText(frmInfo.txt1.Text & vbCrLf & vbCrLf & frmInfo.txt2.Text & vbCrLf & vbCrLf & frmInfo.txt3.Text)
+            End If
+        Catch ex As Exception
+            MsgBox("An error occurred: " & ex.Message)
+        Finally
+            Me.cmdGetMinerInfo.Enabled = True
+        End Try
 
     End Sub
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MAntMonitor", "MAntMonitor.vbproj", "{B06F37FA-6108-4D9E-8590-760FD02F06B6}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MMinerMonitor", "MMinerMonitor.vbproj", "{B06F37FA-6108-4D9E-8590-760FD02F06B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
