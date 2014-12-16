@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v4.0b2"
+    Private Const csVersion As String = "M's Miner Monitor v4.0"
 
     'alert string   
     Private sAlerts As String
@@ -1836,7 +1836,7 @@ Public Class frmMain
         Dim count(0 To 9), iTemp As Integer
         Dim dBestShare As Double
         Dim x As Integer
-        Dim bStep As Byte
+        Dim sbStep As System.Text.StringBuilder
         Dim pd As clsPoolData
         Dim pdl As System.Collections.Generic.List(Of clsPoolData)
         Dim Lock As New Object
@@ -1846,19 +1846,24 @@ Public Class frmMain
         Debug.Print("Refreshing " & MinerData.sAntIP)
 
         Try
+            sbStep = New System.Text.StringBuilder(3)
+
             dr = FindDisplayAntByID(MinerData.ID)
 
             MinerConfig = FindMinerConfig(MinerData.ID)
 
             dr.Item("Name") = MinerConfig("Name")
 
-            bStep = 1
+            sbStep.Append("1.0")
 
             '#If DEBUG Then
             '            MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1418083020,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 3.12.0""}],""STATS"":[{""STATS"":0,""ID"":""BMM0"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":18,""frequency"":""225"",""voltage"":5,""hwv1"":7,""hwv2"":0,""hwv3"":0,""hwv4"":3,""fan_num"":2,""fan1"":1200,""fan2"":780,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":35,""temp2"":30,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":32,""temp_max"":38,""Device Hardware%"":0.0006,""no_matching_work"":13,""chain_acn1"":16,""chain_acn2"":16,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":65534,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooooo ooooooo- "",""chain_acs2"":""ooooo-oo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""},{""STATS"":1,""ID"":""POOL0"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15},{""STATS"":2,""ID"":""POOL1"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15}],""id"":1}", "}{", "},{")
             '#End If
 
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sStats)
+
+            sbStep.Clear()
+            sbStep.Append("1.1")
 
             For Each ja In j.Property("STATS")
                 Select Case MinerData.MinerType
@@ -1875,6 +1880,9 @@ Public Class frmMain
 
                 End Select
 
+                sbStep.Clear()
+                sbStep.Append("1.2")
+
                 Select Case MinerData.MinerType
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, _
                          clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
@@ -1889,6 +1897,9 @@ Public Class frmMain
 
                         sbTemp.Clear()
 
+                        sbStep.Clear()
+                        sbStep.Append("1.3")
+
                         For x = 1 To jp1.Value(Of Integer)("fan_num")
                             sbTemp.Append(jp1.Value(Of Integer)("fan" & x))
 
@@ -1902,6 +1913,9 @@ Public Class frmMain
                         sbTemp.Clear()
 
                         iTemp = 0
+
+                        sbStep.Clear()
+                        sbStep.Append("1.4")
 
                         For x = 1 To jp1.Value(Of Integer)("temp_num")
                             sbTemp.Append(jp1.Value(Of Integer)("temp" & x))
@@ -1920,6 +1934,9 @@ Public Class frmMain
                         dr.Item("Temps") = sbTemp.ToString
 
                         dr.Item("Freq") = Val(jp1.Value(Of String)("frequency"))
+
+                        sbStep.Clear()
+                        sbStep.Append("1.5")
 
                         count(0) = HowManyInString(jp1.Value(Of String)("chain_acs1"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs1"), "x")
                         count(1) = HowManyInString(jp1.Value(Of String)("chain_acs2"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs2"), "x")
@@ -1957,6 +1974,9 @@ Public Class frmMain
                             count(9) = 0
                         End If
 
+                        sbStep.Clear()
+                        sbStep.Append("1.6")
+
                         dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
 
                         Select Case MinerData.MinerType
@@ -1972,7 +1992,13 @@ Public Class frmMain
 
                         End Select
 
+                        sbStep.Clear()
+                        sbStep.Append("1.7")
+
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                        sbStep.Clear()
+                        sbStep.Append("1.8")
+
                         ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
 
                         dr.Item("Uptime") = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
@@ -1993,6 +2019,9 @@ Public Class frmMain
                             iTemp = count(0)
                         End If
 
+                        sbStep.Clear()
+                        sbStep.Append("1.9")
+
                         dr.Item("HTemp") = iTemp
 
                         dr.Item("Temps") = count(0).ToString & " " & count(1).ToString & " " & count(2).ToString
@@ -2008,18 +2037,25 @@ Public Class frmMain
                 Exit For
             Next
 
-            bStep = 2
+            sbStep.Clear()
+            sbStep.Append("2.0")
 
             '#If DEBUG Then
             '            MinerData.sSummary = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":11,""Msg"":""Summary"",""Description"":""cgminer 4.6.1""}],""SUMMARY"":[{""Elapsed"":163672,""GHS 5s"":2251.62,""GHS av"":2188.60,""Found Blocks"":0,""Getworks"":17423,""Accepted"":39024,""Rejected"":1393,""Hardware Errors"":84,""Utility"":14.31,""Discarded"":190245,""Stale"":0,""Get Failures"":0,""Local Work"":111561705,""Remote Failures"":0,""Network Blocks"":263,""Total MH"":358211780173.0000,""Work Utility"":30574.35,""Difficulty Accepted"":79921152.00000000,""Difficulty Rejected"":2852864.00000000,""Difficulty Stale"":0.00000000,""Best Share"":0,""Device Hardware%"":0.0001,""Device Rejected%"":3.4206,""Pool Rejected%"":3.4466,""Pool Stale%"":0.0000,""Last getwork"":1418065090}],""id"":1}"
             '#End If
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sSummary)
 
+            sbStep.Clear()
+            sbStep.Append("2.1")
+
             For Each ja In j.Property("SUMMARY")
                 Select Case MinerData.MinerType
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, _
                          clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
                          clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+
+                        sbStep.Clear()
+                        sbStep.Append("2.2")
 
                         For Each jp1 In ja
                             dr.Item("GH/s(5s)") = Val(jp1.Value(Of String)("GHS 5s"))
@@ -2032,6 +2068,9 @@ Public Class frmMain
                         Next
 
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                        sbStep.Clear()
+                        sbStep.Append("2.3")
+
                         For Each jp1 In ja
                             dr.Item("HWE%") = jp1.Value(Of String)("Device Hardware%") & "%"
 
@@ -2046,12 +2085,16 @@ Public Class frmMain
                 End Select
             Next
 
-            bStep = 3
+            sbStep.Clear()
+            sbStep.Append("3.0")
 
             '#If DEBUG Then
             '            MinerData.sPools = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":7,""Msg"":""3 Pool(s)"",""Description"":""cgminer 4.6.1""}],""POOLS"":[{""POOL"":0,""URL"":""stratum+tcp://pool.com:3335"",""Status"":""Alive"",""Priority"":0,""Quota"":1,""Long Poll"":""N"",""Getworks"":17420,""Accepted"":39023,""Rejected"":1393,""Discarded"":190245,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""0:00:03"",""Diff"":""2.05K"",""Diff1 Shares"":83402560,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":79919104.00000000,""Difficulty Rejected"":2852864.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":2048.00000000,""Has Stratum"":true,""Stratum Active"":true,""Stratum URL"":""pool.com"",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":3.4467,""Pool Stale%"":0.0000},{""POOL"":1,""URL"":""stratum+tcp://pool.com:3335"",""Status"":""Alive"",""Priority"":1,""Quota"":1,""Long Poll"":""N"",""Getworks"":1,""Accepted"":1,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""45:27:53"",""Diff"":""2.05K"",""Diff1 Shares"":128,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":2048.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":2048.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000},{""POOL"":2,""URL"":""stratum+tcp://pool.com:3333"",""Status"":""Alive"",""Priority"":2,""Quota"":1,""Long Poll"":""N"",""Getworks"":2,""Accepted"":0,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""0"",""Diff"":""16"",""Diff1 Shares"":0,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":0.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":0.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000}],""id"":1}"
             '#End If
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sPools)
+
+            sbStep.Clear()
+            sbStep.Append("3.1")
 
             dBestShare = 0
 
@@ -2066,12 +2109,17 @@ Public Class frmMain
             pdl = dr.Item("PoolData2")
             pd = New clsPoolData
 
+            sbStep.Clear()
+            sbStep.Append("3.2")
+
             For Each ja In j.Property("POOLS")
                 For Each jp1 In ja
                     Select Case MinerData.MinerType
                         Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, _
                              clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, _
                              clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                            sbStep.Clear()
+                            sbStep.Append("3.3")
 
                             If jp1.Value(Of Double)("Best Share") > dBestShare Then
                                 dBestShare = jp1.Value(Of Double)("Best Share")
@@ -2092,6 +2140,9 @@ Public Class frmMain
                                     sbTemp.Append("U")
 
                             End Select
+
+                            sbStep.Clear()
+                            sbStep.Append("3.4")
 
                             If sbTemp2.Length <> 0 Then
                                 sbTemp2.Append(vbCrLf)
@@ -2104,7 +2155,13 @@ Public Class frmMain
 
                             pdl.Add(pd)
 
+                            sbStep.Clear()
+                            sbStep.Append("3.5")
+
                         Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                            sbStep.Clear()
+                            sbStep.Append("3.6")
+
                             If jp1.Value(Of Double)("Best Share") > dBestShare Then
                                 dBestShare = jp1.Value(Of Double)("Best Share")
                             End If
@@ -2125,11 +2182,17 @@ Public Class frmMain
 
                             End Select
 
+                            sbStep.Clear()
+                            sbStep.Append("3.7")
+
                             If sbTemp2.Length <> 0 Then
                                 sbTemp2.Append(vbCrLf)
                             End If
 
                             sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
+
+                            sbStep.Clear()
+                            sbStep.Append("3.8")
 
                             pd.URL = jp1.Value(Of String)("URL")
                             pd.UID = jp1.Value(Of String)("User")
@@ -2142,6 +2205,9 @@ Public Class frmMain
                 Exit For
             Next
 
+            sbStep.Clear()
+            sbStep.Append("3.9")
+
             dr.Item("BestShare") = Format(dBestShare, "###,###,###,###,###,##0")
             dr.Item("Pools") = sbTemp.ToString
             dr.Item("PoolData") = sbTemp2.ToString
@@ -2152,13 +2218,16 @@ Public Class frmMain
                 ds.Tables(0).Rows.Add(dr)
             End If
 
+            sbStep.Clear()
+            sbStep.Append("4.0")
+
             Call HandleAlerts(dr, MinerConfig, Nothing)
 
             Call RefreshTitle()
         Catch ex As Exception When bErrorHandle = True
             dr.Item("Uptime") = "ERROR"
 
-            AddToLogQueue("ERROR when querying " & MinerConfig("Name") & " (step " & bStep & "): " & ex.Message)
+            AddToLogQueue("ERROR when querying " & MinerConfig("Name") & " (step " & sbStep.ToString & "): " & ex.Message)
 
             If Me.chkRebootAntOnError.Checked = True Then
                 AddToLogQueue("Attempting to reboot " & MinerConfig("Name") & " via the web because the API query errored out.")
@@ -2173,8 +2242,8 @@ Public Class frmMain
     'it then passes it back to the UI thread for display
     Private Sub GetMinerDataViaAPI(ByRef MinerToCheck As stMinerConfig)
 
-        Dim sTemp As String
-        Dim x As Integer
+        'Dim sTemp As String
+        'Dim x As Integer
         Dim bStep As Byte
         'Dim s() As String
         Dim MinerData As clsMinerRefreshData
@@ -2188,16 +2257,16 @@ Public Class frmMain
 
             bStep = 1
 
-            sTemp = GetIPData(MinerToCheck.sIP, MinerToCheck.sAPIPort, "stats")
+            MinerData.sStats = Replace(GetIPData(MinerToCheck.sIP, MinerToCheck.sAPIPort, "stats"), "}{", "},{")
 
             'fix mangled JSON
-            x = InStr(sTemp, "}{")
+            'x = InStr(sTemp, "}{")
 
-            If x <> 0 Then
-                MinerData.sStats = sTemp.Insert(x, ",")
-            Else
-                MinerData.sStats = sTemp
-            End If
+            'If x <> 0 Then
+            '    MinerData.sStats = sTemp.Insert(x, ",")
+            'Else
+            '    MinerData.sStats = sTemp
+            'End If
 
             bStep = 2
 
@@ -2208,16 +2277,16 @@ Public Class frmMain
             MinerData.sPools = GetIPData(MinerToCheck.sIP, MinerToCheck.sAPIPort, "pools")
 
             MinerData.ID = MinerToCheck.ID
+
+            SyncLock MinerRefreshLock
+                MinerRefreshDataQueue.Enqueue(MinerData)
+            End SyncLock
         Catch ex As Exception
             MinerData.bError = True
             MinerData.ex = ex
 
             AddToLogQueue("ERROR when querying " & MinerToCheck.sIP & " (step " & bStep & "): " & ex.Message)
         End Try
-
-        SyncLock MinerRefreshLock
-            MinerRefreshDataQueue.Enqueue(MinerData)
-        End SyncLock
 
     End Sub
 

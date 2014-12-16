@@ -1,6 +1,6 @@
 v4.0
-- Added support for Spondoolies' SP20.
-- Fixed more problems with the Scanning code.
+- Added support for Spondoolies' SP20.  Note this may work for other Spondoolie items.
+- Fixed more problems with the "Scanning for miner" code.
 - Added the ability to get unsupported miner info that can be reported to the author for additional miner support.
 - Fixed the problem with the "reboot on error" getting inadvertently turned on.  It wasn't happening during startup, but in the Ant config.
 - Fixed a logging problem with manually rebooting a miner.  It would display a number instead of the miner's name.
