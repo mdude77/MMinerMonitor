@@ -1,3 +1,17 @@
+v4.3
+- Fixed the problem with errors being thrown on startup if you've never used it before.  Forgot to check for this before publishing the prior version. :(
+
+v4.2
+- Significantly redid the Alerting logic.  Everything is on one tab now, and you set your alert settings for whatever
+miner type is in the drop down.  These changes make it much easier, quicker, and foolproof for me to add support for more miner types.
+- Adds support for Antminer S5 units.
+- Adds support for Spondoolie SP20, SP30, SP31, and SP35 units.  Note that for now you still need to enable API access for this work!
+- Spondoolie SP10 is listed, but I don't know if it'll work.  Per my conversations with Spondoolie techs, SP20, SP30, SP31, and SP35 behave 
+the same API wise, the SP10 may be different.
+
+v4.1
+- Fixed the problem with the "save" button on the miner config screen not working if you're trying to add a new miner.
+
 v4.0
 - Added support for Spondoolies' SP20.  Note this may work for other Spondoolie items.
 - Fixed more problems with the "Scanning for miner" code.

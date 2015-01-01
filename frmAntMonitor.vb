@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v4.0"
+    Private Const csVersion As String = "M's Miner Monitor v4.3"
 
     'alert string   
     Private sAlerts As String
@@ -53,13 +53,116 @@ Public Class frmMain
             AntMinerS3 = 3
             AntMinerS4 = 4
             AntMinerC1 = 5
-            SpondoolieSP20 = 6
+            SpondooliesSP10 = 6
+            SpondooliesSP20 = 7
+            SpondooliesSP30 = 8
+            SpondooliesSP31 = 9
+            SpondooliesSP35 = 10
+            AntminerS5 = 11
         End Enum
+
+        Public Structure stAlertTypes
+            Public Fans As Boolean
+            Public Hash As Boolean
+            Public Temps As Boolean
+            Public XCount As Boolean
+        End Structure
+
+        Public Structure stAlertInfoStringRegistry
+            Public Key As String
+            Public Value As String
+        End Structure
+
+        Public Structure stAlertInfoBooleanRegistry
+            Public Key As String
+            Public Value As Boolean
+        End Structure
+
+        Public Class clsAlertInfo
+            Public Item As stAlertInfoStringRegistry
+            Public Enabled As stAlertInfoBooleanRegistry
+
+            Public Sub Initialize(ByVal sEnabledKey As String, ByVal sValueKey As String, ByVal sDefault As String, ByVal bDefaultEnabled As Boolean)
+                Dim sReturn As String
+
+                Me.Item.Key = sValueKey
+                Me.Enabled.Key = sEnabledKey
+
+                Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey)
+                    If key Is Nothing Then
+                        My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey)
+                    End If
+                End Using
+
+                Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey)
+                    'is enabled
+                    sReturn = key.GetValue(sEnabledKey)
+
+                    If String.IsNullOrEmpty(sReturn) = True Then
+                        Me.Enabled.Value = bDefaultEnabled
+                    Else
+                        If sReturn = "Y" Then
+                            Me.Enabled.Value = True
+                        Else
+                            Me.Enabled.Value = False
+                        End If
+                    End If
+
+                    'value  
+                    sReturn = key.GetValue(sValueKey)
+
+                    If String.IsNullOrEmpty(sReturn) = False Then
+                        Me.Item.Value = sReturn
+                    Else
+                        Me.Item.Value = sDefault
+                    End If
+                End Using
+            End Sub
+
+            Public Sub SaveSettings(ByVal bEnabled As Boolean, ByVal sValue As String)
+                If Me.Enabled.Key Is Nothing Then
+                    'unsupported value
+                    Exit Sub
+                End If
+
+                Me.Enabled.Value = bEnabled
+                Me.Item.Value = sValue
+
+                If bEnabled = True Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, Me.Enabled.Key, "Y")
+                Else
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, Me.Enabled.Key, "N")
+                End If
+
+                My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, Me.Item.Key, sValue)
+            End Sub
+
+        End Class
+
+        Public Class clsAlerts
+            Public FanHigh As clsAlertInfo
+            Public FanLow As clsAlertInfo
+            Public HashLow As clsAlertInfo
+            Public TempHigh As clsAlertInfo
+            Public XCount As clsAlertInfo
+
+            Public Sub New()
+                FanHigh = New clsAlertInfo
+                FanLow = New clsAlertInfo
+                HashLow = New clsAlertInfo
+                TempHigh = New clsAlertInfo
+                XCount = New clsAlertInfo
+            End Sub
+        End Class
 
         Public Class clsMinerInfo
             Private sShortName As String
             Private sLongName As String
             Private xMinerType As clsSupportedMinerInfo.enSupportedMinerTypes
+            Private xAlertTypes As stAlertTypes
+            Private xAlerts As clsAlerts
+
+            Private ctlsByKey As ControlsByRegistry
 
             Public ReadOnly Property ShortName As String
                 Get
@@ -79,34 +182,198 @@ Public Class frmMain
                 End Get
             End Property
 
+            Public ReadOnly Property AlertTypes As stAlertTypes
+                Get
+                    Return xAlertTypes
+                End Get
+            End Property
+
+            Public ReadOnly Property AlertValues As clsAlerts
+                Get
+                    Return xAlerts
+                End Get
+            End Property
+
             Public Sub New(ByVal MinerType As clsSupportedMinerInfo.enSupportedMinerTypes)
 
                 Me.xMinerType = MinerType
+                Me.xAlerts = New clsAlerts
 
                 Select Case MinerType
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1
                         Me.sShortName = "C1"
                         Me.sLongName = "Antminer C1"
 
+                        Me.xAlertTypes.Fans = True
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = True
+
+                        With Me.xAlerts
+                            .FanHigh.Initialize("AlertIfC1Fan", "AlertValueC1Fan", "", False)
+                            .FanLow.Initialize("AlertIfC1FanLow", "AlertValueC1FanLow", "", False)
+                            .TempHigh.Initialize("AlertIfC1Temp", "AlertValueC1Temp", "", False)
+                            .HashLow.Initialize("AlertIfC1Hash", "AlertValueC1Hash", "", False)
+                            .XCount.Initialize("AlertIfC1XCount", "AlertValueC1XCount", "", False)
+                        End With
+
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1
                         Me.sShortName = "S1"
                         Me.sLongName = "Antminer S1"
+
+                        Me.xAlertTypes.Fans = True
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = True
+
+                        With Me.xAlerts
+                            .FanHigh.Initialize("AlertIfS1Fan", "AlertValueS1Fan", "", False)
+                            .FanLow.Initialize("AlertIfS1FanLow", "AlertValueS1FanLow", "", False)
+                            .TempHigh.Initialize("AlertIfS1Temp", "AlertValueS1Temp", "", False)
+                            .HashLow.Initialize("AlertIfS1Hash", "AlertValueS1Hash", "", False)
+                            .XCount.Initialize("AlertIfS1XCount", "AlertValueS1XCount", "", False)
+                        End With
 
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
                         Me.sShortName = "S2"
                         Me.sLongName = "Antminer S2"
 
+                        Me.xAlertTypes.Fans = True
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = True
+
+                        With Me.xAlerts
+                            .FanHigh.Initialize("AlertIfS2Fan", "AlertValueS2Fan", "", False)
+                            .FanLow.Initialize("AlertIfS2FanLow", "AlertValueS2FanLow", "", False)
+                            .TempHigh.Initialize("AlertIfS2Temp", "AlertValueS2Temp", "", False)
+                            .HashLow.Initialize("AlertIfS2Hash", "AlertValueS2Hash", "", False)
+                            .XCount.Initialize("AlertIfS2XCount", "AlertValueS2XCount", "", False)
+                        End With
+
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3
                         Me.sShortName = "S3"
                         Me.sLongName = "Antminer S3"
+
+                        Me.xAlertTypes.Fans = True
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = True
+
+                        With Me.xAlerts
+                            .FanHigh.Initialize("AlertIfS3Fan", "AlertValueS3Fan", "", False)
+                            .FanLow.Initialize("AlertIfS3FanLow", "AlertValueS3FanLow", "", False)
+                            .TempHigh.Initialize("AlertIfS3Temp", "AlertValueS3Temp", "", False)
+                            .HashLow.Initialize("AlertIfS3Hash", "AlertValueS3Hash", "", False)
+                            .XCount.Initialize("AlertIfS3XCount", "AlertValueS3XCount", "", False)
+                        End With
 
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
                         Me.sShortName = "S4"
                         Me.sLongName = "Antminer S4"
 
-                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
-                        Me.sShortName = "SP"
-                        Me.sLongName = "Spondoolie SP20"
+                        Me.xAlertTypes.Fans = True
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = True
+
+                        With Me.xAlerts
+                            .FanHigh.Initialize("AlertIfS4Fan", "AlertValueS4Fan", "", False)
+                            .FanLow.Initialize("AlertIfS4FanLow", "AlertValueS4FanLow", "", False)
+                            .TempHigh.Initialize("AlertIfS4Temp", "AlertValueS4Temp", "", False)
+                            .HashLow.Initialize("AlertIfS4Hash", "AlertValueS4Hash", "", False)
+                            .XCount.Initialize("AlertIfS4XCount", "AlertValueS4XCount", "", False)
+                        End With
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
+                        Me.sShortName = "S5"
+                        Me.sLongName = "Antminer S5"
+
+                        Me.xAlertTypes.Fans = True
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = True
+
+                        With Me.xAlerts
+                            .FanHigh.Initialize("AlertIfS5Fan", "AlertValueS5Fan", "", False)
+                            .FanLow.Initialize("AlertIfS5FanLow", "AlertValueS5FanLow", "", False)
+                            .TempHigh.Initialize("AlertIfS5Temp", "AlertValueS5Temp", "", False)
+                            .HashLow.Initialize("AlertIfS5Hash", "AlertValueS5Hash", "", False)
+                            .XCount.Initialize("AlertIfS5XCount", "AlertValueS5XCount", "", False)
+                        End With
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10
+                        Me.sShortName = "SP10"
+                        Me.sLongName = "Spondoolies SP10"
+
+                        Me.xAlertTypes.Fans = False
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = False
+
+                        With Me.xAlerts
+                            .TempHigh.Initialize("AlertIfSP10Temp", "AlertValueSP10Temp", "", False)
+                            .HashLow.Initialize("AlertIfSP10Hash", "AlertValueSP10Hash", "", False)
+                        End With
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20
+                        Me.sShortName = "SP20"
+                        Me.sLongName = "Spondoolies SP20"
+
+                        Me.xAlertTypes.Fans = False
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = False
+
+                        With Me.xAlerts
+                            .TempHigh.Initialize("AlertIfSP20Temp", "AlertValueSP20Temp", "", False)
+                            .HashLow.Initialize("AlertIfSP20Hash", "AlertValueSP20Hash", "", False)
+                        End With
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30
+                        Me.sShortName = "SP30"
+                        Me.sLongName = "Spondoolies SP30"
+
+                        Me.xAlertTypes.Fans = False
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = False
+
+                        With Me.xAlerts
+                            .TempHigh.Initialize("AlertIfSP30Temp", "AlertValueSP30Temp", "", False)
+                            .HashLow.Initialize("AlertIfSP30Hash", "AlertValueSP30Hash", "", False)
+                        End With
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31
+                        Me.sShortName = "SP31"
+                        Me.sLongName = "Spondoolies SP31"
+
+                        Me.xAlertTypes.Fans = False
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = False
+
+                        With Me.xAlerts
+                            .TempHigh.Initialize("AlertIfSP31Temp", "AlertValueSP31Temp", "", False)
+                            .HashLow.Initialize("AlertIfSP31Hash", "AlertValueSP31Hash", "", False)
+                        End With
+
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
+                        Me.sShortName = "SP35"
+                        Me.sLongName = "Spondoolies SP35"
+
+                        Me.xAlertTypes.Fans = False
+                        Me.xAlertTypes.Hash = True
+                        Me.xAlertTypes.Temps = True
+                        Me.xAlertTypes.XCount = False
+
+                        With Me.xAlerts
+                            .TempHigh.Initialize("AlertIfSP35Temp", "AlertValueSP35Temp", "", False)
+                            .HashLow.Initialize("AlertIfSP35Hash", "AlertValueSP35Hash", "", False)
+                        End With
+
+                    Case Else
+                        Throw New Exception("Internal error: miner type not found")
 
                 End Select
 
@@ -117,8 +384,13 @@ Public Class frmMain
         Public AntMinerS2 As clsMinerInfo
         Public AntMinerS3 As clsMinerInfo
         Public AntMinerS4 As clsMinerInfo
+        Public AntMinerS5 As clsMinerInfo
         Public AntMinerC1 As clsMinerInfo
-        Public AntMinerSP20 As clsMinerInfo
+        Public SpondoolieSP10 As clsMinerInfo
+        Public SpondoolieSP20 As clsMinerInfo
+        Public SpondoolieSP30 As clsMinerInfo
+        Public SpondoolieSP31 As clsMinerInfo
+        Public SpondoolieSP35 As clsMinerInfo
 
         Public SupportedMinerCollection As System.Collections.Generic.List(Of clsMinerInfo)
 
@@ -129,15 +401,25 @@ Public Class frmMain
             AntMinerS2 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS2)
             AntMinerS3 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS3)
             AntMinerS4 = New clsMinerInfo(enSupportedMinerTypes.AntMinerS4)
-            AntMinerSP20 = New clsMinerInfo(enSupportedMinerTypes.SpondoolieSP20)
+            AntMinerS5 = New clsMinerInfo(enSupportedMinerTypes.AntminerS5)
+            SpondoolieSP10 = New clsMinerInfo(enSupportedMinerTypes.SpondooliesSP10)
+            SpondoolieSP20 = New clsMinerInfo(enSupportedMinerTypes.SpondooliesSP20)
+            SpondoolieSP30 = New clsMinerInfo(enSupportedMinerTypes.SpondooliesSP30)
+            SpondoolieSP31 = New clsMinerInfo(enSupportedMinerTypes.SpondooliesSP31)
+            SpondoolieSP35 = New clsMinerInfo(enSupportedMinerTypes.SpondooliesSP35)
 
             SupportedMinerCollection = New System.Collections.Generic.List(Of clsMinerInfo)
             SupportedMinerCollection.Add(Me.AntMinerS1)
             SupportedMinerCollection.Add(Me.AntMinerS2)
             SupportedMinerCollection.Add(Me.AntMinerS3)
             SupportedMinerCollection.Add(Me.AntMinerS4)
+            SupportedMinerCollection.Add(Me.AntMinerS5)
             SupportedMinerCollection.Add(Me.AntMinerC1)
-            SupportedMinerCollection.Add(Me.AntMinerSP20)
+            SupportedMinerCollection.Add(Me.SpondoolieSP10)
+            SupportedMinerCollection.Add(Me.SpondoolieSP20)
+            SupportedMinerCollection.Add(Me.SpondoolieSP30)
+            SupportedMinerCollection.Add(Me.SpondoolieSP31)
+            SupportedMinerCollection.Add(Me.SpondoolieSP35)
 
         End Sub
 
@@ -174,7 +456,7 @@ Public Class frmMain
             Dim mi As clsMinerInfo
 
             For Each mi In Me.SupportedMinerCollection
-                If mi.MinerTYpe = minerType Then
+                If mi.MinerType = minerType Then
                     Return mi
                 End If
             Next
@@ -195,11 +477,11 @@ Public Class frmMain
     Private Shared minersToCheckQueue As System.Collections.Generic.Queue(Of stMinerConfig)
     Private Shared minersToCheckLock As Object
 
-    'data coming back from the worker threads with Ant refresh data
+    'data coming back from the worker threads with Miner refresh data
     Private Shared MinerRefreshDataQueue As System.Collections.Generic.Queue(Of clsMinerRefreshData)
     Private Shared MinerRefreshLock As Object
 
-    'display refresh period after ant refresh is initiated
+    'display refresh period after miner refresh is initiated
     Private iDisplayRefreshPeriod As Integer
 
     'object populated by the worker threads that is passed back to the UI thread for grid population
@@ -256,7 +538,7 @@ Public Class frmMain
         End Sub
     End Class
 
-    'for Ant scanning on another thread
+    'for miner scanning on another thread
     Private sIPDataResponse As String
     Private sIPToCheck As String
 
@@ -286,6 +568,7 @@ Public Class frmMain
         Dim s() As String
         Dim dr As DataRow
         Dim MinerInfo As clsSupportedMinerInfo.clsMinerInfo
+        Dim bTemp As Boolean
 
         bStarted = True
 
@@ -330,6 +613,7 @@ Public Class frmMain
 
         For Each SupportMiner As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
             Me.cmbMinerType.Items.Add(SupportMiner.LongName)
+            Me.cmbAlertMinerType.Items.Add(SupportMiner.LongName)
         Next
 
         RebootInfo = New System.Collections.Generic.Dictionary(Of String, Date)
@@ -465,72 +749,72 @@ Public Class frmMain
             .AddControl(Me.trackThreadCount, "WorkerThreadCount")
             .AddControl(Me.txtDisplayRefreshInSecs, "DisplayRefreshPeriod")
 
-            'alerts
-            'S1
-            .AddControl(Me.chkAlertIfS1Temp, "AlertIfS1Temp")
-            .AddControl(Me.txtAlertS1Temp, "AlertValueS1Temp")
-            .AddControl(Me.chkAlertIfS1FanHigh, "AlertIfS1Fan")
-            .AddControl(Me.txtAlertS1FanHigh, "AlertValueS1Fan")
-            .AddControl(Me.chkAlertIfS1FanLow, "AlertIfS1FanLow")
-            .AddControl(Me.txtAlertS1FanLow, "AlertValueS1FanLow")
-            .AddControl(Me.chkAlertIfS1Hash, "AlertIfS1Hash")
-            .AddControl(Me.txtAlertS1Hash, "AlertValueS1Hash")
-            .AddControl(Me.chkAlertIfS1XCount, "AlertIfS1XCount")
-            .AddControl(Me.txtAlertS1XCount, "AlertValueS1XCount")
+            ''alerts
+            ''S1
+            '.AddControl(Me.chkAlertIfS1Temp, "AlertIfS1Temp")
+            '.AddControl(Me.txtAlertS1Temp, "AlertValueS1Temp")
+            '.AddControl(Me.chkAlertIfS1FanHigh, "AlertIfS1Fan")
+            '.AddControl(Me.txtAlertS1FanHigh, "AlertValueS1Fan")
+            '.AddControl(Me.chkAlertIfS1FanLow, "AlertIfS1FanLow")
+            '.AddControl(Me.txtAlertS1FanLow, "AlertValueS1FanLow")
+            '.AddControl(Me.chkAlertIfS1Hash, "AlertIfS1Hash")
+            '.AddControl(Me.txtAlertS1Hash, "AlertValueS1Hash")
+            '.AddControl(Me.chkAlertIfS1XCount, "AlertIfS1XCount")
+            '.AddControl(Me.txtAlertS1XCount, "AlertValueS1XCount")
 
-            'S2
-            .AddControl(Me.chkAlertIfS2Temp, "AlertIfS2Temp")
-            .AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
-            .AddControl(Me.chkAlertIfS2FanHigh, "AlertIfS2Fan")
-            .AddControl(Me.txtAlertS2FanHigh, "AlertValueS2Fan")
-            .AddControl(Me.chkAlertIfS2FanLow, "AlertIfS2FanLow")
-            .AddControl(Me.txtAlertS2FanLow, "AlertValueS2FanLow")
-            .AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
-            .AddControl(Me.txtAlertS2Hash, "AlertValueS2Hash")
-            .AddControl(Me.chkAlertIfS2XCount, "AlertIFS2XCount")
-            .AddControl(Me.txtAlertS2XCount, "AlertValueS2XCount")
+            ''S2
+            '.AddControl(Me.chkAlertIfS2Temp, "AlertIfS2Temp")
+            '.AddControl(Me.txtAlertS2Temp, "AlertValueS2Temp")
+            '.AddControl(Me.chkAlertIfS2FanHigh, "AlertIfS2Fan")
+            '.AddControl(Me.txtAlertS2FanHigh, "AlertValueS2Fan")
+            '.AddControl(Me.chkAlertIfS2FanLow, "AlertIfS2FanLow")
+            '.AddControl(Me.txtAlertS2FanLow, "AlertValueS2FanLow")
+            '.AddControl(Me.chkAlertIfS2Hash, "AlertIFS2Hash")
+            '.AddControl(Me.txtAlertS2Hash, "AlertValueS2Hash")
+            '.AddControl(Me.chkAlertIfS2XCount, "AlertIFS2XCount")
+            '.AddControl(Me.txtAlertS2XCount, "AlertValueS2XCount")
 
-            'S3
-            .AddControl(Me.chkAlertIfS3Temp, "AlertIfS3Temp")
-            .AddControl(Me.txtAlertS3Temp, "AlertValueS3Temp")
-            .AddControl(Me.chkAlertIfS3FanHigh, "AlertIfS3Fan")
-            .AddControl(Me.txtAlertS3FanHigh, "AlertValueS3Fan")
-            .AddControl(Me.chkAlertIfS3FanLow, "AlertIfS3FanLow")
-            .AddControl(Me.txtAlertS3FanLow, "AlertValueS3FanLow")
-            .AddControl(Me.chkAlertIfS3Hash, "AlertIFS3Hash")
-            .AddControl(Me.txtAlertS3Hash, "AlertValueS3Hash")
-            .AddControl(Me.chkAlertIfS3XCount, "AlertIFS3XCount")
-            .AddControl(Me.txtAlertS3XCount, "AlertValueS3XCount")
+            ''S3
+            '.AddControl(Me.chkAlertIfS3Temp, "AlertIfS3Temp")
+            '.AddControl(Me.txtAlertS3Temp, "AlertValueS3Temp")
+            '.AddControl(Me.chkAlertIfS3FanHigh, "AlertIfS3Fan")
+            '.AddControl(Me.txtAlertS3FanHigh, "AlertValueS3Fan")
+            '.AddControl(Me.chkAlertIfS3FanLow, "AlertIfS3FanLow")
+            '.AddControl(Me.txtAlertS3FanLow, "AlertValueS3FanLow")
+            '.AddControl(Me.chkAlertIfS3Hash, "AlertIFS3Hash")
+            '.AddControl(Me.txtAlertS3Hash, "AlertValueS3Hash")
+            '.AddControl(Me.chkAlertIfS3XCount, "AlertIFS3XCount")
+            '.AddControl(Me.txtAlertS3XCount, "AlertValueS3XCount")
 
-            'S4
-            .AddControl(Me.chkAlertIfS4Temp, "AlertIfS4Temp")
-            .AddControl(Me.txtAlertS4Temp, "AlertValueS4Temp")
-            .AddControl(Me.chkAlertIfS4FanHigh, "AlertIfS4Fan")
-            .AddControl(Me.txtAlertS4FanHigh, "AlertValueS4Fan")
-            .AddControl(Me.chkAlertIfS4FanLow, "AlertIfS4FanLow")
-            .AddControl(Me.txtAlertS4FanLow, "AlertValueS4FanLow")
-            .AddControl(Me.chkAlertIfS4Hash, "AlertIFS4Hash")
-            .AddControl(Me.txtAlertS4Hash, "AlertValueS4Hash")
-            .AddControl(Me.chkAlertIfS4XCount, "AlertIFS4XCount")
-            .AddControl(Me.txtAlertS4XCount, "AlertValueS4XCount")
+            ''S4
+            '.AddControl(Me.chkAlertIfS4Temp, "AlertIfS4Temp")
+            '.AddControl(Me.txtAlertS4Temp, "AlertValueS4Temp")
+            '.AddControl(Me.chkAlertIfS4FanHigh, "AlertIfS4Fan")
+            '.AddControl(Me.txtAlertS4FanHigh, "AlertValueS4Fan")
+            '.AddControl(Me.chkAlertIfS4FanLow, "AlertIfS4FanLow")
+            '.AddControl(Me.txtAlertS4FanLow, "AlertValueS4FanLow")
+            '.AddControl(Me.chkAlertIfS4Hash, "AlertIFS4Hash")
+            '.AddControl(Me.txtAlertS4Hash, "AlertValueS4Hash")
+            '.AddControl(Me.chkAlertIfS4XCount, "AlertIFS4XCount")
+            '.AddControl(Me.txtAlertS4XCount, "AlertValueS4XCount")
 
-            'C1
-            .AddControl(Me.txtAlertC1Temp, "AlertValueC1Temp")
-            .AddControl(Me.chkAlertIfC1Temp, "AlertIfC1Temp")
-            .AddControl(Me.chkAlertIfC1FanHigh, "AlertIfC1Fan")
-            .AddControl(Me.txtAlertC1FanHigh, "AlertValueC1Fan")
-            .AddControl(Me.chkAlertIfC1FanLow, "AlertIfC1FanLow")
-            .AddControl(Me.txtAlertC1FanLow, "AlertValueC1FanLow")
-            .AddControl(Me.chkAlertIfC1Hash, "AlertIFC1Hash")
-            .AddControl(Me.txtAlertC1Hash, "AlertValueC1Hash")
-            .AddControl(Me.chkAlertIfC1XCount, "AlertIFC1XCount")
-            .AddControl(Me.txtAlertC1XCount, "AlertValueC1XCount")
+            ''C1
+            '.AddControl(Me.txtAlertC1Temp, "AlertValueC1Temp")
+            '.AddControl(Me.chkAlertIfC1Temp, "AlertIfC1Temp")
+            '.AddControl(Me.chkAlertIfC1FanHigh, "AlertIfC1Fan")
+            '.AddControl(Me.txtAlertC1FanHigh, "AlertValueC1Fan")
+            '.AddControl(Me.chkAlertIfC1FanLow, "AlertIfC1FanLow")
+            '.AddControl(Me.txtAlertC1FanLow, "AlertValueC1FanLow")
+            '.AddControl(Me.chkAlertIfC1Hash, "AlertIFC1Hash")
+            '.AddControl(Me.txtAlertC1Hash, "AlertValueC1Hash")
+            '.AddControl(Me.chkAlertIfC1XCount, "AlertIFC1XCount")
+            '.AddControl(Me.txtAlertC1XCount, "AlertValueC1XCount")
 
-            'SP
-            .AddControl(Me.txtAlertSPTemp, "AlertValueSPTemp")
-            .AddControl(Me.chkAlertIfSPTemp, "AlertIfSPTemp")
-            .AddControl(Me.chkAlertIfSPHash, "AlertIFSPHash")
-            .AddControl(Me.txtAlertSPHash, "AlertValueSPHash")
+            ''SP
+            '.AddControl(Me.txtAlertSPTemp, "AlertValueSPTemp")
+            '.AddControl(Me.chkAlertIfSPTemp, "AlertIfSPTemp")
+            '.AddControl(Me.chkAlertIfSPHash, "AlertIFSPHash")
+            '.AddControl(Me.txtAlertSPHash, "AlertValueSPHash")
 
             .AddControl(Me.chkAlertHighlightField, "AlertHighlightField")
             .AddControl(Me.chkAlertShowAnnoyingPopup, "AlertShowAnnoyingPopup")
@@ -602,72 +886,72 @@ Public Class frmMain
 
             Call txtDisplayRefreshInSecs_Leave(sender, e)
 
-            'alerts
-            'S1
-            .SetControlByRegKey(Me.chkAlertIfS1Temp)
-            .SetControlByRegKey(Me.txtAlertS1Temp)
-            .SetControlByRegKey(Me.chkAlertIfS1FanHigh)
-            .SetControlByRegKey(Me.txtAlertS1FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfS1FanLow)
-            .SetControlByRegKey(Me.txtAlertS1FanLow)
-            .SetControlByRegKey(Me.chkAlertIfS1Hash)
-            .SetControlByRegKey(Me.txtAlertS1Hash)
-            .SetControlByRegKey(Me.chkAlertIfS1XCount)
-            .SetControlByRegKey(Me.txtAlertS1XCount)
+            ''alerts
+            ''S1
+            '.SetControlByRegKey(Me.chkAlertIfS1Temp)
+            '.SetControlByRegKey(Me.txtAlertS1Temp)
+            '.SetControlByRegKey(Me.chkAlertIfS1FanHigh)
+            '.SetControlByRegKey(Me.txtAlertS1FanHigh)
+            '.SetControlByRegKey(Me.chkAlertIfS1FanLow)
+            '.SetControlByRegKey(Me.txtAlertS1FanLow)
+            '.SetControlByRegKey(Me.chkAlertIfS1Hash)
+            '.SetControlByRegKey(Me.txtAlertS1Hash)
+            '.SetControlByRegKey(Me.chkAlertIfS1XCount)
+            '.SetControlByRegKey(Me.txtAlertS1XCount)
 
-            'S2
-            .SetControlByRegKey(Me.chkAlertIfS2Temp)
-            .SetControlByRegKey(Me.txtAlertS2Temp)
-            .SetControlByRegKey(Me.chkAlertIfS2FanHigh)
-            .SetControlByRegKey(Me.txtAlertS2FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfS2FanLow)
-            .SetControlByRegKey(Me.txtAlertS2FanLow)
-            .SetControlByRegKey(Me.chkAlertIfS2Hash)
-            .SetControlByRegKey(Me.txtAlertS2Hash)
-            .SetControlByRegKey(Me.chkAlertIfS2XCount)
-            .SetControlByRegKey(Me.txtAlertS2XCount)
+            ''S2
+            '.SetControlByRegKey(Me.chkAlertIfS2Temp)
+            '.SetControlByRegKey(Me.txtAlertS2Temp)
+            '.SetControlByRegKey(Me.chkAlertIfS2FanHigh)
+            '.SetControlByRegKey(Me.txtAlertS2FanHigh)
+            '.SetControlByRegKey(Me.chkAlertIfS2FanLow)
+            '.SetControlByRegKey(Me.txtAlertS2FanLow)
+            '.SetControlByRegKey(Me.chkAlertIfS2Hash)
+            '.SetControlByRegKey(Me.txtAlertS2Hash)
+            '.SetControlByRegKey(Me.chkAlertIfS2XCount)
+            '.SetControlByRegKey(Me.txtAlertS2XCount)
 
-            'S3
-            .SetControlByRegKey(Me.chkAlertIfS3Temp)
-            .SetControlByRegKey(Me.txtAlertS3Temp)
-            .SetControlByRegKey(Me.chkAlertIfS3FanHigh)
-            .SetControlByRegKey(Me.txtAlertS3FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfS3FanLow)
-            .SetControlByRegKey(Me.txtAlertS3FanLow)
-            .SetControlByRegKey(Me.chkAlertIfS3Hash)
-            .SetControlByRegKey(Me.txtAlertS3Hash)
-            .SetControlByRegKey(Me.chkAlertIfS3XCount)
-            .SetControlByRegKey(Me.txtAlertS3XCount)
+            ''S3
+            '.SetControlByRegKey(Me.chkAlertIfS3Temp)
+            '.SetControlByRegKey(Me.txtAlertS3Temp)
+            '.SetControlByRegKey(Me.chkAlertIfS3FanHigh)
+            '.SetControlByRegKey(Me.txtAlertS3FanHigh)
+            '.SetControlByRegKey(Me.chkAlertIfS3FanLow)
+            '.SetControlByRegKey(Me.txtAlertS3FanLow)
+            '.SetControlByRegKey(Me.chkAlertIfS3Hash)
+            '.SetControlByRegKey(Me.txtAlertS3Hash)
+            '.SetControlByRegKey(Me.chkAlertIfS3XCount)
+            '.SetControlByRegKey(Me.txtAlertS3XCount)
 
-            'S4
-            .SetControlByRegKey(Me.chkAlertIfS4Temp)
-            .SetControlByRegKey(Me.txtAlertS4Temp)
-            .SetControlByRegKey(Me.chkAlertIfS4FanHigh)
-            .SetControlByRegKey(Me.txtAlertS4FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfS4FanLow)
-            .SetControlByRegKey(Me.txtAlertS4FanLow)
-            .SetControlByRegKey(Me.chkAlertIfS4Hash)
-            .SetControlByRegKey(Me.txtAlertS4Hash)
-            .SetControlByRegKey(Me.chkAlertIfS4XCount)
-            .SetControlByRegKey(Me.txtAlertS4XCount)
+            ''S4
+            '.SetControlByRegKey(Me.chkAlertIfS4Temp)
+            '.SetControlByRegKey(Me.txtAlertS4Temp)
+            '.SetControlByRegKey(Me.chkAlertIfS4FanHigh)
+            '.SetControlByRegKey(Me.txtAlertS4FanHigh)
+            '.SetControlByRegKey(Me.chkAlertIfS4FanLow)
+            '.SetControlByRegKey(Me.txtAlertS4FanLow)
+            '.SetControlByRegKey(Me.chkAlertIfS4Hash)
+            '.SetControlByRegKey(Me.txtAlertS4Hash)
+            '.SetControlByRegKey(Me.chkAlertIfS4XCount)
+            '.SetControlByRegKey(Me.txtAlertS4XCount)
 
-            'C1
-            .SetControlByRegKey(Me.chkAlertIfC1Temp)
-            .SetControlByRegKey(Me.txtAlertC1Temp)
-            .SetControlByRegKey(Me.chkAlertIfC1FanHigh)
-            .SetControlByRegKey(Me.txtAlertC1FanHigh)
-            .SetControlByRegKey(Me.chkAlertIfC1FanLow)
-            .SetControlByRegKey(Me.txtAlertC1FanLow)
-            .SetControlByRegKey(Me.chkAlertIfC1Hash)
-            .SetControlByRegKey(Me.txtAlertC1Hash)
-            .SetControlByRegKey(Me.chkAlertIfC1XCount)
-            .SetControlByRegKey(Me.txtAlertC1XCount)
+            ''C1
+            '.SetControlByRegKey(Me.chkAlertIfC1Temp)
+            '.SetControlByRegKey(Me.txtAlertC1Temp)
+            '.SetControlByRegKey(Me.chkAlertIfC1FanHigh)
+            '.SetControlByRegKey(Me.txtAlertC1FanHigh)
+            '.SetControlByRegKey(Me.chkAlertIfC1FanLow)
+            '.SetControlByRegKey(Me.txtAlertC1FanLow)
+            '.SetControlByRegKey(Me.chkAlertIfC1Hash)
+            '.SetControlByRegKey(Me.txtAlertC1Hash)
+            '.SetControlByRegKey(Me.chkAlertIfC1XCount)
+            '.SetControlByRegKey(Me.txtAlertC1XCount)
 
-            'SP
-            .SetControlByRegKey(Me.chkAlertIfSPTemp)
-            .SetControlByRegKey(Me.txtAlertSPTemp)
-            .SetControlByRegKey(Me.chkAlertIfSPHash)
-            .SetControlByRegKey(Me.txtAlertSPHash)
+            ''SP
+            '.SetControlByRegKey(Me.chkAlertIfSPTemp)
+            '.SetControlByRegKey(Me.txtAlertSPTemp)
+            '.SetControlByRegKey(Me.chkAlertIfSPHash)
+            '.SetControlByRegKey(Me.txtAlertSPHash)
 
             .SetControlByRegKey(Me.chkAlertHighlightField, True)
             .SetControlByRegKey(Me.chkAlertShowNotifyPopup, True)
@@ -722,6 +1006,58 @@ Public Class frmMain
             For Each sKey As String In key.GetSubKeyNames
                 Me.lstPools.AddItem(My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\Pools\" & sKey, "Description", ""), sKey)
             Next
+        End Using
+
+        'convert SP20 values that were generic under SP to SP20
+        Using key As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey)
+            For Each sKey As String In key.GetValueNames
+                If sKey = "AlertIfSP20Hash" Then
+                    bTemp = True
+
+                    Exit For
+                End If
+            Next
+
+            If bTemp = False Then
+                If key.GetValue("AlertIfSPHash") IsNot Nothing Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertIfSP20Hash", key.GetValue("AlertIfSPHash"))
+                Else
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertIfSP20Hash", "N")
+                End If
+
+                If key.GetValue("AlertIfSPTemp") IsNot Nothing Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertIfSP20Temp", key.GetValue("AlertIfSPTemp"))
+                Else
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertIfSP20Temp", "")
+                End If
+
+                If key.GetValue("AlertValueSPHash") IsNot Nothing Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertValueSP20Hash", key.GetValue("AlertValueSPHash"))
+                Else
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertValueSP20Hash", "N")
+                End If
+
+                If key.GetValue("AlertValueSPTemp") IsNot Nothing Then
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertValueSP20Temp", key.GetValue("AlertValueSPTemp"))
+                Else
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey, "AlertValueSP20Temp", "")
+                End If
+
+                Using key2 As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\AntsV2")
+                    If key2 Is Nothing Then
+                        My.Computer.Registry.CurrentUser.CreateSubKey(csRegKey & "\AntsV2")
+                    End If
+                End Using
+
+                'iterate through miner entries and change those with type SP to SP20
+                Using key2 As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(csRegKey & "\AntsV2")
+                    For Each sKey As String In key2.GetSubKeyNames
+                        If My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "Type", "") = "SP" Then
+                            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "Type", "SP20")
+                        End If
+                    Next
+                End Using
+            End If
         End Using
 
         'config
@@ -870,7 +1206,7 @@ Public Class frmMain
 
         'startup if ready
         If iAntsEnabled = 0 Then
-            MsgBox("Please add some active Ant addresses first." & vbCrLf & vbCrLf & "You can also use the scan feature to auto detect your Ants.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+            MsgBox("Please add some active miner addresses first." & vbCrLf & vbCrLf & "You can also use the scan feature to auto detect your supported miners.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
             Me.TabControl1.SelectTab(1)
 
@@ -1818,7 +2154,7 @@ Public Class frmMain
 
     Private Function GetHeader() As String
 
-        Return "Authorization: Basic " & Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(Me.txtAntWebUsername.Text & ":" & Me.txtAntWebPassword.Text)) & System.Environment.NewLine
+        Return "Authorization: Basic " & Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(Me.txtMinerWebUsername.Text & ":" & Me.txtMinerWebPassword.Text)) & System.Environment.NewLine
 
     End Function
 
@@ -1857,7 +2193,7 @@ Public Class frmMain
             sbStep.Append("1.0")
 
             '#If DEBUG Then
-            '            MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1418083020,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 3.12.0""}],""STATS"":[{""STATS"":0,""ID"":""BMM0"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":18,""frequency"":""225"",""voltage"":5,""hwv1"":7,""hwv2"":0,""hwv3"":0,""hwv4"":3,""fan_num"":2,""fan1"":1200,""fan2"":780,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":35,""temp2"":30,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":32,""temp_max"":38,""Device Hardware%"":0.0006,""no_matching_work"":13,""chain_acn1"":16,""chain_acn2"":16,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":65534,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooooo ooooooo- "",""chain_acs2"":""ooooo-oo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""},{""STATS"":1,""ID"":""POOL0"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15},{""STATS"":2,""ID"":""POOL1"",""Elapsed"":23914,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":414.46,""GHS av"":413.15}],""id"":1}", "}{", "},{")
+            '            MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1419899238,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.7.0""}],""STATS"":[{""CGMiner"":""4.7.0"",""Miner"":""3.4.3.0"",""CompileTime"":""Thu Dec 18 20:21:28 CST 2014"",""Type"":""Antminer S5""}{""STATS"":0,""ID"":""BTM0"",""Elapsed"":3624,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":1168.94,""GHS av"":1147.56,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":4,""frequency"":""356.25"",""voltage"":""0.725"",""hwv1"":3,""hwv2"":4,""hwv3"":3,""hwv4"":0,""fan_num"":4,""fan1"":3360,""fan2"":0,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":43,""temp2"":47,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":45,""temp_max"":47,""Device Hardware%"":0.0009,""no_matching_work"":9,""chain_acn1"":30,""chain_acn2"":30,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":0,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooo oooooooo oooooooo oooooooo "",""chain_acs2"":""oooooo oooooooo oooooooo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}", "}{", "},{")
             '#End If
 
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sStats)
@@ -1868,14 +2204,17 @@ Public Class frmMain
             For Each ja In j.Property("STATS")
                 Select Case MinerData.MinerType
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
-                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
                         If ja.Count = 4 Then
                             jp1 = ja(0)
                         Else
                             jp1 = ja(1)
                         End If
 
-                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
                         jp1 = ja(0)
 
                 End Select
@@ -1886,7 +2225,7 @@ Public Class frmMain
                 Select Case MinerData.MinerType
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, _
                          clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
-                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4, clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
 
                         ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
 
@@ -1944,7 +2283,7 @@ Public Class frmMain
                         If MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2 OrElse _
                            MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1 OrElse _
                            MinerData.MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4 Then
-
+                            
                             count(2) = HowManyInString(jp1.Value(Of String)("chain_acs3"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs3"), "x")
                             count(3) = HowManyInString(jp1.Value(Of String)("chain_acs4"), "-") + HowManyInString(jp1.Value(Of String)("chain_acs4"), "x")
 
@@ -1995,7 +2334,10 @@ Public Class frmMain
                         sbStep.Clear()
                         sbStep.Append("1.7")
 
-                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
+
                         sbStep.Clear()
                         sbStep.Append("1.8")
 
@@ -2041,7 +2383,7 @@ Public Class frmMain
             sbStep.Append("2.0")
 
             '#If DEBUG Then
-            '            MinerData.sSummary = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":11,""Msg"":""Summary"",""Description"":""cgminer 4.6.1""}],""SUMMARY"":[{""Elapsed"":163672,""GHS 5s"":2251.62,""GHS av"":2188.60,""Found Blocks"":0,""Getworks"":17423,""Accepted"":39024,""Rejected"":1393,""Hardware Errors"":84,""Utility"":14.31,""Discarded"":190245,""Stale"":0,""Get Failures"":0,""Local Work"":111561705,""Remote Failures"":0,""Network Blocks"":263,""Total MH"":358211780173.0000,""Work Utility"":30574.35,""Difficulty Accepted"":79921152.00000000,""Difficulty Rejected"":2852864.00000000,""Difficulty Stale"":0.00000000,""Best Share"":0,""Device Hardware%"":0.0001,""Device Rejected%"":3.4206,""Pool Rejected%"":3.4466,""Pool Stale%"":0.0000,""Last getwork"":1418065090}],""id"":1}"
+            '            MinerData.sSummary = "{""STATUS"":[{""STATUS"":""S"",""When"":1419899238,""Code"":11,""Msg"":""Summary"",""Description"":""cgminer 4.7.0""}],""SUMMARY"":[{""Elapsed"":3627,""GHS 5s"":1168.94,""GHS av"":1147.64,""Found Blocks"":0,""Getworks"":260,""Accepted"":498,""Rejected"":19,""Hardware Errors"":9,""Utility"":8.24,""Discarded"":9775,""Stale"":0,""Get Failures"":0,""Local Work"":3948467,""Remote Failures"":0,""Network Blocks"":5,""Total MH"":4162750238.0000,""Work Utility"":16045.36,""Difficulty Accepted"":930881.15243851,""Difficulty Rejected"":34098.47781631,""Difficulty Stale"":0.00000000,""Best Share"":563865,""Device Hardware%"":0.0009,""Device Rejected%"":3.5153,""Pool Rejected%"":3.5336,""Pool Stale%"":0.0000,""Last getwork"":1419899238}],""id"":1}"
             '#End If
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sSummary)
 
@@ -2052,7 +2394,7 @@ Public Class frmMain
                 Select Case MinerData.MinerType
                     Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, _
                          clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
-                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                         clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4, clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
 
                         sbStep.Clear()
                         sbStep.Append("2.2")
@@ -2067,7 +2409,10 @@ Public Class frmMain
                             dr.Item("Blocks") = jp1.Value(Of String)("Found Blocks")
                         Next
 
-                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                    Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
+
                         sbStep.Clear()
                         sbStep.Append("2.3")
 
@@ -2089,7 +2434,7 @@ Public Class frmMain
             sbStep.Append("3.0")
 
             '#If DEBUG Then
-            '            MinerData.sPools = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":7,""Msg"":""3 Pool(s)"",""Description"":""cgminer 4.6.1""}],""POOLS"":[{""POOL"":0,""URL"":""stratum+tcp://pool.com:3335"",""Status"":""Alive"",""Priority"":0,""Quota"":1,""Long Poll"":""N"",""Getworks"":17420,""Accepted"":39023,""Rejected"":1393,""Discarded"":190245,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""0:00:03"",""Diff"":""2.05K"",""Diff1 Shares"":83402560,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":79919104.00000000,""Difficulty Rejected"":2852864.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":2048.00000000,""Has Stratum"":true,""Stratum Active"":true,""Stratum URL"":""pool.com"",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":3.4467,""Pool Stale%"":0.0000},{""POOL"":1,""URL"":""stratum+tcp://pool.com:3335"",""Status"":""Alive"",""Priority"":1,""Quota"":1,""Long Poll"":""N"",""Getworks"":1,""Accepted"":1,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""45:27:53"",""Diff"":""2.05K"",""Diff1 Shares"":128,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":2048.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":2048.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000},{""POOL"":2,""URL"":""stratum+tcp://pool.com:3333"",""Status"":""Alive"",""Priority"":2,""Quota"":1,""Long Poll"":""N"",""Getworks"":2,""Accepted"":0,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""user.163"",""Last Share Time"":""0"",""Diff"":""16"",""Diff1 Shares"":0,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":0.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":0.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000}],""id"":1}"
+            '            MinerData.sPools = "{""STATUS"":[{""STATUS"":""S"",""When"":1419899238,""Code"":7,""Msg"":""3 Pool(s)"",""Description"":""cgminer 4.7.0""}],""POOLS"":[{""POOL"":0,""URL"":""stratum+tcp://192.168.1.5:9332"",""Status"":""Alive"",""Priority"":0,""Quota"":1,""Long Poll"":""N"",""Getworks"":257,""Accepted"":498,""Rejected"":19,""Discarded"":9775,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""IYFTech"",""Last Share Time"":""0:00:04"",""Diff"":""1.77K"",""Diff1 Shares"":968975,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":930881.15243851,""Difficulty Rejected"":34098.47781631,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":1774.17342395,""Has Stratum"":true,""Stratum Active"":true,""Stratum URL"":""192.168.1.5"",""Has GBT"":false,""Best Share"":563865,""Pool Rejected%"":3.5336,""Pool Stale%"":0.0000},{""POOL"":1,""URL"":""stratum+tcp://btcguild.gigaforge.com:3333"",""Status"":""Alive"",""Priority"":1,""Quota"":1,""Long Poll"":""N"",""Getworks"":2,""Accepted"":0,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""xxxxx"",""Last Share Time"":""0"",""Diff"":""2.05K"",""Diff1 Shares"":0,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":0.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":0.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000},{""POOL"":2,""URL"":""stratum+tcp://stratum.mining.eligius.st:3334"",""Status"":""Alive"",""Priority"":2,""Quota"":1,""Long Poll"":""N"",""Getworks"":1,""Accepted"":0,""Rejected"":0,""Discarded"":0,""Stale"":0,""Get Failures"":0,""Remote Failures"":0,""User"":""xxxxxx"",""Last Share Time"":""0"",""Diff"":"""",""Diff1 Shares"":0,""Proxy Type"":"""",""Proxy"":"""",""Difficulty Accepted"":0.00000000,""Difficulty Rejected"":0.00000000,""Difficulty Stale"":0.00000000,""Last Share Difficulty"":0.00000000,""Has Stratum"":true,""Stratum Active"":false,""Stratum URL"":"""",""Has GBT"":false,""Best Share"":0,""Pool Rejected%"":0.0000,""Pool Stale%"":0.0000}],""id"":1}"
             '#End If
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sPools)
 
@@ -2117,7 +2462,7 @@ Public Class frmMain
                     Select Case MinerData.MinerType
                         Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, _
                              clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, _
-                             clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
+                             clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4, clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
                             sbStep.Clear()
                             sbStep.Append("3.3")
 
@@ -2158,7 +2503,10 @@ Public Class frmMain
                             sbStep.Clear()
                             sbStep.Append("3.5")
 
-                        Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                        Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30, _
+                         clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
+
                             sbStep.Clear()
                             sbStep.Append("3.6")
 
@@ -2290,11 +2638,11 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub HandleAlerts(ByRef drAnt As DataRow, ByRef drAntConfig As DataRow, ByRef wb As WebBrowser)
+    Private Sub HandleAlerts(ByRef drMiner As DataRow, ByRef drMinerConfig As DataRow, ByRef wb As WebBrowser)
 
         Dim x As Integer
         Dim dr As DataGridViewRow
-        Dim iAlertCount, iAntAlertCount As Integer
+        Dim iAlertCount, iMinerAlertCount As Integer
         Dim bStep As Byte
         Dim colHighlightColumns As System.Collections.Generic.List(Of Integer)
         Dim bFound As Boolean
@@ -2302,7 +2650,7 @@ Public Class frmMain
         'alert logic
         Try
             For Each dr In Me.dataMiners.Rows
-                If dr.Cells("ID").Value.ToString = drAnt.Item("ID").ToString Then
+                If dr.Cells("ID").Value.ToString = drMiner.Item("ID").ToString Then
                     bFound = True
 
                     Exit For
@@ -2310,13 +2658,13 @@ Public Class frmMain
             Next
 
             If bFound = False Then
-                AddToLogQueue("Ant " & drAnt("ID") & " not found in HandleAlerts!")
+                AddToLogQueue("Miner " & drMiner("ID") & " not found in HandleAlerts!")
 
                 Exit Sub
             End If
 
             If IsDBNull(dr.Cells("Uptime").Value) = False AndAlso dr.Cells("Uptime").Value <> "ERROR" AndAlso dr.Cells("Uptime").Value <> "???" Then
-                iAntAlertCount = 0
+                iMinerAlertCount = 0
 
                 If dr.Tag Is Nothing Then
                     dr.Tag = New System.Collections.Generic.List(Of Integer)
@@ -2325,532 +2673,656 @@ Public Class frmMain
                 colHighlightColumns = dr.Tag
                 colHighlightColumns.Clear()
 
-                Select Case drAntConfig("Type")
-                    Case "S1"
-                        If Me.chkAlertIfS1Temp.Checked = True Then
-                            bStep = 1
+                For Each MinerInfo As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
+                    If MinerInfo.ShortName = drMinerConfig("Type") Then
+                        'temp check available for this miner type?
+                        bStep = 1
 
-                            x = Val(Me.txtAlertS1Temp.Text)
+                        If MinerInfo.AlertTypes.Temps = True Then
+                            'temp check enabled for this miner type?
+                            If MinerInfo.AlertValues.TempHigh.Enabled.Value = True Then
+                                'compare
+                                x = Val(MinerInfo.AlertValues.TempHigh.Item.Value)
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                    iAntAlertCount += 1
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+                                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S1 Temp Alert")
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", MinerInfo.ShortName & " Temp Alert (> " & MinerInfo.AlertValues.TempHigh.Item.Value & ")")
+                                    End If
                                 End If
                             End If
                         End If
 
-                        If Me.chkAlertIfS1FanHigh.Checked = True Then
-                            bStep = 2
+                        'available?
+                        bStep = 2
 
-                            x = Val(Me.txtAlertS1FanHigh.Text)
+                        If MinerInfo.AlertTypes.Fans = True Then
+                            'enabled for this miner type?
+                            If MinerInfo.AlertValues.FanHigh.Enabled.Value = True Then
+                                'compare
+                                x = Val(MinerInfo.AlertValues.FanHigh.Item.Value)
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                    iAntAlertCount += 1
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S1 Fan Alert")
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", MinerInfo.ShortName & " Fan Alert (> " & MinerInfo.AlertValues.FanHigh.Item.Value & ")")
+                                    End If
                                 End If
                             End If
-                        End If
 
-                        If Me.chkAlertIfS1FanLow.Checked = True Then
+                            'available?
                             bStep = 3
 
-                            x = Val(Me.txtAlertS1FanLow.Text)
+                            'enabled for this miner type?
+                            If MinerInfo.AlertValues.FanLow.Enabled.Value = True Then
+                                'compare
+                                x = Val(MinerInfo.AlertValues.FanLow.Item.Value)
 
-                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                                iAntAlertCount += 1
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                                        iMinerAlertCount += 1
 
-                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S1 Fan Alert")
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", MinerInfo.ShortName & " Fan Alert (< " & MinerInfo.AlertValues.FanHigh.Item.Value & ")")
+                                    End If
+                                End If
                             End If
                         End If
 
-                        If Me.chkAlertIfS1Hash.Checked = True Then
-                            bStep = 4
+                        bStep = 4
 
-                            x = Val(Me.txtAlertS1Hash.Text)
+                        If MinerInfo.AlertTypes.Hash = True Then
+                            'enabled for this miner type?
+                            If MinerInfo.AlertValues.HashLow.Enabled.Value = True Then
+                                'compare
+                                x = Val(MinerInfo.AlertValues.HashLow.Item.Value)
 
-                            If x > 0 Then
                                 If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                    iAntAlertCount += 1
+                                    iMinerAlertCount += 1
 
                                     colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S1 Hash Alert")
+                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", MinerInfo.ShortName & " Hash Alert (< " & MinerInfo.AlertValues.HashLow.Item.Value & ")")
 
                                     If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
+                                        If drMinerConfig("RebootViaSSH") = "Y" Then
+                                            Call RebootMiner(drMinerConfig, False, True, Nothing)
                                         Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
+                                            Call RebootMiner(drMinerConfig, False, False, wb)
                                         End If
                                     End If
                                 End If
                             End If
                         End If
 
-                        If Me.chkAlertIfS1XCount.Checked = True Then
-                            bStep = 5
+                        bStep = 5
 
-                            x = Val(Me.txtAlertS1XCount.Text)
+                        If MinerInfo.AlertTypes.XCount = True Then
+                            'enabled for this miner type?
+                            If MinerInfo.AlertValues.XCount.Enabled.Value = True Then
+                                'compare
+                                x = Val(MinerInfo.AlertValues.XCount.Item.Value)
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                    iAntAlertCount += 1
+                                If x > 0 Then
+                                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+                                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S1 XCount Alert")
+                                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", MinerInfo.ShortName & " XCount Alert (< " & MinerInfo.AlertValues.XCount.Item.Value & ")")
 
-                                    'use SSH only if using the API, as the web code has its own reboot logic
-                                    If Me.chkAlertRebootIfXd.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
+                                        'use SSH only if using the API, as the web code has its own reboot logic
+                                        If Me.chkAlertRebootIfXd.Checked = True Then
+                                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                                            Else
+                                                Call RebootMiner(drMinerConfig, False, False, wb)
+                                            End If
                                         End If
                                     End If
                                 End If
                             End If
                         End If
 
-                    Case "S2"
-                        If Me.chkAlertIfS2Temp.Checked = True Then
-                            bStep = 6
+                        Exit For
+                    End If
+                Next
 
-                            x = Val(Me.txtAlertS2Temp.Text)
+                'If 1 = 2 Then
+                '    Select Case drMinerConfig("Type")
+                '        Case "S1"
+                '            If Me.chkAlertIfS1Temp.Checked = True Then
+                '                bStep = 1
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS1Temp.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S2 Temp Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
-                        If Me.chkAlertIfS2FanHigh.Checked = True Then
-                            bStep = 7
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S1 Temp Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS2FanHigh.Text)
+                '            If Me.chkAlertIfS1FanHigh.Checked = True Then
+                '                bStep = 2
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS1FanHigh.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S2 Fan Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                        If Me.chkAlertIfS2FanLow.Checked = True Then
-                            bStep = 8
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S1 Fan Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS2FanLow.Text)
+                '            If Me.chkAlertIfS1FanLow.Checked = True Then
+                '                bStep = 3
 
-                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                                iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS1FanLow.Text)
 
-                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                '                    iMinerAlertCount += 1
 
-                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S2 Fan Alert")
-                            End If
+                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                        End If
+                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S1 Fan Alert")
+                '                End If
+                '            End If
 
-                        If Me.chkAlertIfS2Hash.Checked = True Then
-                            bStep = 9
+                '            If Me.chkAlertIfS1Hash.Checked = True Then
+                '                bStep = 4
 
-                            x = Val(Me.txtAlertS2Hash.Text)
+                '                x = Val(Me.txtAlertS1Hash.Text)
 
-                            If x > 0 Then
-                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                    iAntAlertCount += 1
+                '                If x > 0 Then
+                '                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                '                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+                '                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S2 Hash Alert")
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S1 Hash Alert")
 
-                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                        If Me.chkAlertIfS2XCount.Checked = True Then
-                            bStep = 10
+                '            If Me.chkAlertIfS1XCount.Checked = True Then
+                '                bStep = 5
 
-                            x = Val(Me.txtAlertS2XCount.Text)
+                '                x = Val(Me.txtAlertS1XCount.Text)
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                    iAntAlertCount += 1
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S2 XCount Alert")
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S1 XCount Alert")
 
-                                    'use SSH only if using the API, as the web code has its own reboot logic
-                                    If Me.chkAlertRebootIfXd.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        'use SSH only if using the API, as the web code has its own reboot logic
+                '                        If Me.chkAlertRebootIfXd.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                    Case "S3"
-                        If Me.chkAlertIfS3Temp.Checked = True Then
-                            bStep = 1
+                '        Case "S2"
+                '            If Me.chkAlertIfS2Temp.Checked = True Then
+                '                bStep = 6
 
-                            x = Val(Me.txtAlertS3Temp.Text)
+                '                x = Val(Me.txtAlertS2Temp.Text)
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S3 Temp Alert")
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S2 Temp Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                        If Me.chkAlertIfS3FanHigh.Checked = True Then
-                            bStep = 2
+                '            If Me.chkAlertIfS2FanHigh.Checked = True Then
+                '                bStep = 7
 
-                            x = Val(Me.txtAlertS3FanHigh.Text)
+                '                x = Val(Me.txtAlertS2FanHigh.Text)
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S3 Fan Alert")
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S2 Fan Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                        If Me.chkAlertIfS3FanLow.Checked = True Then
-                            bStep = 3
+                '            If Me.chkAlertIfS2FanLow.Checked = True Then
+                '                bStep = 8
 
-                            x = Val(Me.txtAlertS3FanLow.Text)
+                '                x = Val(Me.txtAlertS2FanLow.Text)
 
-                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                                iAntAlertCount += 1
+                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                '                    iMinerAlertCount += 1
 
-                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S3 Fan Alert")
-                            End If
-                        End If
+                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S2 Fan Alert")
+                '                End If
 
-                        If Me.chkAlertIfS3Hash.Checked = True Then
-                            bStep = 4
+                '            End If
 
-                            x = Val(Me.txtAlertS3Hash.Text)
+                '            If Me.chkAlertIfS2Hash.Checked = True Then
+                '                bStep = 9
 
-                            If x > 0 Then
-                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS2Hash.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S3 Hash Alert")
+                '                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
-                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S2 Hash Alert")
 
-                        If Me.chkAlertIfS3XCount.Checked = True Then
-                            bStep = 5
+                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS3XCount.Text)
+                '            If Me.chkAlertIfS2XCount.Checked = True Then
+                '                bStep = 10
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS2XCount.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S3 XCount Alert")
+                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
-                                    'use SSH only if using the API, as the web code has its own reboot logic
-                                    If Me.chkAlertRebootIfXd.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S2 XCount Alert")
 
-                    Case "S4"
-                        If Me.chkAlertIfS4Temp.Checked = True Then
-                            bStep = 1
+                '                        'use SSH only if using the API, as the web code has its own reboot logic
+                '                        If Me.chkAlertRebootIfXd.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS4Temp.Text)
+                '        Case "S3"
+                '            If Me.chkAlertIfS3Temp.Checked = True Then
+                '                bStep = 1
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS3Temp.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S4 Temp Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
-                        If Me.chkAlertIfS4FanHigh.Checked = True Then
-                            bStep = 2
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S3 Temp Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS4FanHigh.Text)
+                '            If Me.chkAlertIfS3FanHigh.Checked = True Then
+                '                bStep = 2
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS3FanHigh.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S4 Fan Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                        If Me.chkAlertIfS4FanLow.Checked = True Then
-                            bStep = 3
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S3 Fan Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS4FanLow.Text)
+                '            If Me.chkAlertIfS3FanLow.Checked = True Then
+                '                bStep = 3
 
-                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                                iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS3FanLow.Text)
 
-                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                '                    iMinerAlertCount += 1
 
-                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S4 Fan Alert")
-                            End If
-                        End If
+                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                        If Me.chkAlertIfS4Hash.Checked = True Then
-                            bStep = 4
+                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S3 Fan Alert")
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS4Hash.Text)
+                '            If Me.chkAlertIfS3Hash.Checked = True Then
+                '                bStep = 4
 
-                            If x > 0 Then
-                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS3Hash.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S4 Hash Alert")
+                '                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
-                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S3 Hash Alert")
 
-                        If Me.chkAlertIfS4XCount.Checked = True Then
-                            bStep = 5
+                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertS4XCount.Text)
+                '            If Me.chkAlertIfS3XCount.Checked = True Then
+                '                bStep = 5
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS3XCount.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S4 XCount Alert")
+                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
-                                    'use SSH only if using the API, as the web code has its own reboot logic
-                                    If Me.chkAlertRebootIfXd.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S3 XCount Alert")
 
-                    Case "C1"
-                        If Me.chkAlertIfC1Temp.Checked = True Then
-                            bStep = 1
+                '                        'use SSH only if using the API, as the web code has its own reboot logic
+                '                        If Me.chkAlertRebootIfXd.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertC1Temp.Text)
+                '        Case "S4"
+                '            If Me.chkAlertIfS4Temp.Checked = True Then
+                '                bStep = 1
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS4Temp.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "C1 Temp Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
-                        If Me.chkAlertIfC1FanHigh.Checked = True Then
-                            bStep = 2
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S4 Temp Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertC1FanHigh.Text)
+                '            If Me.chkAlertIfS4FanHigh.Checked = True Then
+                '                bStep = 2
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS4FanHigh.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "C1 Fan Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                        If Me.chkAlertIfC1FanLow.Checked = True Then
-                            bStep = 3
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S4 Fan Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertC1FanLow.Text)
+                '            If Me.chkAlertIfS4FanLow.Checked = True Then
+                '                bStep = 3
 
-                            If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                                iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS4FanLow.Text)
 
-                                colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                '                    iMinerAlertCount += 1
 
-                                Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "C1 Fan Alert")
-                            End If
-                        End If
+                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                        If Me.chkAlertIfC1Hash.Checked = True Then
-                            bStep = 4
+                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S4 Fan Alert")
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertC1Hash.Text)
+                '            If Me.chkAlertIfS4Hash.Checked = True Then
+                '                bStep = 4
 
-                            If x > 0 Then
-                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS4Hash.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "C1 Hash Alert")
+                '                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
 
-                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S4 Hash Alert")
 
-                        If Me.chkAlertIfC1XCount.Checked = True Then
-                            bStep = 5
+                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertC1XCount.Text)
+                '            If Me.chkAlertIfS4XCount.Checked = True Then
+                '                bStep = 5
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertS4XCount.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "C1 XCount Alert")
+                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
 
-                                    'use SSH only if using the API, as the web code has its own reboot logic
-                                    If Me.chkAlertRebootIfXd.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S4 XCount Alert")
 
-                    Case "SP"
-                        If Me.chkAlertIfSPTemp.Checked = True Then
-                            bStep = 1
+                '                        'use SSH only if using the API, as the web code has its own reboot logic
+                '                        If Me.chkAlertRebootIfXd.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertSPTemp.Text)
+                '        Case "C1"
+                '            If Me.chkAlertIfC1Temp.Checked = True Then
+                '                bStep = 1
 
-                            If x > 0 Then
-                                If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertC1Temp.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "SP Temp Alert")
-                                End If
-                            End If
-                        End If
+                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
 
-                        If Me.chkAlertIfSPHash.Checked = True Then
-                            bStep = 4
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "C1 Temp Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                            x = Val(Me.txtAlertSPHash.Text)
+                '            If Me.chkAlertIfC1FanHigh.Checked = True Then
+                '                bStep = 2
 
-                            If x > 0 Then
-                                If Val(dr.Cells("GH/s(avg)").Value) <= x Then
-                                    iAntAlertCount += 1
+                '                x = Val(Me.txtAlertC1FanHigh.Text)
 
-                                    colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
+                '                        iMinerAlertCount += 1
 
-                                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "SP Hash Alert")
+                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
 
-                                    If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                                        If drAntConfig("RebootViaSSH") = "Y" Then
-                                            Call RebootMiner(drAntConfig, False, True, Nothing)
-                                        Else
-                                            Call RebootMiner(drAntConfig, False, False, wb)
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "C1 Fan Alert")
+                '                    End If
+                '                End If
+                '            End If
 
-                End Select
+                '            If Me.chkAlertIfC1FanLow.Checked = True Then
+                '                bStep = 3
 
-                dr.Cells("ACount").Value = iAntAlertCount
+                '                x = Val(Me.txtAlertC1FanLow.Text)
+
+                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
+                '                    iMinerAlertCount += 1
+
+                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
+
+                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "C1 Fan Alert")
+                '                End If
+                '            End If
+
+                '            If Me.chkAlertIfC1Hash.Checked = True Then
+                '                bStep = 4
+
+                '                x = Val(Me.txtAlertC1Hash.Text)
+
+                '                If x > 0 Then
+                '                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                '                        iMinerAlertCount += 1
+
+                '                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "C1 Hash Alert")
+
+                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
+
+                '            If Me.chkAlertIfC1XCount.Checked = True Then
+                '                bStep = 5
+
+                '                x = Val(Me.txtAlertC1XCount.Text)
+
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
+                '                        iMinerAlertCount += 1
+
+                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
+
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "C1 XCount Alert")
+
+                '                        'use SSH only if using the API, as the web code has its own reboot logic
+                '                        If Me.chkAlertRebootIfXd.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
+
+                '        Case "SP"
+                '            If Me.chkAlertIfSPTemp.Checked = True Then
+                '                bStep = 1
+
+                '                x = Val(Me.txtAlertSPTemp.Text)
+
+                '                If x > 0 Then
+                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
+                '                        iMinerAlertCount += 1
+
+                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
+
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "SP Temp Alert")
+                '                    End If
+                '                End If
+                '            End If
+
+                '            If Me.chkAlertIfSPHash.Checked = True Then
+                '                bStep = 4
+
+                '                x = Val(Me.txtAlertSPHash.Text)
+
+                '                If x > 0 Then
+                '                    If Val(dr.Cells("GH/s(avg)").Value) <= x Then
+                '                        iMinerAlertCount += 1
+
+                '                        colHighlightColumns.Add(dr.Cells("GH/s(avg)").ColumnIndex)
+
+                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "SP Hash Alert")
+
+                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
+                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
+                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
+                '                            Else
+                '                                Call RebootMiner(drMinerConfig, False, False, wb)
+                '                            End If
+                '                        End If
+                '                    End If
+                '                End If
+                '            End If
+
+                '    End Select
+                'End If
+
+                dr.Cells("ACount").Value = iMinerAlertCount
 
                 If dr.Tag IsNot Nothing Then
                     colHighlightColumns = dr.Tag
@@ -3288,7 +3760,7 @@ Public Class frmMain
                             'y = InStr(sIPDataResponse, """Type"":""S3""}{""STATS")
 
                             '#If DEBUG Then
-                            'sIPDataResponse = "{""STATUS"":[{""STATUS"":""S"",""When"":1418065091,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.6.1""}],""STATS"":[{""CGMiner"":""4.6.1"",""Miner"":""3.4.3.0"",""CompileTime"":"""",""Type"":""""}{""STATS"":0,""ID"":""BTM0"",""Elapsed"":163672,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":2251.62,""GHS av"":2188.60,""baud"":115200,""miner_count"":4,""asic_count"":8,""timeout"":7,""frequency"":""218.75"",""voltage"":""0.725"",""hwv1"":3,""hwv2"":4,""hwv3"":3,""hwv4"":0,""fan_num"":4,""fan1"":3960,""fan2"":3960,""fan3"":3840,""fan4"":3840,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":4,""temp1"":51,""temp2"":52,""temp3"":52,""temp4"":49,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":51,""temp_max"":52,""Device Hardware%"":0.0001,""no_matching_work"":84,""chain_acn1"":40,""chain_acn2"":40,""chain_acn3"":40,""chain_acn4"":40,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":0,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs2"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs3"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs4"":"" oooooooo oooooooo oooooooo oooooooo oooooooo "",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}"
+                            '                            sIPDataResponse = "{""STATUS"":[{""STATUS"":""S"",""When"":1419899238,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.7.0""}],""STATS"":[{""CGMiner"":""4.7.0"",""Miner"":""3.4.3.0"",""CompileTime"":""Thu Dec 18 20:21:28 CST 2014"",""Type"":""Antminer S5""}{""STATS"":0,""ID"":""BTM0"",""Elapsed"":3624,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":1168.94,""GHS av"":1147.56,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":4,""frequency"":""356.25"",""voltage"":""0.725"",""hwv1"":3,""hwv2"":4,""hwv3"":3,""hwv4"":0,""fan_num"":4,""fan1"":3360,""fan2"":0,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":43,""temp2"":47,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":45,""temp_max"":47,""Device Hardware%"":0.0009,""no_matching_work"":9,""chain_acn1"":30,""chain_acn2"":30,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":0,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooo oooooooo oooooooo oooooooo "",""chain_acs2"":""oooooo oooooooo oooooooo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}"
                             '#End If
 
                             y = InStr(sIPDataResponse, "}{")
@@ -3306,7 +3778,7 @@ Public Class frmMain
 
                                 Select Case jp1.Value(Of String)("ID")
                                     Case "BTM0"
-                                        'could be S2, C1, or S4
+                                        'could be S2, C1, S4, or S5
                                         Select Case HowManyInString(jp1.Value(Of String)("chain_acs1"), " ")
                                             Case 8
                                                 MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
@@ -3322,6 +3794,11 @@ Public Class frmMain
                                                 MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
 
                                                 sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
+
+                                            Case 4
+                                                MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
+
+                                                sMiner = SupportedMinerInfo.AntMinerS5.ShortName & ": " & sIPToCheck
 
                                         End Select
 
@@ -3343,17 +3820,17 @@ Public Class frmMain
 
                                     Case "S300"
                                         'Spondoolie of some sort
-                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
+                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20
 
-                                        sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
+                                        sMiner = SupportedMinerInfo.SpondoolieSP20.ShortName & ": " & sIPToCheck
 
                                     Case ""
-                                        'might be an S3 on second node of the array
+                                        'might be on second node of the array
                                         jp1 = ja(1)
 
                                         Select Case jp1.Value(Of String)("ID")
                                             Case "BTM0"
-                                                'could be S2, S4 or C1
+                                                'could be S2, S4, C1, or S5
                                                 Select Case HowManyInString(jp1.Value(Of String)("chain_acs1"), " ")
                                                     Case 8
                                                         MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2
@@ -3369,6 +3846,11 @@ Public Class frmMain
                                                         MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
 
                                                         sMiner = SupportedMinerInfo.AntMinerS4.ShortName & ": " & sIPToCheck
+
+                                                    Case 4
+                                                        MinerType = clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
+
+                                                        sMiner = SupportedMinerInfo.AntMinerS5.ShortName & ": " & sIPToCheck
 
                                                 End Select
 
@@ -3402,28 +3884,31 @@ Public Class frmMain
                                 Next
 
                                 If bFound = False Then
-                                    Me.txtAntAddress.Text = sIPToCheck
-                                    Me.txtAntName.Text = ""
+                                    Me.txtMinerAddress.Text = sIPToCheck
+                                    Me.txtMinerName.Text = ""
 
-                                    Me.txtAntSSHUsername.Text = "root"
+                                    Me.txtMinerSSHUsername.Text = "root"
 
                                     Select Case MinerType
-                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3
-                                            Me.txtAntSSHPassword.Text = "root"
-                                            Me.txtAntWebPassword.Text = "root"
-                                            Me.txtAntWebUsername.Text = "root"
+                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS1, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS3, _
+                                             clsSupportedMinerInfo.enSupportedMinerTypes.AntminerS5
+                                            Me.txtMinerSSHPassword.Text = "root"
+                                            Me.txtMinerWebPassword.Text = "root"
+                                            Me.txtMinerWebUsername.Text = "root"
 
                                         Case clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS2, clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerC1, _
                                              clsSupportedMinerInfo.enSupportedMinerTypes.AntMinerS4
-                                            Me.txtAntSSHPassword.Text = "admin"
-                                            Me.txtAntWebPassword.Text = "root"
-                                            Me.txtAntWebUsername.Text = "root"
+                                            Me.txtMinerSSHPassword.Text = "admin"
+                                            Me.txtMinerWebPassword.Text = "root"
+                                            Me.txtMinerWebUsername.Text = "root"
 
-                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondoolieSP20
-                                            Me.txtAntWebPassword.Text = ""
-                                            Me.txtAntWebUsername.Text = ""
-                                            Me.txtAntSSHUsername.Text = ""
-                                            Me.txtAntSSHPassword.Text = ""
+                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10, _
+                                             clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30, _
+                                             clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
+                                            Me.txtMinerWebPassword.Text = ""
+                                            Me.txtMinerWebUsername.Text = ""
+                                            Me.txtMinerSSHUsername.Text = ""
+                                            Me.txtMinerSSHPassword.Text = ""
 
                                     End Select
 
@@ -3565,13 +4050,13 @@ Public Class frmMain
                 Exit Sub
             End If
 
-            If Me.txtAntAddress.Text.IsNullOrEmpty = False Then
-                Me.txtAntAddress.Text = Me.txtAntAddress.Text.ToLower.Replace("http://", "")
+            If Me.txtMinerAddress.Text.IsNullOrEmpty = False Then
+                Me.txtMinerAddress.Text = Me.txtMinerAddress.Text.ToLower.Replace("http://", "")
 
                 If bAddNewAnt = True Then
                     For Each dr As DataRow In Me.dsMinerConfig.Tables(0).Rows
-                        If dr("IPAddress") = Me.txtAntAddress.Text Then
-                            If dr("HTTPPort") = Me.txtAntWebPort.Text Then
+                        If dr("IPAddress") = Me.txtMinerAddress.Text Then
+                            If dr("HTTPPort") = Me.txtMinerWebPort.Text Then
                                 If MsgBox("This address/port combination seems to already exist.  Are you sure you want to add it?", MsgBoxStyle.Question Or MsgBoxStyle.YesNo) = MsgBoxResult.No Then
                                     bAntFound = True
 
@@ -3585,35 +4070,46 @@ Public Class frmMain
                 If bAntFound = False Then
                     MinerInfo = SupportedMinerInfo.GetMinerObjectByLongName(Me.cmbMinerType.Text)
 
-                    If Me.txtAntName.Text.IsNullOrEmpty = True Then
-                        Me.txtAntName.Text = MinerInfo.ShortName & ": " & Me.txtAntAddress.Text
+                    If Me.txtMinerName.Text.IsNullOrEmpty = True Then
+                        Me.txtMinerName.Text = MinerInfo.ShortName & ": " & Me.txtMinerAddress.Text
                     End If
 
                     If bAddNewAnt = True Then
                         MinerConfigRow = dsMinerConfig.Tables(0).NewRow
                     Else
                         MinerConfigRow = FindMinerConfig(ID)
+
+                        If MinerConfigRow Is Nothing Then
+                            If MsgBox("Did you intend to add a new miner?", MsgBoxStyle.Question Or MsgBoxStyle.YesNo) = vbYes Then
+                                MinerConfigRow = dsMinerConfig.Tables(0).NewRow
+                                bAddNewAnt = True
+                            Else
+                                MsgBox("There doesn't seem to be an existing record to save.  Aborting.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+
+                                Exit Sub
+                            End If
+                        End If
                     End If
 
                     MinerConfigRow("Type") = MinerInfo.ShortName
 
-                    ID = AddOrSaveMiner(ID, Me.txtAntName.Text, MinerInfo, Me.txtAntAddress.Text, chkBoxToYN(Me.chkAntActive), _
-                                    Me.txtAntWebPort.Text, Me.txtAntWebUsername.Text, Me.txtAntWebPassword.Text, _
-                                    Me.txtAntSSHUsername.Text, Me.txtAntSSHPassword.Text, Me.txtAntAPIPort.Text, _
-                                    Me.txtAntSSHPort.Text, chkBoxToYN(Me.chkAntUseAPI), chkBoxToYN(Me.chkAntRebootViaSSH))
+                    ID = AddOrSaveMiner(ID, Me.txtMinerName.Text, MinerInfo, Me.txtMinerAddress.Text, chkBoxToYN(Me.chkMinerActive), _
+                                    Me.txtMinerWebPort.Text, Me.txtMinerWebUsername.Text, Me.txtMinerWebPassword.Text, _
+                                    Me.txtMinerSSHUsername.Text, Me.txtMinerSSHPassword.Text, Me.txtMinerAPIPort.Text, _
+                                    Me.txtMinerSSHPort.Text, chkBoxToYN(Me.chkMinerUseAPI), chkBoxToYN(Me.chkMinerRebootViaSSH))
 
-                    MinerConfigRow("Name") = Me.txtAntName.Text
-                    MinerConfigRow("IPAddress") = Me.txtAntAddress.Text
-                    MinerConfigRow("Active") = chkBoxToYN(Me.chkAntActive)
-                    MinerConfigRow("HTTPPort") = Me.txtAntWebPort.Text
-                    MinerConfigRow("WebUsername") = Me.txtAntWebUsername.Text
-                    MinerConfigRow("WebPassword") = Me.txtAntWebPassword.Text
-                    MinerConfigRow("SSHPort") = Me.txtAntSSHPort.Text
-                    MinerConfigRow("SSHUsername") = Me.txtAntSSHUsername.Text
-                    MinerConfigRow("SSHPassword") = Me.txtAntSSHPassword.Text
-                    MinerConfigRow("UseAPI") = chkBoxToYN(Me.chkAntUseAPI)
-                    MinerConfigRow("APIPort") = Me.txtAntAPIPort.Text
-                    MinerConfigRow("RebootViaSSH") = chkBoxToYN(Me.chkAntRebootViaSSH)
+                    MinerConfigRow("Name") = Me.txtMinerName.Text
+                    MinerConfigRow("IPAddress") = Me.txtMinerAddress.Text
+                    MinerConfigRow("Active") = chkBoxToYN(Me.chkMinerActive)
+                    MinerConfigRow("HTTPPort") = Me.txtMinerWebPort.Text
+                    MinerConfigRow("WebUsername") = Me.txtMinerWebUsername.Text
+                    MinerConfigRow("WebPassword") = Me.txtMinerWebPassword.Text
+                    MinerConfigRow("SSHPort") = Me.txtMinerSSHPort.Text
+                    MinerConfigRow("SSHUsername") = Me.txtMinerSSHUsername.Text
+                    MinerConfigRow("SSHPassword") = Me.txtMinerSSHPassword.Text
+                    MinerConfigRow("UseAPI") = chkBoxToYN(Me.chkMinerUseAPI)
+                    MinerConfigRow("APIPort") = Me.txtMinerAPIPort.Text
+                    MinerConfigRow("RebootViaSSH") = chkBoxToYN(Me.chkMinerRebootViaSSH)
                     MinerConfigRow("ID") = ID
 
                     If bAddNewAnt = True Then
@@ -3661,8 +4157,8 @@ Public Class frmMain
     End Sub
 
     Private Sub NumericOnlyKeyPressHandler(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtRefreshRate.KeyPress, _
-        txtAlertEMailGovernor.KeyPress, txtAntAPIPort.KeyPress, txtAntSSHPort.KeyPress, txtAntWebPort.KeyPress, txtAlertS1Temp.KeyPress, _
-        txtAlertS2Temp.KeyPress, txtAlertS3Temp.KeyPress, txtAlertS4Temp.KeyPress, txtAlertSPTemp.KeyPress, cmbAntScanStart.KeyPress, _
+        txtAlertEMailGovernor.KeyPress, txtMinerAPIPort.KeyPress, txtMinerSSHPort.KeyPress, txtMinerWebPort.KeyPress, _
+         cmbAntScanStart.KeyPress, _
         cmbAntScanStop.KeyPress, txtRebootAntsByUptime.KeyPress
 
         Select Case e.KeyChar
@@ -3811,9 +4307,8 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles cmdSaveAlerts1.Click, cmdSaveAlerts2.Click, _
-        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveAlerts5.Click, cmdSaveReboots.Click, tabAlertsAndReboots.Click, cmdSaveAlerts6.Click, _
-        cmdSaveAlerts7.Click, cmdSaveAlerts8.Click
+    Private Sub cmdSaveAlerts_Click(sender As System.Object, e As System.EventArgs) Handles _
+        cmdSaveAlerts3.Click, cmdSaveAlerts4.Click, cmdSaveReboots.Click, tabAlertsAndReboots.Click, cmdSaveAlerts6.Click
 
         With ctlsByKey
             .SetRegKeyByControl(Me.chkAlertHighlightField)
@@ -3832,329 +4327,371 @@ Public Class frmMain
             .SetRegKeyByControl(Me.txtAlertStartProcessName)
             .SetRegKeyByControl(Me.txtAlertStartProcessParms)
 
-            's1
-            If Me.chkAlertIfS1Temp.Checked = True Then
-                If Me.txtAlertS1Temp.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+            For Each MinerInfo As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
+                If Me.cmbAlertMinerType.Text.ToLower = MinerInfo.LongName.ToLower Then
+                    If Me.chkAlertHighFan.Checked = True AndAlso Me.txtAlertHighFanValue.Text.IsNullOrEmpty = True Then
+                        Me.chkAlertHighFan.Checked = False
 
-                    Me.chkAlertIfS1Temp.Checked = False
+                        MsgBox("Please specify a high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+                    End If
+
+                    If Me.chkAlertLowFan.Checked = True AndAlso Me.txtAlertLowFanValue.Text.IsNullOrEmpty = True Then
+                        Me.chkAlertLowFan.Checked = False
+
+                        MsgBox("Please specify a low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+                    End If
+
+                    If Me.chkAlertTempHigh.Checked = True AndAlso Me.txtAlertTempHighValue.Text.IsNullOrEmpty = True Then
+                        Me.chkAlertTempHigh.Checked = False
+
+                        MsgBox("Please specify a high temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+                    End If
+
+                    If Me.chkAlertHashLow.Checked = True AndAlso Me.txtAlertHashLowValue.Text.IsNullOrEmpty = True Then
+                        Me.chkAlertHashLow.Checked = False
+
+                        MsgBox("Please specify a low hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+                    End If
+
+                    If Me.chkAlertXCount.Checked = True AndAlso Me.txtAlertXCountValue.Text.IsNullOrEmpty = True Then
+                        Me.chkAlertXCount.Checked = False
+
+                        MsgBox("Please specify a X count alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+                    End If
+
+                    MinerInfo.AlertValues.FanHigh.SaveSettings(Me.chkAlertHighFan.Checked, Me.txtAlertHighFanValue.Text)
+                    MinerInfo.AlertValues.FanLow.SaveSettings(Me.chkAlertLowFan.Checked, Me.txtAlertLowFanValue.Text)
+                    MinerInfo.AlertValues.TempHigh.SaveSettings(Me.chkAlertTempHigh.Checked, Me.txtAlertTempHighValue.Text)
+                    MinerInfo.AlertValues.HashLow.SaveSettings(Me.chkAlertHashLow.Checked, Me.txtAlertHashLowValue.Text)
+                    MinerInfo.AlertValues.XCount.SaveSettings(Me.chkAlertXCount.Checked, Me.txtAlertXCountValue.Text)
+
+                    Exit For
                 End If
-            End If
+            Next
+
+            ''s1
+            'If Me.chkAlertIfS1Temp.Checked = True Then
+            '    If Me.txtAlertS1Temp.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS1Temp.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS1Temp)
-            .SetRegKeyByControl(Me.txtAlertS1Temp)
+            '.SetRegKeyByControl(Me.chkAlertIfS1Temp)
+            '.SetRegKeyByControl(Me.txtAlertS1Temp)
+
+            ''s2
+            'If Me.chkAlertIfS2Temp.Checked = True Then
+            '    If Me.txtAlertS2Temp.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S2 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS2Temp.Checked = False
+            '    End If
+            'End If
 
-            's2
-            If Me.chkAlertIfS2Temp.Checked = True Then
-                If Me.txtAlertS2Temp.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S2 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS2Temp.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfS2Temp)
+            '.SetRegKeyByControl(Me.txtAlertS2Temp)
+
+            ''s3
+            'If Me.chkAlertIfS3Temp.Checked = True Then
+            '    If Me.txtAlertS3Temp.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S3 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS3Temp.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS2Temp)
-            .SetRegKeyByControl(Me.txtAlertS2Temp)
+            '.SetRegKeyByControl(Me.chkAlertIfS3Temp)
+            '.SetRegKeyByControl(Me.txtAlertS3Temp)
+
+            ''s4
+            'If Me.chkAlertIfS4Temp.Checked = True Then
+            '    If Me.txtAlertS4Temp.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S4 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS4Temp.Checked = False
+            '    End If
+            'End If
 
-            's3
-            If Me.chkAlertIfS3Temp.Checked = True Then
-                If Me.txtAlertS3Temp.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S3 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS3Temp.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfS4Temp)
+            '.SetRegKeyByControl(Me.txtAlertS4Temp)
+
+            ''c1
+            'If Me.chkAlertIfC1Temp.Checked = True Then
+            '    If Me.txtAlertC1Temp.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an C1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfC1Temp.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS3Temp)
-            .SetRegKeyByControl(Me.txtAlertS3Temp)
+            '.SetRegKeyByControl(Me.chkAlertIfC1Temp)
+            '.SetRegKeyByControl(Me.txtAlertC1Temp)
+
+            ''sp
+            'If Me.chkAlertIfSPTemp.Checked = True Then
+            '    If Me.txtAlertSPTemp.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an SP temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfSPTemp.Checked = False
+            '    End If
+            'End If
 
-            's4
-            If Me.chkAlertIfS4Temp.Checked = True Then
-                If Me.txtAlertS4Temp.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S4 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS4Temp.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfSPTemp)
+            '.SetRegKeyByControl(Me.txtAlertSPTemp)
+
+            ''s1
+            'If Me.chkAlertIfS1FanHigh.Checked = True Then
+            '    If Me.txtAlertS1FanHigh.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS1FanHigh.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS4Temp)
-            .SetRegKeyByControl(Me.txtAlertS4Temp)
+            '.SetRegKeyByControl(Me.chkAlertIfS1FanHigh)
+            '.SetRegKeyByControl(Me.txtAlertS1FanHigh)
+
+            ''s2
+            'If Me.chkAlertIfS2FanHigh.Checked = True Then
+            '    If Me.txtAlertS2FanHigh.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S2 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS2FanHigh.Checked = False
+            '    End If
+            'End If
 
-            'c1
-            If Me.chkAlertIfC1Temp.Checked = True Then
-                If Me.txtAlertC1Temp.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an C1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfC1Temp.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfS2FanHigh)
+            '.SetRegKeyByControl(Me.txtAlertS2FanHigh)
+
+            ''S3
+            'If Me.chkAlertIfS3FanHigh.Checked = True Then
+            '    If Me.txtAlertS3FanHigh.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S3 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS3FanHigh.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfC1Temp)
-            .SetRegKeyByControl(Me.txtAlertC1Temp)
+            '.SetRegKeyByControl(Me.chkAlertIfS3FanHigh)
+            '.SetRegKeyByControl(Me.txtAlertS3FanHigh)
+
+            ''S4
+            'If Me.chkAlertIfS4FanHigh.Checked = True Then
+            '    If Me.txtAlertS4FanHigh.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S4 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS4FanHigh.Checked = False
+            '    End If
+            'End If
 
-            'sp
-            If Me.chkAlertIfSPTemp.Checked = True Then
-                If Me.txtAlertSPTemp.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an SP temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfSPTemp.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfS4FanHigh)
+            '.SetRegKeyByControl(Me.txtAlertS4FanHigh)
+
+            ''c1
+            'If Me.chkAlertIfC1FanHigh.Checked = True Then
+            '    If Me.txtAlertC1FanHigh.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an C1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfC1FanHigh.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfSPTemp)
-            .SetRegKeyByControl(Me.txtAlertSPTemp)
+            '.SetRegKeyByControl(Me.chkAlertIfC1FanHigh)
+            '.SetRegKeyByControl(Me.txtAlertC1FanHigh)
+
+            ''S1
+            'If Me.chkAlertIfS1FanLow.Checked = True Then
+            '    If Me.txtAlertS1FanLow.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS1FanLow.Checked = False
+            '    End If
+            'End If
 
-            's1
-            If Me.chkAlertIfS1FanHigh.Checked = True Then
-                If Me.txtAlertS1FanHigh.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS1FanHigh.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfS1FanLow)
+            '.SetRegKeyByControl(Me.txtAlertS1FanLow)
+
+            ''S2
+            'If Me.chkAlertIfS2FanLow.Checked = True Then
+            '    If Me.txtAlertS2FanLow.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S2 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS2FanLow.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS1FanHigh)
-            .SetRegKeyByControl(Me.txtAlertS1FanHigh)
+            '.SetRegKeyByControl(Me.chkAlertIfS2FanLow)
+            '.SetRegKeyByControl(Me.txtAlertS2FanLow)
+
+            ''S3
+            'If Me.chkAlertIfS3FanLow.Checked = True Then
+            '    If Me.txtAlertS3FanLow.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S3 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS3FanLow.Checked = False
+            '    End If
+            'End If
 
-            's2
-            If Me.chkAlertIfS2FanHigh.Checked = True Then
-                If Me.txtAlertS2FanHigh.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S2 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS2FanHigh.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfS3FanLow)
+            '.SetRegKeyByControl(Me.txtAlertS3FanLow)
+
+            ''S4
+            'If Me.chkAlertIfS4FanLow.Checked = True Then
+            '    If Me.txtAlertS4FanLow.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S4 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS4FanLow.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS2FanHigh)
-            .SetRegKeyByControl(Me.txtAlertS2FanHigh)
+            '.SetRegKeyByControl(Me.chkAlertIfS4FanLow)
+            '.SetRegKeyByControl(Me.txtAlertS4FanLow)
+
+            ''C1
+            'If Me.chkAlertIfC1FanLow.Checked = True Then
+            '    If Me.txtAlertC1FanLow.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an C1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfC1FanLow.Checked = False
+            '    End If
+            'End If
 
-            'S3
-            If Me.chkAlertIfS3FanHigh.Checked = True Then
-                If Me.txtAlertS3FanHigh.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S3 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS3FanHigh.Checked = False
-                End If
-            End If
+            '.SetRegKeyByControl(Me.chkAlertIfC1FanLow)
+            '.SetRegKeyByControl(Me.txtAlertC1FanLow)
+
+            ''s1
+            'If Me.chkAlertIfS1Hash.Checked = True Then
+            '    If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS1Hash.Checked = False
+            '    End If
+            'End If
 
-            .SetRegKeyByControl(Me.chkAlertIfS3FanHigh)
-            .SetRegKeyByControl(Me.txtAlertS3FanHigh)
+            '.SetRegKeyByControl(Me.chkAlertIfS1Hash)
+            '.SetRegKeyByControl(Me.txtAlertS1Hash)
+
+            ''s2
+            'If Me.chkAlertIfS2Hash.Checked = True Then
+            '    If Me.txtAlertS2Hash.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S2 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS2Hash.Checked = False
+            '    End If
+            'End If
 
-            'S4
-            If Me.chkAlertIfS4FanHigh.Checked = True Then
-                If Me.txtAlertS4FanHigh.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S4 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS4FanHigh.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS4FanHigh)
-            .SetRegKeyByControl(Me.txtAlertS4FanHigh)
-
-            'c1
-            If Me.chkAlertIfC1FanHigh.Checked = True Then
-                If Me.txtAlertC1FanHigh.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an C1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfC1FanHigh.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfC1FanHigh)
-            .SetRegKeyByControl(Me.txtAlertC1FanHigh)
-
-            'S1
-            If Me.chkAlertIfS1FanLow.Checked = True Then
-                If Me.txtAlertS1FanLow.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS1FanLow.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS1FanLow)
-            .SetRegKeyByControl(Me.txtAlertS1FanLow)
-
-            'S2
-            If Me.chkAlertIfS2FanLow.Checked = True Then
-                If Me.txtAlertS2FanLow.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S2 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS2FanLow.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS2FanLow)
-            .SetRegKeyByControl(Me.txtAlertS2FanLow)
-
-            'S3
-            If Me.chkAlertIfS3FanLow.Checked = True Then
-                If Me.txtAlertS3FanLow.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S3 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS3FanLow.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS3FanLow)
-            .SetRegKeyByControl(Me.txtAlertS3FanLow)
-
-            'S4
-            If Me.chkAlertIfS4FanLow.Checked = True Then
-                If Me.txtAlertS4FanLow.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S4 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS4FanLow.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS4FanLow)
-            .SetRegKeyByControl(Me.txtAlertS4FanLow)
-
-            'C1
-            If Me.chkAlertIfC1FanLow.Checked = True Then
-                If Me.txtAlertC1FanLow.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an C1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfC1FanLow.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfC1FanLow)
-            .SetRegKeyByControl(Me.txtAlertC1FanLow)
-
-            's1
-            If Me.chkAlertIfS1Hash.Checked = True Then
-                If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS1Hash.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS1Hash)
-            .SetRegKeyByControl(Me.txtAlertS1Hash)
-
-            's2
-            If Me.chkAlertIfS2Hash.Checked = True Then
-                If Me.txtAlertS2Hash.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S2 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS2Hash.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS2Hash)
-            .SetRegKeyByControl(Me.txtAlertS2Hash)
-
-            'S3
-            If Me.chkAlertIfS3Hash.Checked = True Then
-                If Me.txtAlertS3Hash.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S3 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS3Hash.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS3Hash)
-            .SetRegKeyByControl(Me.txtAlertS3Hash)
-
-            'S4
-            If Me.chkAlertIfS4Hash.Checked = True Then
-                If Me.txtAlertS4Hash.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S4 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS4Hash.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS4Hash)
-            .SetRegKeyByControl(Me.txtAlertS4Hash)
-
-            'C1
-            If Me.chkAlertIfC1Hash.Checked = True Then
-                If Me.txtAlertC1Hash.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an C1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfC1Hash.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfC1Hash)
-            .SetRegKeyByControl(Me.txtAlertC1Hash)
-
-            'SP
-            If Me.chkAlertIfSPHash.Checked = True Then
-                If Me.txtAlertSPHash.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an SP hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfSPHash.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfSPHash)
-            .SetRegKeyByControl(Me.txtAlertSPHash)
-
-            'S1
-            If Me.chkAlertIfS1XCount.Checked = True Then
-                If Me.txtAlertS1XCount.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS1XCount.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS1XCount)
-            .SetRegKeyByControl(Me.txtAlertS1XCount)
-
-            'S2
-            If Me.chkAlertIfS2XCount.Checked = True Then
-                If Me.txtAlertS2XCount.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S2 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS2XCount.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS2XCount)
-            .SetRegKeyByControl(Me.txtAlertS2XCount)
-
-            'S3
-            If Me.chkAlertIfS3XCount.Checked = True Then
-                If Me.txtAlertS3XCount.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S3 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS3XCount.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS3XCount)
-            .SetRegKeyByControl(Me.txtAlertS3XCount)
-
-            'S4
-            If Me.chkAlertIfS4XCount.Checked = True Then
-                If Me.txtAlertS4XCount.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an S4 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfS4XCount.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfS4XCount)
-            .SetRegKeyByControl(Me.txtAlertS4XCount)
-
-            'c1
-            If Me.chkAlertIfC1XCount.Checked = True Then
-                If Me.txtAlertC1XCount.Text.IsNullOrEmpty Then
-                    MsgBox("Please specify an C1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-                    Me.chkAlertIfC1XCount.Checked = False
-                End If
-            End If
-
-            .SetRegKeyByControl(Me.chkAlertIfC1XCount)
-            .SetRegKeyByControl(Me.txtAlertC1XCount)
+            '.SetRegKeyByControl(Me.chkAlertIfS2Hash)
+            '.SetRegKeyByControl(Me.txtAlertS2Hash)
+
+            ''S3
+            'If Me.chkAlertIfS3Hash.Checked = True Then
+            '    If Me.txtAlertS3Hash.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S3 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS3Hash.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfS3Hash)
+            '.SetRegKeyByControl(Me.txtAlertS3Hash)
+
+            ''S4
+            'If Me.chkAlertIfS4Hash.Checked = True Then
+            '    If Me.txtAlertS4Hash.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S4 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS4Hash.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfS4Hash)
+            '.SetRegKeyByControl(Me.txtAlertS4Hash)
+
+            ''C1
+            'If Me.chkAlertIfC1Hash.Checked = True Then
+            '    If Me.txtAlertC1Hash.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an C1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfC1Hash.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfC1Hash)
+            '.SetRegKeyByControl(Me.txtAlertC1Hash)
+
+            ''SP
+            'If Me.chkAlertIfSPHash.Checked = True Then
+            '    If Me.txtAlertSPHash.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an SP hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfSPHash.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfSPHash)
+            '.SetRegKeyByControl(Me.txtAlertSPHash)
+
+            ''S1
+            'If Me.chkAlertIfS1XCount.Checked = True Then
+            '    If Me.txtAlertS1XCount.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS1XCount.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfS1XCount)
+            '.SetRegKeyByControl(Me.txtAlertS1XCount)
+
+            ''S2
+            'If Me.chkAlertIfS2XCount.Checked = True Then
+            '    If Me.txtAlertS2XCount.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S2 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS2XCount.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfS2XCount)
+            '.SetRegKeyByControl(Me.txtAlertS2XCount)
+
+            ''S3
+            'If Me.chkAlertIfS3XCount.Checked = True Then
+            '    If Me.txtAlertS3XCount.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S3 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS3XCount.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfS3XCount)
+            '.SetRegKeyByControl(Me.txtAlertS3XCount)
+
+            ''S4
+            'If Me.chkAlertIfS4XCount.Checked = True Then
+            '    If Me.txtAlertS4XCount.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an S4 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfS4XCount.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfS4XCount)
+            '.SetRegKeyByControl(Me.txtAlertS4XCount)
+
+            ''c1
+            'If Me.chkAlertIfC1XCount.Checked = True Then
+            '    If Me.txtAlertC1XCount.Text.IsNullOrEmpty Then
+            '        MsgBox("Please specify an C1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
+
+            '        Me.chkAlertIfC1XCount.Checked = False
+            '    End If
+            'End If
+
+            '.SetRegKeyByControl(Me.chkAlertIfC1XCount)
+            '.SetRegKeyByControl(Me.txtAlertC1XCount)
 
             'email notifications
             Call ctlsByKey.SetRegKeyByControl(Me.txtSMTPServer)
@@ -5045,7 +5582,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub txtAntAddress_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtAntAddress.KeyPress
+    Private Sub txtAntAddress_KeyPress(sender As Object, e As System.Windows.Forms.KeyPressEventArgs) Handles txtMinerAddress.KeyPress
 
         Select Case e.KeyChar
             Case "0" To "9", vbBack, "."
@@ -5089,23 +5626,23 @@ Public Class frmMain
             If Me.dataAntConfig.SelectedRows.Count = 1 Then
                 dr = Me.dataAntConfig.SelectedRows(0)
 
-                Me.txtAntAddress.Text = dr.Cells("IPAddress").Value
-                Me.txtAntName.Text = dr.Cells("Name").Value
+                Me.txtMinerAddress.Text = dr.Cells("IPAddress").Value
+                Me.txtMinerName.Text = dr.Cells("Name").Value
 
                 Me.cmbMinerType.Text = SupportedMinerInfo.GetMinerObjectByShortName(dr.Cells("Type").Value).LongName
 
-                Me.txtAntSSHUsername.Text = dr.Cells("SSHUsername").Value
-                Me.txtAntSSHPassword.Text = dr.Cells("SSHPassword").Value
-                Me.txtAntSSHPort.Text = dr.Cells("SSHPort").Value
+                Me.txtMinerSSHUsername.Text = dr.Cells("SSHUsername").Value
+                Me.txtMinerSSHPassword.Text = dr.Cells("SSHPassword").Value
+                Me.txtMinerSSHPort.Text = dr.Cells("SSHPort").Value
 
-                Me.txtAntWebUsername.Text = dr.Cells("WebUsername").Value
-                Me.txtAntWebPassword.Text = dr.Cells("WebPassword").Value
-                Me.txtAntWebPort.Text = dr.Cells("HTTPPort").Value
+                Me.txtMinerWebUsername.Text = dr.Cells("WebUsername").Value
+                Me.txtMinerWebPassword.Text = dr.Cells("WebPassword").Value
+                Me.txtMinerWebPort.Text = dr.Cells("HTTPPort").Value
 
-                Me.chkAntUseAPI.Checked = YNtoBoolean(dr.Cells("UseAPI").Value)
-                Me.txtAntAPIPort.Text = dr.Cells("APIPort").Value
-                Me.chkAntRebootViaSSH.Checked = YNtoBoolean(dr.Cells("RebootViaSSH").Value)
-                Me.chkAntActive.Checked = YNtoBoolean(dr.Cells("Active").Value)
+                Me.chkMinerUseAPI.Checked = YNtoBoolean(dr.Cells("UseAPI").Value)
+                Me.txtMinerAPIPort.Text = dr.Cells("APIPort").Value
+                Me.chkMinerRebootViaSSH.Checked = YNtoBoolean(dr.Cells("RebootViaSSH").Value)
+                Me.chkMinerActive.Checked = YNtoBoolean(dr.Cells("Active").Value)
 
                 Me.lblMinerID.Text = "ID #" & dr.Cells("ID").Value
                 Me.lblMinerID.Tag = dr.Cells("ID").Value
@@ -5118,17 +5655,23 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub cmbMinerType_LostFocus(sender As Object, e As System.EventArgs) Handles cmbMinerType.LostFocus
+    Private Sub cmbMinerType_LostFocus(sender As Object, e As System.EventArgs) Handles cmbMinerType.LostFocus, cmbAlertMinerType.LostFocus
+
+        Dim cmbAny As ComboBox
+
+        cmbAny = sender
+
+        If cmbAny.Text.IsNullOrEmpty = True Then Exit Sub
 
         For Each MinerInfo As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
-            If Me.cmbMinerType.Text.ToLower = MinerInfo.LongName.ToLower Then
+            If cmbAny.Text.ToLower = MinerInfo.LongName.ToLower Then
                 Exit Sub
             End If
         Next
 
-        MsgBox("Invalid value entered.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+        MsgBox("Invalid miner type entered.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
 
-        Me.cmbMinerType.Text = ""
+        cmbAny.Text = ""
 
     End Sub
 
@@ -5141,14 +5684,14 @@ Public Class frmMain
         Try
             sTemp = SupportedMinerInfo.GetMinerObjectByLongName(Me.cmbMinerType.Text).ShortName
 
-            s = Me.txtAntAddress.Text.Split(".")
+            s = Me.txtMinerAddress.Text.Split(".")
 
-            If Me.txtAntName.Text.IsNullOrEmpty Then
-                Me.txtAntName.Text = sTemp & ":" & s(2) & "." & s(3)
+            If Me.txtMinerName.Text.IsNullOrEmpty Then
+                Me.txtMinerName.Text = sTemp & ":" & s(2) & "." & s(3)
             Else
                 For Each MinerInfo In SupportedMinerInfo.SupportedMinerCollection
-                    If Me.txtAntName.Text.Substring(0, 3).ToLower = MinerInfo.ShortName.ToLower & ":" Then
-                        Me.txtAntName.Text = sTemp & ":" & Me.txtAntName.Text.Substring(3)
+                    If Me.txtMinerName.Text.Substring(0, 3).ToLower = MinerInfo.ShortName.ToLower & ":" Then
+                        Me.txtMinerName.Text = sTemp & ":" & Me.txtMinerName.Text.Substring(3)
                     End If
                 Next
             End If
@@ -5159,11 +5702,11 @@ Public Class frmMain
 
     Private Sub cmdAntClear_Click(sender As System.Object, e As System.EventArgs) Handles cmdAntClear.Click
 
-        Me.txtAntName.Text = ""
-        Me.txtAntAddress.Text = ""
+        Me.txtMinerName.Text = ""
+        Me.txtMinerAddress.Text = ""
         Me.cmbMinerType.Text = ""
 
-        Me.txtAntAddress.Focus()
+        Me.txtMinerAddress.Focus()
 
     End Sub
 
@@ -5248,8 +5791,8 @@ Public Class frmMain
     End Sub
 
     Private Sub txtAlertEMailGovernor_LostFocus(sender As Object, e As System.EventArgs) Handles txtRefreshRate.LostFocus, _
-        txtAlertEMailGovernor.LostFocus, txtAntAPIPort.LostFocus, txtAntSSHPort.LostFocus, txtAntWebPort.LostFocus, txtAlertS1Temp.LostFocus, _
-        txtAlertS2Temp.LostFocus, txtAlertS3Temp.LostFocus, txtAlertS4Temp.LostFocus, txtAlertSPTemp.LostFocus, txtRebootAntsByUptime.LostFocus
+        txtAlertEMailGovernor.LostFocus, txtMinerAPIPort.LostFocus, txtMinerSSHPort.LostFocus, txtMinerWebPort.LostFocus, _
+         txtRebootAntsByUptime.LostFocus
 
         Dim txtAny As TextBox
 
@@ -5369,6 +5912,54 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub cmbAlertMinerType_SelectedIndexChanged(sender As Object, e As System.EventArgs) Handles cmbAlertMinerType.SelectedIndexChanged
+
+        If Me.cmbAlertMinerType.Text.IsNullOrEmpty = True Then
+            Me.chkAlertHashLow.Enabled = False
+            Me.chkAlertHighFan.Enabled = False
+            Me.chkAlertLowFan.Enabled = False
+            Me.chkAlertXCount.Enabled = False
+            Me.chkAlertTempHigh.Enabled = False
+
+            Me.txtAlertHashLowValue.Enabled = False
+            Me.txtAlertHighFanValue.Enabled = False
+            Me.txtAlertLowFanValue.Enabled = False
+            Me.txtAlertXCountValue.Enabled = False
+            Me.txtAlertTempHighValue.Enabled = False
+
+            Exit Sub
+        End If
+
+        For Each MinerInfo As clsSupportedMinerInfo.clsMinerInfo In SupportedMinerInfo.SupportedMinerCollection
+            If Me.cmbAlertMinerType.Text.ToLower = MinerInfo.LongName.ToLower Then
+                Me.chkAlertHashLow.Enabled = MinerInfo.AlertTypes.Hash
+                Me.chkAlertHashLow.Checked = MinerInfo.AlertValues.HashLow.Enabled.Value
+                Me.txtAlertHashLowValue.Enabled = MinerInfo.AlertTypes.Hash
+                Me.txtAlertHashLowValue.Text = MinerInfo.AlertValues.HashLow.Item.Value
+
+                Me.chkAlertHighFan.Enabled = MinerInfo.AlertTypes.Fans
+                Me.chkAlertHighFan.Checked = MinerInfo.AlertValues.FanHigh.Enabled.Value
+                Me.txtAlertHighFanValue.Enabled = MinerInfo.AlertTypes.Fans
+                Me.txtAlertHighFanValue.Text = MinerInfo.AlertValues.FanHigh.Item.Value
+
+                Me.chkAlertLowFan.Enabled = MinerInfo.AlertTypes.Fans
+                Me.chkAlertLowFan.Checked = MinerInfo.AlertValues.FanLow.Enabled.Value
+                Me.txtAlertLowFanValue.Enabled = MinerInfo.AlertTypes.Fans
+                Me.txtAlertLowFanValue.Text = MinerInfo.AlertValues.FanLow.Item.Value
+
+                Me.chkAlertXCount.Enabled = MinerInfo.AlertTypes.XCount
+                Me.chkAlertXCount.Checked = MinerInfo.AlertValues.XCount.Enabled.Value
+                Me.txtAlertXCountValue.Enabled = MinerInfo.AlertTypes.XCount
+                Me.txtAlertXCountValue.Text = MinerInfo.AlertValues.XCount.Item.Value
+
+                Me.chkAlertTempHigh.Enabled = MinerInfo.AlertTypes.Temps
+                Me.chkAlertTempHigh.Checked = MinerInfo.AlertValues.TempHigh.Enabled.Value
+                Me.txtAlertTempHighValue.Enabled = MinerInfo.AlertTypes.Temps
+                Me.txtAlertTempHighValue.Text = MinerInfo.AlertValues.TempHigh.Item.Value
+            End If
+        Next
+
+    End Sub
 End Class
 
 'wrapper around the datagridview to allow disabling the paint event

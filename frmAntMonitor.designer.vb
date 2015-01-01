@@ -45,18 +45,18 @@ Partial Class frmMain
         Me.cmbAntScanStart = New System.Windows.Forms.ComboBox()
         Me.cmdAntClear = New System.Windows.Forms.Button()
         Me.lblMinerID = New System.Windows.Forms.Label()
-        Me.txtAntSSHPort = New System.Windows.Forms.TextBox()
+        Me.txtMinerSSHPort = New System.Windows.Forms.TextBox()
         Me.Label23 = New System.Windows.Forms.Label()
-        Me.txtAntWebPort = New System.Windows.Forms.TextBox()
-        Me.txtAntAPIPort = New System.Windows.Forms.TextBox()
+        Me.txtMinerWebPort = New System.Windows.Forms.TextBox()
+        Me.txtMinerAPIPort = New System.Windows.Forms.TextBox()
         Me.Label21 = New System.Windows.Forms.Label()
-        Me.chkAntRebootViaSSH = New System.Windows.Forms.CheckBox()
-        Me.chkAntUseAPI = New System.Windows.Forms.CheckBox()
-        Me.chkAntActive = New System.Windows.Forms.CheckBox()
+        Me.chkMinerRebootViaSSH = New System.Windows.Forms.CheckBox()
+        Me.chkMinerUseAPI = New System.Windows.Forms.CheckBox()
+        Me.chkMinerActive = New System.Windows.Forms.CheckBox()
         Me.Label20 = New System.Windows.Forms.Label()
         Me.Label19 = New System.Windows.Forms.Label()
         Me.dataAntConfig = New System.Windows.Forms.DataGridView()
-        Me.txtAntName = New System.Windows.Forms.TextBox()
+        Me.txtMinerName = New System.Windows.Forms.TextBox()
         Me.Label15 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.txtIPRangeToScan = New System.Windows.Forms.TextBox()
@@ -64,15 +64,15 @@ Partial Class frmMain
         Me.cmdScan = New System.Windows.Forms.Button()
         Me.cmdSaveAnt = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.txtAntAddress = New System.Windows.Forms.TextBox()
-        Me.txtAntSSHPassword = New System.Windows.Forms.TextBox()
+        Me.txtMinerAddress = New System.Windows.Forms.TextBox()
+        Me.txtMinerSSHPassword = New System.Windows.Forms.TextBox()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.cmdAddAnt = New System.Windows.Forms.Button()
         Me.lblWBPassword = New System.Windows.Forms.Label()
-        Me.txtAntWebPassword = New System.Windows.Forms.TextBox()
+        Me.txtMinerWebPassword = New System.Windows.Forms.TextBox()
         Me.cmdDelAnt = New System.Windows.Forms.Button()
-        Me.txtAntSSHUsername = New System.Windows.Forms.TextBox()
-        Me.txtAntWebUsername = New System.Windows.Forms.TextBox()
+        Me.txtMinerSSHUsername = New System.Windows.Forms.TextBox()
+        Me.txtMinerWebUsername = New System.Windows.Forms.TextBox()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.lblWBUserName = New System.Windows.Forms.Label()
         Me.tabConfig = New System.Windows.Forms.TabPage()
@@ -130,72 +130,20 @@ Partial Class frmMain
         Me.lstPools = New MMinerMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.tabAlertsAndReboots = New System.Windows.Forms.TabControl()
-        Me.tabC1Alerts = New System.Windows.Forms.TabPage()
-        Me.chkAlertIfC1FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertC1FanLow = New System.Windows.Forms.TextBox()
+        Me.tabAlertSettings = New System.Windows.Forms.TabPage()
+        Me.chkAlertLowFan = New System.Windows.Forms.CheckBox()
+        Me.txtAlertLowFanValue = New System.Windows.Forms.TextBox()
+        Me.chkAlertXCount = New System.Windows.Forms.CheckBox()
+        Me.txtAlertXCountValue = New System.Windows.Forms.TextBox()
+        Me.chkAlertTempHigh = New System.Windows.Forms.CheckBox()
+        Me.chkAlertHashLow = New System.Windows.Forms.CheckBox()
+        Me.txtAlertHighFanValue = New System.Windows.Forms.TextBox()
+        Me.txtAlertHashLowValue = New System.Windows.Forms.TextBox()
+        Me.chkAlertHighFan = New System.Windows.Forms.CheckBox()
+        Me.txtAlertTempHighValue = New System.Windows.Forms.TextBox()
+        Me.cmbAlertMinerType = New System.Windows.Forms.ComboBox()
+        Me.Label28 = New System.Windows.Forms.Label()
         Me.cmdSaveAlerts6 = New System.Windows.Forms.Button()
-        Me.chkAlertIfC1XCount = New System.Windows.Forms.CheckBox()
-        Me.txtAlertC1XCount = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfC1Temp = New System.Windows.Forms.CheckBox()
-        Me.chkAlertIfC1Hash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertC1FanHigh = New System.Windows.Forms.TextBox()
-        Me.txtAlertC1Hash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfC1FanHigh = New System.Windows.Forms.CheckBox()
-        Me.txtAlertC1Temp = New System.Windows.Forms.TextBox()
-        Me.tabS1Alerts = New System.Windows.Forms.TabPage()
-        Me.chkAlertIfS1FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS1FanLow = New System.Windows.Forms.TextBox()
-        Me.cmdSaveAlerts1 = New System.Windows.Forms.Button()
-        Me.chkAlertIfS1XCount = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS1XCount = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS1FanHigh = New System.Windows.Forms.CheckBox()
-        Me.chkAlertIfS1Hash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS1Temp = New System.Windows.Forms.TextBox()
-        Me.txtAlertS1Hash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS1Temp = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS1FanHigh = New System.Windows.Forms.TextBox()
-        Me.tabS2Alerts = New System.Windows.Forms.TabPage()
-        Me.chkAlertIfS2FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS2FanLow = New System.Windows.Forms.TextBox()
-        Me.cmdSaveAlerts2 = New System.Windows.Forms.Button()
-        Me.chkAlertIfS2XCount = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS2XCount = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS2Temp = New System.Windows.Forms.CheckBox()
-        Me.chkAlertIfS2Hash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS2FanHigh = New System.Windows.Forms.TextBox()
-        Me.txtAlertS2Hash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS2FanHigh = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS2Temp = New System.Windows.Forms.TextBox()
-        Me.tabS3Alerts = New System.Windows.Forms.TabPage()
-        Me.chkAlertIfS3FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS3FanLow = New System.Windows.Forms.TextBox()
-        Me.cmdSaveAlerts5 = New System.Windows.Forms.Button()
-        Me.chkAlertIfS3XCount = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS3XCount = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS3FanHigh = New System.Windows.Forms.CheckBox()
-        Me.chkAlertIfS3Hash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS3Temp = New System.Windows.Forms.TextBox()
-        Me.txtAlertS3Hash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS3Temp = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS3FanHigh = New System.Windows.Forms.TextBox()
-        Me.tabS4Alerts = New System.Windows.Forms.TabPage()
-        Me.chkAlertIfS4FanLow = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS4FanLow = New System.Windows.Forms.TextBox()
-        Me.cmdSaveAlerts7 = New System.Windows.Forms.Button()
-        Me.chkAlertIfS4XCount = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS4XCount = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS4FanHigh = New System.Windows.Forms.CheckBox()
-        Me.chkAlertIfS4Hash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS4Temp = New System.Windows.Forms.TextBox()
-        Me.txtAlertS4Hash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfS4Temp = New System.Windows.Forms.CheckBox()
-        Me.txtAlertS4FanHigh = New System.Windows.Forms.TextBox()
-        Me.tabSPAlerts = New System.Windows.Forms.TabPage()
-        Me.cmdSaveAlerts8 = New System.Windows.Forms.Button()
-        Me.chkAlertIfSPHash = New System.Windows.Forms.CheckBox()
-        Me.txtAlertSPTemp = New System.Windows.Forms.TextBox()
-        Me.txtAlertSPHash = New System.Windows.Forms.TextBox()
-        Me.chkAlertIfSPTemp = New System.Windows.Forms.CheckBox()
         Me.tabAlertTypes = New System.Windows.Forms.TabPage()
         Me.cmbAlertEMailGovernor = New System.Windows.Forms.ComboBox()
         Me.txtAlertEMailGovernor = New System.Windows.Forms.TextBox()
@@ -288,12 +236,7 @@ Partial Class frmMain
         Me.tabPools.SuspendLayout()
         Me.tabAlerts.SuspendLayout()
         Me.tabAlertsAndReboots.SuspendLayout()
-        Me.tabC1Alerts.SuspendLayout()
-        Me.tabS1Alerts.SuspendLayout()
-        Me.tabS2Alerts.SuspendLayout()
-        Me.tabS3Alerts.SuspendLayout()
-        Me.tabS4Alerts.SuspendLayout()
-        Me.tabSPAlerts.SuspendLayout()
+        Me.tabAlertSettings.SuspendLayout()
         Me.tabAlertTypes.SuspendLayout()
         Me.tabReboots.SuspendLayout()
         Me.tabEmail.SuspendLayout()
@@ -401,7 +344,7 @@ Partial Class frmMain
         Me.dataMiners.ReadOnly = True
         Me.dataMiners.RowHeadersVisible = False
         Me.dataMiners.RowTemplate.Height = 24
-        Me.dataMiners.Size = New System.Drawing.Size(1139, 258)
+        Me.dataMiners.Size = New System.Drawing.Size(1139, 250)
         Me.dataMiners.TabIndex = 0
         '
         'tabMinerConfig
@@ -415,18 +358,18 @@ Partial Class frmMain
         Me.tabMinerConfig.Controls.Add(Me.cmbAntScanStart)
         Me.tabMinerConfig.Controls.Add(Me.cmdAntClear)
         Me.tabMinerConfig.Controls.Add(Me.lblMinerID)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntSSHPort)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerSSHPort)
         Me.tabMinerConfig.Controls.Add(Me.Label23)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntWebPort)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntAPIPort)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerWebPort)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerAPIPort)
         Me.tabMinerConfig.Controls.Add(Me.Label21)
-        Me.tabMinerConfig.Controls.Add(Me.chkAntRebootViaSSH)
-        Me.tabMinerConfig.Controls.Add(Me.chkAntUseAPI)
-        Me.tabMinerConfig.Controls.Add(Me.chkAntActive)
+        Me.tabMinerConfig.Controls.Add(Me.chkMinerRebootViaSSH)
+        Me.tabMinerConfig.Controls.Add(Me.chkMinerUseAPI)
+        Me.tabMinerConfig.Controls.Add(Me.chkMinerActive)
         Me.tabMinerConfig.Controls.Add(Me.Label20)
         Me.tabMinerConfig.Controls.Add(Me.Label19)
         Me.tabMinerConfig.Controls.Add(Me.dataAntConfig)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntName)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerName)
         Me.tabMinerConfig.Controls.Add(Me.Label15)
         Me.tabMinerConfig.Controls.Add(Me.Label3)
         Me.tabMinerConfig.Controls.Add(Me.txtIPRangeToScan)
@@ -434,15 +377,15 @@ Partial Class frmMain
         Me.tabMinerConfig.Controls.Add(Me.cmdScan)
         Me.tabMinerConfig.Controls.Add(Me.cmdSaveAnt)
         Me.tabMinerConfig.Controls.Add(Me.Label1)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntAddress)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntSSHPassword)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerAddress)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerSSHPassword)
         Me.tabMinerConfig.Controls.Add(Me.Label7)
         Me.tabMinerConfig.Controls.Add(Me.cmdAddAnt)
         Me.tabMinerConfig.Controls.Add(Me.lblWBPassword)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntWebPassword)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerWebPassword)
         Me.tabMinerConfig.Controls.Add(Me.cmdDelAnt)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntSSHUsername)
-        Me.tabMinerConfig.Controls.Add(Me.txtAntWebUsername)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerSSHUsername)
+        Me.tabMinerConfig.Controls.Add(Me.txtMinerWebUsername)
         Me.tabMinerConfig.Controls.Add(Me.Label6)
         Me.tabMinerConfig.Controls.Add(Me.lblWBUserName)
         Me.tabMinerConfig.Location = New System.Drawing.Point(4, 4)
@@ -454,10 +397,12 @@ Partial Class frmMain
         '
         'cmbMinerType
         '
+        Me.cmbMinerType.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cmbMinerType.FormattingEnabled = True
         Me.cmbMinerType.Location = New System.Drawing.Point(524, 43)
         Me.cmbMinerType.Name = "cmbMinerType"
-        Me.cmbMinerType.Size = New System.Drawing.Size(155, 28)
+        Me.cmbMinerType.Size = New System.Drawing.Size(170, 28)
+        Me.cmbMinerType.Sorted = True
         Me.cmbMinerType.TabIndex = 93
         '
         'txtIPToGetInfo
@@ -532,13 +477,13 @@ Partial Class frmMain
         Me.lblMinerID.TabIndex = 84
         Me.lblMinerID.Text = "Miner ID"
         '
-        'txtAntSSHPort
+        'txtMinerSSHPort
         '
-        Me.txtAntSSHPort.Location = New System.Drawing.Point(488, 192)
-        Me.txtAntSSHPort.Name = "txtAntSSHPort"
-        Me.txtAntSSHPort.Size = New System.Drawing.Size(60, 27)
-        Me.txtAntSSHPort.TabIndex = 4
-        Me.txtAntSSHPort.Text = "22"
+        Me.txtMinerSSHPort.Location = New System.Drawing.Point(488, 192)
+        Me.txtMinerSSHPort.Name = "txtMinerSSHPort"
+        Me.txtMinerSSHPort.Size = New System.Drawing.Size(60, 27)
+        Me.txtMinerSSHPort.TabIndex = 4
+        Me.txtMinerSSHPort.Text = "22"
         '
         'Label23
         '
@@ -549,21 +494,21 @@ Partial Class frmMain
         Me.Label23.TabIndex = 82
         Me.Label23.Text = "Port:"
         '
-        'txtAntWebPort
+        'txtMinerWebPort
         '
-        Me.txtAntWebPort.Location = New System.Drawing.Point(594, 192)
-        Me.txtAntWebPort.Name = "txtAntWebPort"
-        Me.txtAntWebPort.Size = New System.Drawing.Size(60, 27)
-        Me.txtAntWebPort.TabIndex = 7
-        Me.txtAntWebPort.Text = "80"
+        Me.txtMinerWebPort.Location = New System.Drawing.Point(594, 192)
+        Me.txtMinerWebPort.Name = "txtMinerWebPort"
+        Me.txtMinerWebPort.Size = New System.Drawing.Size(60, 27)
+        Me.txtMinerWebPort.TabIndex = 7
+        Me.txtMinerWebPort.Text = "80"
         '
-        'txtAntAPIPort
+        'txtMinerAPIPort
         '
-        Me.txtAntAPIPort.Location = New System.Drawing.Point(594, 222)
-        Me.txtAntAPIPort.Name = "txtAntAPIPort"
-        Me.txtAntAPIPort.Size = New System.Drawing.Size(60, 27)
-        Me.txtAntAPIPort.TabIndex = 8
-        Me.txtAntAPIPort.Text = "4028"
+        Me.txtMinerAPIPort.Location = New System.Drawing.Point(594, 222)
+        Me.txtMinerAPIPort.Name = "txtMinerAPIPort"
+        Me.txtMinerAPIPort.Size = New System.Drawing.Size(60, 27)
+        Me.txtMinerAPIPort.TabIndex = 8
+        Me.txtMinerAPIPort.Text = "4028"
         '
         'Label21
         '
@@ -573,41 +518,41 @@ Partial Class frmMain
         Me.Label21.TabIndex = 78
         Me.Label21.Text = "Port:"
         '
-        'chkAntRebootViaSSH
+        'chkMinerRebootViaSSH
         '
-        Me.chkAntRebootViaSSH.AutoSize = True
-        Me.chkAntRebootViaSSH.Checked = True
-        Me.chkAntRebootViaSSH.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAntRebootViaSSH.Location = New System.Drawing.Point(428, 249)
-        Me.chkAntRebootViaSSH.Name = "chkAntRebootViaSSH"
-        Me.chkAntRebootViaSSH.Size = New System.Drawing.Size(150, 24)
-        Me.chkAntRebootViaSSH.TabIndex = 77
-        Me.chkAntRebootViaSSH.Text = "Reboot via SSH"
-        Me.chkAntRebootViaSSH.UseVisualStyleBackColor = True
+        Me.chkMinerRebootViaSSH.AutoSize = True
+        Me.chkMinerRebootViaSSH.Checked = True
+        Me.chkMinerRebootViaSSH.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkMinerRebootViaSSH.Location = New System.Drawing.Point(428, 249)
+        Me.chkMinerRebootViaSSH.Name = "chkMinerRebootViaSSH"
+        Me.chkMinerRebootViaSSH.Size = New System.Drawing.Size(150, 24)
+        Me.chkMinerRebootViaSSH.TabIndex = 77
+        Me.chkMinerRebootViaSSH.Text = "Reboot via SSH"
+        Me.chkMinerRebootViaSSH.UseVisualStyleBackColor = True
         '
-        'chkAntUseAPI
+        'chkMinerUseAPI
         '
-        Me.chkAntUseAPI.AutoSize = True
-        Me.chkAntUseAPI.Checked = True
-        Me.chkAntUseAPI.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAntUseAPI.Location = New System.Drawing.Point(428, 225)
-        Me.chkAntUseAPI.Name = "chkAntUseAPI"
-        Me.chkAntUseAPI.Size = New System.Drawing.Size(92, 24)
-        Me.chkAntUseAPI.TabIndex = 76
-        Me.chkAntUseAPI.Text = "Use API"
-        Me.chkAntUseAPI.UseVisualStyleBackColor = True
+        Me.chkMinerUseAPI.AutoSize = True
+        Me.chkMinerUseAPI.Checked = True
+        Me.chkMinerUseAPI.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkMinerUseAPI.Location = New System.Drawing.Point(428, 225)
+        Me.chkMinerUseAPI.Name = "chkMinerUseAPI"
+        Me.chkMinerUseAPI.Size = New System.Drawing.Size(92, 24)
+        Me.chkMinerUseAPI.TabIndex = 76
+        Me.chkMinerUseAPI.Text = "Use API"
+        Me.chkMinerUseAPI.UseVisualStyleBackColor = True
         '
-        'chkAntActive
+        'chkMinerActive
         '
-        Me.chkAntActive.AutoSize = True
-        Me.chkAntActive.Checked = True
-        Me.chkAntActive.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkAntActive.Location = New System.Drawing.Point(428, 272)
-        Me.chkAntActive.Name = "chkAntActive"
-        Me.chkAntActive.Size = New System.Drawing.Size(77, 24)
-        Me.chkAntActive.TabIndex = 75
-        Me.chkAntActive.Text = "Active"
-        Me.chkAntActive.UseVisualStyleBackColor = True
+        Me.chkMinerActive.AutoSize = True
+        Me.chkMinerActive.Checked = True
+        Me.chkMinerActive.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkMinerActive.Location = New System.Drawing.Point(428, 272)
+        Me.chkMinerActive.Name = "chkMinerActive"
+        Me.chkMinerActive.Size = New System.Drawing.Size(77, 24)
+        Me.chkMinerActive.TabIndex = 75
+        Me.chkMinerActive.Text = "Active"
+        Me.chkMinerActive.UseVisualStyleBackColor = True
         '
         'Label20
         '
@@ -623,9 +568,9 @@ Partial Class frmMain
         Me.Label19.AutoSize = True
         Me.Label19.Location = New System.Drawing.Point(424, 44)
         Me.Label19.Name = "Label19"
-        Me.Label19.Size = New System.Drawing.Size(50, 20)
+        Me.Label19.Size = New System.Drawing.Size(97, 20)
         Me.Label19.TabIndex = 72
-        Me.Label19.Text = "Type:"
+        Me.Label19.Text = "Miner Type:"
         '
         'dataAntConfig
         '
@@ -642,12 +587,12 @@ Partial Class frmMain
         Me.dataAntConfig.Size = New System.Drawing.Size(411, 313)
         Me.dataAntConfig.TabIndex = 71
         '
-        'txtAntName
+        'txtMinerName
         '
-        Me.txtAntName.Location = New System.Drawing.Point(524, 79)
-        Me.txtAntName.Name = "txtAntName"
-        Me.txtAntName.Size = New System.Drawing.Size(155, 27)
-        Me.txtAntName.TabIndex = 1
+        Me.txtMinerName.Location = New System.Drawing.Point(524, 79)
+        Me.txtMinerName.Name = "txtMinerName"
+        Me.txtMinerName.Size = New System.Drawing.Size(170, 27)
+        Me.txtMinerName.TabIndex = 1
         '
         'Label15
         '
@@ -712,20 +657,20 @@ Partial Class frmMain
         Me.Label1.TabIndex = 54
         Me.Label1.Text = "IP Address:"
         '
-        'txtAntAddress
+        'txtMinerAddress
         '
-        Me.txtAntAddress.Location = New System.Drawing.Point(524, 10)
-        Me.txtAntAddress.Name = "txtAntAddress"
-        Me.txtAntAddress.Size = New System.Drawing.Size(155, 27)
-        Me.txtAntAddress.TabIndex = 0
+        Me.txtMinerAddress.Location = New System.Drawing.Point(524, 10)
+        Me.txtMinerAddress.Name = "txtMinerAddress"
+        Me.txtMinerAddress.Size = New System.Drawing.Size(170, 27)
+        Me.txtMinerAddress.TabIndex = 0
         '
-        'txtAntSSHPassword
+        'txtMinerSSHPassword
         '
-        Me.txtAntSSHPassword.Location = New System.Drawing.Point(488, 163)
-        Me.txtAntSSHPassword.Name = "txtAntSSHPassword"
-        Me.txtAntSSHPassword.Size = New System.Drawing.Size(100, 27)
-        Me.txtAntSSHPassword.TabIndex = 3
-        Me.txtAntSSHPassword.Text = "root"
+        Me.txtMinerSSHPassword.Location = New System.Drawing.Point(488, 163)
+        Me.txtMinerSSHPassword.Name = "txtMinerSSHPassword"
+        Me.txtMinerSSHPassword.Size = New System.Drawing.Size(100, 27)
+        Me.txtMinerSSHPassword.TabIndex = 3
+        Me.txtMinerSSHPassword.Text = "root"
         '
         'Label7
         '
@@ -754,13 +699,13 @@ Partial Class frmMain
         Me.lblWBPassword.TabIndex = 9
         Me.lblWBPassword.Text = "Pass:"
         '
-        'txtAntWebPassword
+        'txtMinerWebPassword
         '
-        Me.txtAntWebPassword.Location = New System.Drawing.Point(594, 163)
-        Me.txtAntWebPassword.Name = "txtAntWebPassword"
-        Me.txtAntWebPassword.Size = New System.Drawing.Size(100, 27)
-        Me.txtAntWebPassword.TabIndex = 6
-        Me.txtAntWebPassword.Text = "root"
+        Me.txtMinerWebPassword.Location = New System.Drawing.Point(594, 163)
+        Me.txtMinerWebPassword.Name = "txtMinerWebPassword"
+        Me.txtMinerWebPassword.Size = New System.Drawing.Size(100, 27)
+        Me.txtMinerWebPassword.TabIndex = 6
+        Me.txtMinerWebPassword.Text = "root"
         '
         'cmdDelAnt
         '
@@ -771,23 +716,23 @@ Partial Class frmMain
         Me.cmdDelAnt.Text = "&Delete"
         Me.cmdDelAnt.UseVisualStyleBackColor = True
         '
-        'txtAntSSHUsername
+        'txtMinerSSHUsername
         '
-        Me.txtAntSSHUsername.Location = New System.Drawing.Point(488, 134)
-        Me.txtAntSSHUsername.Name = "txtAntSSHUsername"
-        Me.txtAntSSHUsername.Size = New System.Drawing.Size(100, 27)
-        Me.txtAntSSHUsername.TabIndex = 2
-        Me.txtAntSSHUsername.Text = "root"
-        Me.ToolTip1.SetToolTip(Me.txtAntSSHUsername, "If left empty, default is used")
+        Me.txtMinerSSHUsername.Location = New System.Drawing.Point(488, 134)
+        Me.txtMinerSSHUsername.Name = "txtMinerSSHUsername"
+        Me.txtMinerSSHUsername.Size = New System.Drawing.Size(100, 27)
+        Me.txtMinerSSHUsername.TabIndex = 2
+        Me.txtMinerSSHUsername.Text = "root"
+        Me.ToolTip1.SetToolTip(Me.txtMinerSSHUsername, "If left empty, default is used")
         '
-        'txtAntWebUsername
+        'txtMinerWebUsername
         '
-        Me.txtAntWebUsername.Location = New System.Drawing.Point(594, 134)
-        Me.txtAntWebUsername.Name = "txtAntWebUsername"
-        Me.txtAntWebUsername.Size = New System.Drawing.Size(100, 27)
-        Me.txtAntWebUsername.TabIndex = 5
-        Me.txtAntWebUsername.Text = "root"
-        Me.ToolTip1.SetToolTip(Me.txtAntWebUsername, "If left empty, default is used")
+        Me.txtMinerWebUsername.Location = New System.Drawing.Point(594, 134)
+        Me.txtMinerWebUsername.Name = "txtMinerWebUsername"
+        Me.txtMinerWebUsername.Size = New System.Drawing.Size(100, 27)
+        Me.txtMinerWebUsername.TabIndex = 5
+        Me.txtMinerWebUsername.Text = "root"
+        Me.ToolTip1.SetToolTip(Me.txtMinerWebUsername, "If left empty, default is used")
         '
         'Label6
         '
@@ -1405,12 +1350,7 @@ Partial Class frmMain
         Me.tabAlertsAndReboots.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tabAlertsAndReboots.Controls.Add(Me.tabC1Alerts)
-        Me.tabAlertsAndReboots.Controls.Add(Me.tabS1Alerts)
-        Me.tabAlertsAndReboots.Controls.Add(Me.tabS2Alerts)
-        Me.tabAlertsAndReboots.Controls.Add(Me.tabS3Alerts)
-        Me.tabAlertsAndReboots.Controls.Add(Me.tabS4Alerts)
-        Me.tabAlertsAndReboots.Controls.Add(Me.tabSPAlerts)
+        Me.tabAlertsAndReboots.Controls.Add(Me.tabAlertSettings)
         Me.tabAlertsAndReboots.Controls.Add(Me.tabAlertTypes)
         Me.tabAlertsAndReboots.Controls.Add(Me.tabReboots)
         Me.tabAlertsAndReboots.Controls.Add(Me.tabEmail)
@@ -1421,688 +1361,160 @@ Partial Class frmMain
         Me.tabAlertsAndReboots.Size = New System.Drawing.Size(1144, 317)
         Me.tabAlertsAndReboots.TabIndex = 18
         '
-        'tabC1Alerts
+        'tabAlertSettings
         '
-        Me.tabC1Alerts.Controls.Add(Me.chkAlertIfC1FanLow)
-        Me.tabC1Alerts.Controls.Add(Me.txtAlertC1FanLow)
-        Me.tabC1Alerts.Controls.Add(Me.cmdSaveAlerts6)
-        Me.tabC1Alerts.Controls.Add(Me.chkAlertIfC1XCount)
-        Me.tabC1Alerts.Controls.Add(Me.txtAlertC1XCount)
-        Me.tabC1Alerts.Controls.Add(Me.chkAlertIfC1Temp)
-        Me.tabC1Alerts.Controls.Add(Me.chkAlertIfC1Hash)
-        Me.tabC1Alerts.Controls.Add(Me.txtAlertC1FanHigh)
-        Me.tabC1Alerts.Controls.Add(Me.txtAlertC1Hash)
-        Me.tabC1Alerts.Controls.Add(Me.chkAlertIfC1FanHigh)
-        Me.tabC1Alerts.Controls.Add(Me.txtAlertC1Temp)
-        Me.tabC1Alerts.Location = New System.Drawing.Point(4, 4)
-        Me.tabC1Alerts.Name = "tabC1Alerts"
-        Me.tabC1Alerts.Size = New System.Drawing.Size(1136, 284)
-        Me.tabC1Alerts.TabIndex = 6
-        Me.tabC1Alerts.Text = "C1 Alerts"
-        Me.tabC1Alerts.UseVisualStyleBackColor = True
+        Me.tabAlertSettings.Controls.Add(Me.chkAlertLowFan)
+        Me.tabAlertSettings.Controls.Add(Me.txtAlertLowFanValue)
+        Me.tabAlertSettings.Controls.Add(Me.chkAlertXCount)
+        Me.tabAlertSettings.Controls.Add(Me.txtAlertXCountValue)
+        Me.tabAlertSettings.Controls.Add(Me.chkAlertTempHigh)
+        Me.tabAlertSettings.Controls.Add(Me.chkAlertHashLow)
+        Me.tabAlertSettings.Controls.Add(Me.txtAlertHighFanValue)
+        Me.tabAlertSettings.Controls.Add(Me.txtAlertHashLowValue)
+        Me.tabAlertSettings.Controls.Add(Me.chkAlertHighFan)
+        Me.tabAlertSettings.Controls.Add(Me.txtAlertTempHighValue)
+        Me.tabAlertSettings.Controls.Add(Me.cmbAlertMinerType)
+        Me.tabAlertSettings.Controls.Add(Me.Label28)
+        Me.tabAlertSettings.Controls.Add(Me.cmdSaveAlerts6)
+        Me.tabAlertSettings.Location = New System.Drawing.Point(4, 4)
+        Me.tabAlertSettings.Name = "tabAlertSettings"
+        Me.tabAlertSettings.Size = New System.Drawing.Size(1136, 284)
+        Me.tabAlertSettings.TabIndex = 6
+        Me.tabAlertSettings.Text = "Alert Settings"
+        Me.tabAlertSettings.UseVisualStyleBackColor = True
         '
-        'chkAlertIfC1FanLow
+        'chkAlertLowFan
         '
-        Me.chkAlertIfC1FanLow.AutoSize = True
-        Me.chkAlertIfC1FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfC1FanLow.Name = "chkAlertIfC1FanLow"
-        Me.chkAlertIfC1FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfC1FanLow.TabIndex = 31
-        Me.chkAlertIfC1FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfC1FanLow, "Equal to or greater than")
-        Me.chkAlertIfC1FanLow.UseVisualStyleBackColor = True
+        Me.chkAlertLowFan.AutoSize = True
+        Me.chkAlertLowFan.Enabled = False
+        Me.chkAlertLowFan.Location = New System.Drawing.Point(13, 86)
+        Me.chkAlertLowFan.Name = "chkAlertLowFan"
+        Me.chkAlertLowFan.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertLowFan.TabIndex = 104
+        Me.chkAlertLowFan.Text = "Fan Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertLowFan, "Equal to or greater than")
+        Me.chkAlertLowFan.UseVisualStyleBackColor = True
         '
-        'txtAlertC1FanLow
+        'txtAlertLowFanValue
         '
-        Me.txtAlertC1FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertC1FanLow.Name = "txtAlertC1FanLow"
-        Me.txtAlertC1FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertC1FanLow.TabIndex = 32
-        Me.txtAlertC1FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtAlertLowFanValue.Enabled = False
+        Me.txtAlertLowFanValue.Location = New System.Drawing.Point(142, 82)
+        Me.txtAlertLowFanValue.Name = "txtAlertLowFanValue"
+        Me.txtAlertLowFanValue.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertLowFanValue.TabIndex = 105
+        Me.txtAlertLowFanValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertXCount
+        '
+        Me.chkAlertXCount.AutoSize = True
+        Me.chkAlertXCount.Enabled = False
+        Me.chkAlertXCount.Location = New System.Drawing.Point(13, 179)
+        Me.chkAlertXCount.Name = "chkAlertXCount"
+        Me.chkAlertXCount.Size = New System.Drawing.Size(129, 24)
+        Me.chkAlertXCount.TabIndex = 102
+        Me.chkAlertXCount.Text = "XCount Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertXCount, "Great than or equal to")
+        Me.chkAlertXCount.UseVisualStyleBackColor = True
+        '
+        'txtAlertXCountValue
+        '
+        Me.txtAlertXCountValue.Enabled = False
+        Me.txtAlertXCountValue.Location = New System.Drawing.Point(142, 175)
+        Me.txtAlertXCountValue.Name = "txtAlertXCountValue"
+        Me.txtAlertXCountValue.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertXCountValue.TabIndex = 103
+        Me.txtAlertXCountValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertTempHigh
+        '
+        Me.chkAlertTempHigh.AutoSize = True
+        Me.chkAlertTempHigh.Enabled = False
+        Me.chkAlertTempHigh.Location = New System.Drawing.Point(13, 148)
+        Me.chkAlertTempHigh.Name = "chkAlertTempHigh"
+        Me.chkAlertTempHigh.Size = New System.Drawing.Size(116, 24)
+        Me.chkAlertTempHigh.TabIndex = 96
+        Me.chkAlertTempHigh.Text = "Temp Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertTempHigh, "Equal to or greater than")
+        Me.chkAlertTempHigh.UseVisualStyleBackColor = True
+        '
+        'chkAlertHashLow
+        '
+        Me.chkAlertHashLow.AutoSize = True
+        Me.chkAlertHashLow.Enabled = False
+        Me.chkAlertHashLow.Location = New System.Drawing.Point(13, 117)
+        Me.chkAlertHashLow.Name = "chkAlertHashLow"
+        Me.chkAlertHashLow.Size = New System.Drawing.Size(114, 24)
+        Me.chkAlertHashLow.TabIndex = 100
+        Me.chkAlertHashLow.Text = "Hash Is <="
+        Me.ToolTip1.SetToolTip(Me.chkAlertHashLow, "Avg Hash is equal to or less than")
+        Me.chkAlertHashLow.UseVisualStyleBackColor = True
+        '
+        'txtAlertHighFanValue
+        '
+        Me.txtAlertHighFanValue.Enabled = False
+        Me.txtAlertHighFanValue.Location = New System.Drawing.Point(142, 51)
+        Me.txtAlertHighFanValue.Name = "txtAlertHighFanValue"
+        Me.txtAlertHighFanValue.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertHighFanValue.TabIndex = 99
+        Me.txtAlertHighFanValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtAlertHashLowValue
+        '
+        Me.txtAlertHashLowValue.Enabled = False
+        Me.txtAlertHashLowValue.Location = New System.Drawing.Point(142, 113)
+        Me.txtAlertHashLowValue.Name = "txtAlertHashLowValue"
+        Me.txtAlertHashLowValue.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertHashLowValue.TabIndex = 101
+        Me.txtAlertHashLowValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'chkAlertHighFan
+        '
+        Me.chkAlertHighFan.AutoSize = True
+        Me.chkAlertHighFan.Enabled = False
+        Me.chkAlertHighFan.Location = New System.Drawing.Point(13, 55)
+        Me.chkAlertHighFan.Name = "chkAlertHighFan"
+        Me.chkAlertHighFan.Size = New System.Drawing.Size(102, 24)
+        Me.chkAlertHighFan.TabIndex = 98
+        Me.chkAlertHighFan.Text = "Fan Is =>"
+        Me.ToolTip1.SetToolTip(Me.chkAlertHighFan, "Equal to or greater than")
+        Me.chkAlertHighFan.UseVisualStyleBackColor = True
+        '
+        'txtAlertTempHighValue
+        '
+        Me.txtAlertTempHighValue.Enabled = False
+        Me.txtAlertTempHighValue.Location = New System.Drawing.Point(142, 144)
+        Me.txtAlertTempHighValue.Name = "txtAlertTempHighValue"
+        Me.txtAlertTempHighValue.Size = New System.Drawing.Size(54, 27)
+        Me.txtAlertTempHighValue.TabIndex = 97
+        Me.txtAlertTempHighValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'cmbAlertMinerType
+        '
+        Me.cmbAlertMinerType.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.cmbAlertMinerType.FormattingEnabled = True
+        Me.cmbAlertMinerType.Location = New System.Drawing.Point(110, 13)
+        Me.cmbAlertMinerType.Name = "cmbAlertMinerType"
+        Me.cmbAlertMinerType.Size = New System.Drawing.Size(170, 28)
+        Me.cmbAlertMinerType.Sorted = True
+        Me.cmbAlertMinerType.TabIndex = 95
+        '
+        'Label28
+        '
+        Me.Label28.AutoSize = True
+        Me.Label28.Location = New System.Drawing.Point(10, 14)
+        Me.Label28.Name = "Label28"
+        Me.Label28.Size = New System.Drawing.Size(97, 20)
+        Me.Label28.TabIndex = 94
+        Me.Label28.Text = "Miner Type:"
         '
         'cmdSaveAlerts6
         '
-        Me.cmdSaveAlerts6.Location = New System.Drawing.Point(12, 216)
+        Me.cmdSaveAlerts6.Location = New System.Drawing.Point(14, 240)
         Me.cmdSaveAlerts6.Name = "cmdSaveAlerts6"
         Me.cmdSaveAlerts6.Size = New System.Drawing.Size(121, 32)
         Me.cmdSaveAlerts6.TabIndex = 30
         Me.cmdSaveAlerts6.Text = "Save Config"
         Me.cmdSaveAlerts6.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfC1XCount
-        '
-        Me.chkAlertIfC1XCount.AutoSize = True
-        Me.chkAlertIfC1XCount.Location = New System.Drawing.Point(12, 136)
-        Me.chkAlertIfC1XCount.Name = "chkAlertIfC1XCount"
-        Me.chkAlertIfC1XCount.Size = New System.Drawing.Size(129, 24)
-        Me.chkAlertIfC1XCount.TabIndex = 28
-        Me.chkAlertIfC1XCount.Text = "XCount Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfC1XCount, "Great than or equal to")
-        Me.chkAlertIfC1XCount.UseVisualStyleBackColor = True
-        '
-        'txtAlertC1XCount
-        '
-        Me.txtAlertC1XCount.Location = New System.Drawing.Point(141, 132)
-        Me.txtAlertC1XCount.Name = "txtAlertC1XCount"
-        Me.txtAlertC1XCount.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertC1XCount.TabIndex = 29
-        Me.txtAlertC1XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfC1Temp
-        '
-        Me.chkAlertIfC1Temp.AutoSize = True
-        Me.chkAlertIfC1Temp.Location = New System.Drawing.Point(12, 105)
-        Me.chkAlertIfC1Temp.Name = "chkAlertIfC1Temp"
-        Me.chkAlertIfC1Temp.Size = New System.Drawing.Size(116, 24)
-        Me.chkAlertIfC1Temp.TabIndex = 22
-        Me.chkAlertIfC1Temp.Text = "Temp Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfC1Temp, "Equal to or greater than")
-        Me.chkAlertIfC1Temp.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfC1Hash
-        '
-        Me.chkAlertIfC1Hash.AutoSize = True
-        Me.chkAlertIfC1Hash.Location = New System.Drawing.Point(12, 74)
-        Me.chkAlertIfC1Hash.Name = "chkAlertIfC1Hash"
-        Me.chkAlertIfC1Hash.Size = New System.Drawing.Size(114, 24)
-        Me.chkAlertIfC1Hash.TabIndex = 26
-        Me.chkAlertIfC1Hash.Text = "Hash Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfC1Hash, "Avg Hash is equal to or less than")
-        Me.chkAlertIfC1Hash.UseVisualStyleBackColor = True
-        '
-        'txtAlertC1FanHigh
-        '
-        Me.txtAlertC1FanHigh.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertC1FanHigh.Name = "txtAlertC1FanHigh"
-        Me.txtAlertC1FanHigh.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertC1FanHigh.TabIndex = 25
-        Me.txtAlertC1FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'txtAlertC1Hash
-        '
-        Me.txtAlertC1Hash.Location = New System.Drawing.Point(141, 70)
-        Me.txtAlertC1Hash.Name = "txtAlertC1Hash"
-        Me.txtAlertC1Hash.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertC1Hash.TabIndex = 27
-        Me.txtAlertC1Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfC1FanHigh
-        '
-        Me.chkAlertIfC1FanHigh.AutoSize = True
-        Me.chkAlertIfC1FanHigh.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfC1FanHigh.Name = "chkAlertIfC1FanHigh"
-        Me.chkAlertIfC1FanHigh.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfC1FanHigh.TabIndex = 24
-        Me.chkAlertIfC1FanHigh.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfC1FanHigh, "Equal to or greater than")
-        Me.chkAlertIfC1FanHigh.UseVisualStyleBackColor = True
-        '
-        'txtAlertC1Temp
-        '
-        Me.txtAlertC1Temp.Location = New System.Drawing.Point(141, 101)
-        Me.txtAlertC1Temp.Name = "txtAlertC1Temp"
-        Me.txtAlertC1Temp.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertC1Temp.TabIndex = 23
-        Me.txtAlertC1Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'tabS1Alerts
-        '
-        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1FanLow)
-        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1FanLow)
-        Me.tabS1Alerts.Controls.Add(Me.cmdSaveAlerts1)
-        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1XCount)
-        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1XCount)
-        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1FanHigh)
-        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1Hash)
-        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1Temp)
-        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1Hash)
-        Me.tabS1Alerts.Controls.Add(Me.chkAlertIfS1Temp)
-        Me.tabS1Alerts.Controls.Add(Me.txtAlertS1FanHigh)
-        Me.tabS1Alerts.Location = New System.Drawing.Point(4, 4)
-        Me.tabS1Alerts.Name = "tabS1Alerts"
-        Me.tabS1Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS1Alerts.Size = New System.Drawing.Size(1136, 284)
-        Me.tabS1Alerts.TabIndex = 0
-        Me.tabS1Alerts.Text = "S1 Alerts"
-        Me.tabS1Alerts.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS1FanLow
-        '
-        Me.chkAlertIfS1FanLow.AutoSize = True
-        Me.chkAlertIfS1FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfS1FanLow.Name = "chkAlertIfS1FanLow"
-        Me.chkAlertIfS1FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS1FanLow.TabIndex = 18
-        Me.chkAlertIfS1FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1FanLow, "Equal to or greater than")
-        Me.chkAlertIfS1FanLow.UseVisualStyleBackColor = True
-        '
-        'txtAlertS1FanLow
-        '
-        Me.txtAlertS1FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertS1FanLow.Name = "txtAlertS1FanLow"
-        Me.txtAlertS1FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1FanLow.TabIndex = 19
-        Me.txtAlertS1FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'cmdSaveAlerts1
-        '
-        Me.cmdSaveAlerts1.Location = New System.Drawing.Point(12, 216)
-        Me.cmdSaveAlerts1.Name = "cmdSaveAlerts1"
-        Me.cmdSaveAlerts1.Size = New System.Drawing.Size(121, 32)
-        Me.cmdSaveAlerts1.TabIndex = 17
-        Me.cmdSaveAlerts1.Text = "Save Config"
-        Me.cmdSaveAlerts1.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS1XCount
-        '
-        Me.chkAlertIfS1XCount.AutoSize = True
-        Me.chkAlertIfS1XCount.Location = New System.Drawing.Point(12, 136)
-        Me.chkAlertIfS1XCount.Name = "chkAlertIfS1XCount"
-        Me.chkAlertIfS1XCount.Size = New System.Drawing.Size(129, 24)
-        Me.chkAlertIfS1XCount.TabIndex = 9
-        Me.chkAlertIfS1XCount.Text = "XCount Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1XCount, "Great than or equal to")
-        Me.chkAlertIfS1XCount.UseVisualStyleBackColor = True
-        '
-        'txtAlertS1XCount
-        '
-        Me.txtAlertS1XCount.Location = New System.Drawing.Point(141, 132)
-        Me.txtAlertS1XCount.Name = "txtAlertS1XCount"
-        Me.txtAlertS1XCount.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1XCount.TabIndex = 10
-        Me.txtAlertS1XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS1FanHigh
-        '
-        Me.chkAlertIfS1FanHigh.AutoSize = True
-        Me.chkAlertIfS1FanHigh.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfS1FanHigh.Name = "chkAlertIfS1FanHigh"
-        Me.chkAlertIfS1FanHigh.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS1FanHigh.TabIndex = 4
-        Me.chkAlertIfS1FanHigh.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1FanHigh, "Equal to or greater than")
-        Me.chkAlertIfS1FanHigh.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS1Hash
-        '
-        Me.chkAlertIfS1Hash.AutoSize = True
-        Me.chkAlertIfS1Hash.Location = New System.Drawing.Point(12, 74)
-        Me.chkAlertIfS1Hash.Name = "chkAlertIfS1Hash"
-        Me.chkAlertIfS1Hash.Size = New System.Drawing.Size(114, 24)
-        Me.chkAlertIfS1Hash.TabIndex = 7
-        Me.chkAlertIfS1Hash.Text = "Hash Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Hash, "Avg Hash is equal to or less than")
-        Me.chkAlertIfS1Hash.UseVisualStyleBackColor = True
-        '
-        'txtAlertS1Temp
-        '
-        Me.txtAlertS1Temp.Location = New System.Drawing.Point(141, 101)
-        Me.txtAlertS1Temp.Name = "txtAlertS1Temp"
-        Me.txtAlertS1Temp.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1Temp.TabIndex = 2
-        Me.txtAlertS1Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'txtAlertS1Hash
-        '
-        Me.txtAlertS1Hash.Location = New System.Drawing.Point(141, 70)
-        Me.txtAlertS1Hash.Name = "txtAlertS1Hash"
-        Me.txtAlertS1Hash.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1Hash.TabIndex = 8
-        Me.txtAlertS1Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS1Temp
-        '
-        Me.chkAlertIfS1Temp.AutoSize = True
-        Me.chkAlertIfS1Temp.Location = New System.Drawing.Point(12, 105)
-        Me.chkAlertIfS1Temp.Name = "chkAlertIfS1Temp"
-        Me.chkAlertIfS1Temp.Size = New System.Drawing.Size(116, 24)
-        Me.chkAlertIfS1Temp.TabIndex = 0
-        Me.chkAlertIfS1Temp.Text = "Temp Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS1Temp, "Equal to or greater than")
-        Me.chkAlertIfS1Temp.UseVisualStyleBackColor = True
-        '
-        'txtAlertS1FanHigh
-        '
-        Me.txtAlertS1FanHigh.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertS1FanHigh.Name = "txtAlertS1FanHigh"
-        Me.txtAlertS1FanHigh.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS1FanHigh.TabIndex = 6
-        Me.txtAlertS1FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'tabS2Alerts
-        '
-        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2FanLow)
-        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2FanLow)
-        Me.tabS2Alerts.Controls.Add(Me.cmdSaveAlerts2)
-        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2XCount)
-        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2XCount)
-        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2Temp)
-        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2Hash)
-        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2FanHigh)
-        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2Hash)
-        Me.tabS2Alerts.Controls.Add(Me.chkAlertIfS2FanHigh)
-        Me.tabS2Alerts.Controls.Add(Me.txtAlertS2Temp)
-        Me.tabS2Alerts.Location = New System.Drawing.Point(4, 4)
-        Me.tabS2Alerts.Name = "tabS2Alerts"
-        Me.tabS2Alerts.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabS2Alerts.Size = New System.Drawing.Size(1136, 284)
-        Me.tabS2Alerts.TabIndex = 1
-        Me.tabS2Alerts.Text = "S2 Alerts"
-        Me.tabS2Alerts.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS2FanLow
-        '
-        Me.chkAlertIfS2FanLow.AutoSize = True
-        Me.chkAlertIfS2FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfS2FanLow.Name = "chkAlertIfS2FanLow"
-        Me.chkAlertIfS2FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS2FanLow.TabIndex = 20
-        Me.chkAlertIfS2FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2FanLow, "Equal to or greater than")
-        Me.chkAlertIfS2FanLow.UseVisualStyleBackColor = True
-        '
-        'txtAlertS2FanLow
-        '
-        Me.txtAlertS2FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertS2FanLow.Name = "txtAlertS2FanLow"
-        Me.txtAlertS2FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2FanLow.TabIndex = 21
-        Me.txtAlertS2FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'cmdSaveAlerts2
-        '
-        Me.cmdSaveAlerts2.Location = New System.Drawing.Point(12, 216)
-        Me.cmdSaveAlerts2.Name = "cmdSaveAlerts2"
-        Me.cmdSaveAlerts2.Size = New System.Drawing.Size(121, 32)
-        Me.cmdSaveAlerts2.TabIndex = 17
-        Me.cmdSaveAlerts2.Text = "Save Config"
-        Me.cmdSaveAlerts2.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS2XCount
-        '
-        Me.chkAlertIfS2XCount.AutoSize = True
-        Me.chkAlertIfS2XCount.Location = New System.Drawing.Point(12, 136)
-        Me.chkAlertIfS2XCount.Name = "chkAlertIfS2XCount"
-        Me.chkAlertIfS2XCount.Size = New System.Drawing.Size(129, 24)
-        Me.chkAlertIfS2XCount.TabIndex = 11
-        Me.chkAlertIfS2XCount.Text = "XCount Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2XCount, "Great than or equal to")
-        Me.chkAlertIfS2XCount.UseVisualStyleBackColor = True
-        '
-        'txtAlertS2XCount
-        '
-        Me.txtAlertS2XCount.Location = New System.Drawing.Point(141, 132)
-        Me.txtAlertS2XCount.Name = "txtAlertS2XCount"
-        Me.txtAlertS2XCount.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2XCount.TabIndex = 12
-        Me.txtAlertS2XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS2Temp
-        '
-        Me.chkAlertIfS2Temp.AutoSize = True
-        Me.chkAlertIfS2Temp.Location = New System.Drawing.Point(12, 105)
-        Me.chkAlertIfS2Temp.Name = "chkAlertIfS2Temp"
-        Me.chkAlertIfS2Temp.Size = New System.Drawing.Size(116, 24)
-        Me.chkAlertIfS2Temp.TabIndex = 1
-        Me.chkAlertIfS2Temp.Text = "Temp Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Temp, "Equal to or greater than")
-        Me.chkAlertIfS2Temp.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS2Hash
-        '
-        Me.chkAlertIfS2Hash.AutoSize = True
-        Me.chkAlertIfS2Hash.Location = New System.Drawing.Point(12, 74)
-        Me.chkAlertIfS2Hash.Name = "chkAlertIfS2Hash"
-        Me.chkAlertIfS2Hash.Size = New System.Drawing.Size(114, 24)
-        Me.chkAlertIfS2Hash.TabIndex = 9
-        Me.chkAlertIfS2Hash.Text = "Hash Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2Hash, "Avg Hash is equal to or less than")
-        Me.chkAlertIfS2Hash.UseVisualStyleBackColor = True
-        '
-        'txtAlertS2FanHigh
-        '
-        Me.txtAlertS2FanHigh.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertS2FanHigh.Name = "txtAlertS2FanHigh"
-        Me.txtAlertS2FanHigh.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2FanHigh.TabIndex = 7
-        Me.txtAlertS2FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'txtAlertS2Hash
-        '
-        Me.txtAlertS2Hash.Location = New System.Drawing.Point(141, 70)
-        Me.txtAlertS2Hash.Name = "txtAlertS2Hash"
-        Me.txtAlertS2Hash.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2Hash.TabIndex = 10
-        Me.txtAlertS2Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS2FanHigh
-        '
-        Me.chkAlertIfS2FanHigh.AutoSize = True
-        Me.chkAlertIfS2FanHigh.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfS2FanHigh.Name = "chkAlertIfS2FanHigh"
-        Me.chkAlertIfS2FanHigh.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS2FanHigh.TabIndex = 5
-        Me.chkAlertIfS2FanHigh.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS2FanHigh, "Equal to or greater than")
-        Me.chkAlertIfS2FanHigh.UseVisualStyleBackColor = True
-        '
-        'txtAlertS2Temp
-        '
-        Me.txtAlertS2Temp.Location = New System.Drawing.Point(141, 101)
-        Me.txtAlertS2Temp.Name = "txtAlertS2Temp"
-        Me.txtAlertS2Temp.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS2Temp.TabIndex = 3
-        Me.txtAlertS2Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'tabS3Alerts
-        '
-        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3FanLow)
-        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3FanLow)
-        Me.tabS3Alerts.Controls.Add(Me.cmdSaveAlerts5)
-        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3XCount)
-        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3XCount)
-        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3FanHigh)
-        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3Hash)
-        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3Temp)
-        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3Hash)
-        Me.tabS3Alerts.Controls.Add(Me.chkAlertIfS3Temp)
-        Me.tabS3Alerts.Controls.Add(Me.txtAlertS3FanHigh)
-        Me.tabS3Alerts.Location = New System.Drawing.Point(4, 4)
-        Me.tabS3Alerts.Name = "tabS3Alerts"
-        Me.tabS3Alerts.Size = New System.Drawing.Size(1136, 284)
-        Me.tabS3Alerts.TabIndex = 4
-        Me.tabS3Alerts.Text = "S3 Alerts"
-        Me.tabS3Alerts.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS3FanLow
-        '
-        Me.chkAlertIfS3FanLow.AutoSize = True
-        Me.chkAlertIfS3FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfS3FanLow.Name = "chkAlertIfS3FanLow"
-        Me.chkAlertIfS3FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS3FanLow.TabIndex = 29
-        Me.chkAlertIfS3FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3FanLow, "Equal to or greater than")
-        Me.chkAlertIfS3FanLow.UseVisualStyleBackColor = True
-        '
-        'txtAlertS3FanLow
-        '
-        Me.txtAlertS3FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertS3FanLow.Name = "txtAlertS3FanLow"
-        Me.txtAlertS3FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS3FanLow.TabIndex = 30
-        Me.txtAlertS3FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'cmdSaveAlerts5
-        '
-        Me.cmdSaveAlerts5.Location = New System.Drawing.Point(12, 216)
-        Me.cmdSaveAlerts5.Name = "cmdSaveAlerts5"
-        Me.cmdSaveAlerts5.Size = New System.Drawing.Size(121, 32)
-        Me.cmdSaveAlerts5.TabIndex = 28
-        Me.cmdSaveAlerts5.Text = "Save Config"
-        Me.cmdSaveAlerts5.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS3XCount
-        '
-        Me.chkAlertIfS3XCount.AutoSize = True
-        Me.chkAlertIfS3XCount.Location = New System.Drawing.Point(12, 136)
-        Me.chkAlertIfS3XCount.Name = "chkAlertIfS3XCount"
-        Me.chkAlertIfS3XCount.Size = New System.Drawing.Size(129, 24)
-        Me.chkAlertIfS3XCount.TabIndex = 26
-        Me.chkAlertIfS3XCount.Text = "XCount Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3XCount, "Great than or equal to")
-        Me.chkAlertIfS3XCount.UseVisualStyleBackColor = True
-        '
-        'txtAlertS3XCount
-        '
-        Me.txtAlertS3XCount.Location = New System.Drawing.Point(141, 132)
-        Me.txtAlertS3XCount.Name = "txtAlertS3XCount"
-        Me.txtAlertS3XCount.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS3XCount.TabIndex = 27
-        Me.txtAlertS3XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS3FanHigh
-        '
-        Me.chkAlertIfS3FanHigh.AutoSize = True
-        Me.chkAlertIfS3FanHigh.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfS3FanHigh.Name = "chkAlertIfS3FanHigh"
-        Me.chkAlertIfS3FanHigh.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS3FanHigh.TabIndex = 22
-        Me.chkAlertIfS3FanHigh.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3FanHigh, "Equal to or greater than")
-        Me.chkAlertIfS3FanHigh.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS3Hash
-        '
-        Me.chkAlertIfS3Hash.AutoSize = True
-        Me.chkAlertIfS3Hash.Location = New System.Drawing.Point(12, 74)
-        Me.chkAlertIfS3Hash.Name = "chkAlertIfS3Hash"
-        Me.chkAlertIfS3Hash.Size = New System.Drawing.Size(114, 24)
-        Me.chkAlertIfS3Hash.TabIndex = 24
-        Me.chkAlertIfS3Hash.Text = "Hash Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3Hash, "Avg Hash is equal to or less than")
-        Me.chkAlertIfS3Hash.UseVisualStyleBackColor = True
-        '
-        'txtAlertS3Temp
-        '
-        Me.txtAlertS3Temp.Location = New System.Drawing.Point(141, 101)
-        Me.txtAlertS3Temp.Name = "txtAlertS3Temp"
-        Me.txtAlertS3Temp.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS3Temp.TabIndex = 21
-        Me.txtAlertS3Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'txtAlertS3Hash
-        '
-        Me.txtAlertS3Hash.Location = New System.Drawing.Point(141, 70)
-        Me.txtAlertS3Hash.Name = "txtAlertS3Hash"
-        Me.txtAlertS3Hash.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS3Hash.TabIndex = 25
-        Me.txtAlertS3Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS3Temp
-        '
-        Me.chkAlertIfS3Temp.AutoSize = True
-        Me.chkAlertIfS3Temp.Location = New System.Drawing.Point(12, 105)
-        Me.chkAlertIfS3Temp.Name = "chkAlertIfS3Temp"
-        Me.chkAlertIfS3Temp.Size = New System.Drawing.Size(116, 24)
-        Me.chkAlertIfS3Temp.TabIndex = 20
-        Me.chkAlertIfS3Temp.Text = "Temp Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS3Temp, "Equal to or greater than")
-        Me.chkAlertIfS3Temp.UseVisualStyleBackColor = True
-        '
-        'txtAlertS3FanHigh
-        '
-        Me.txtAlertS3FanHigh.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertS3FanHigh.Name = "txtAlertS3FanHigh"
-        Me.txtAlertS3FanHigh.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS3FanHigh.TabIndex = 23
-        Me.txtAlertS3FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'tabS4Alerts
-        '
-        Me.tabS4Alerts.Controls.Add(Me.chkAlertIfS4FanLow)
-        Me.tabS4Alerts.Controls.Add(Me.txtAlertS4FanLow)
-        Me.tabS4Alerts.Controls.Add(Me.cmdSaveAlerts7)
-        Me.tabS4Alerts.Controls.Add(Me.chkAlertIfS4XCount)
-        Me.tabS4Alerts.Controls.Add(Me.txtAlertS4XCount)
-        Me.tabS4Alerts.Controls.Add(Me.chkAlertIfS4FanHigh)
-        Me.tabS4Alerts.Controls.Add(Me.chkAlertIfS4Hash)
-        Me.tabS4Alerts.Controls.Add(Me.txtAlertS4Temp)
-        Me.tabS4Alerts.Controls.Add(Me.txtAlertS4Hash)
-        Me.tabS4Alerts.Controls.Add(Me.chkAlertIfS4Temp)
-        Me.tabS4Alerts.Controls.Add(Me.txtAlertS4FanHigh)
-        Me.tabS4Alerts.Location = New System.Drawing.Point(4, 4)
-        Me.tabS4Alerts.Name = "tabS4Alerts"
-        Me.tabS4Alerts.Size = New System.Drawing.Size(1136, 284)
-        Me.tabS4Alerts.TabIndex = 8
-        Me.tabS4Alerts.Text = "S4 Alerts"
-        Me.tabS4Alerts.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS4FanLow
-        '
-        Me.chkAlertIfS4FanLow.AutoSize = True
-        Me.chkAlertIfS4FanLow.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfS4FanLow.Name = "chkAlertIfS4FanLow"
-        Me.chkAlertIfS4FanLow.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS4FanLow.TabIndex = 40
-        Me.chkAlertIfS4FanLow.Text = "Fan Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS4FanLow, "Equal to or greater than")
-        Me.chkAlertIfS4FanLow.UseVisualStyleBackColor = True
-        '
-        'txtAlertS4FanLow
-        '
-        Me.txtAlertS4FanLow.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertS4FanLow.Name = "txtAlertS4FanLow"
-        Me.txtAlertS4FanLow.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS4FanLow.TabIndex = 41
-        Me.txtAlertS4FanLow.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'cmdSaveAlerts7
-        '
-        Me.cmdSaveAlerts7.Location = New System.Drawing.Point(12, 216)
-        Me.cmdSaveAlerts7.Name = "cmdSaveAlerts7"
-        Me.cmdSaveAlerts7.Size = New System.Drawing.Size(121, 32)
-        Me.cmdSaveAlerts7.TabIndex = 39
-        Me.cmdSaveAlerts7.Text = "Save Config"
-        Me.cmdSaveAlerts7.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS4XCount
-        '
-        Me.chkAlertIfS4XCount.AutoSize = True
-        Me.chkAlertIfS4XCount.Location = New System.Drawing.Point(12, 136)
-        Me.chkAlertIfS4XCount.Name = "chkAlertIfS4XCount"
-        Me.chkAlertIfS4XCount.Size = New System.Drawing.Size(129, 24)
-        Me.chkAlertIfS4XCount.TabIndex = 37
-        Me.chkAlertIfS4XCount.Text = "XCount Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS4XCount, "Great than or equal to")
-        Me.chkAlertIfS4XCount.UseVisualStyleBackColor = True
-        '
-        'txtAlertS4XCount
-        '
-        Me.txtAlertS4XCount.Location = New System.Drawing.Point(141, 132)
-        Me.txtAlertS4XCount.Name = "txtAlertS4XCount"
-        Me.txtAlertS4XCount.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS4XCount.TabIndex = 38
-        Me.txtAlertS4XCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS4FanHigh
-        '
-        Me.chkAlertIfS4FanHigh.AutoSize = True
-        Me.chkAlertIfS4FanHigh.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfS4FanHigh.Name = "chkAlertIfS4FanHigh"
-        Me.chkAlertIfS4FanHigh.Size = New System.Drawing.Size(102, 24)
-        Me.chkAlertIfS4FanHigh.TabIndex = 33
-        Me.chkAlertIfS4FanHigh.Text = "Fan Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS4FanHigh, "Equal to or greater than")
-        Me.chkAlertIfS4FanHigh.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfS4Hash
-        '
-        Me.chkAlertIfS4Hash.AutoSize = True
-        Me.chkAlertIfS4Hash.Location = New System.Drawing.Point(12, 74)
-        Me.chkAlertIfS4Hash.Name = "chkAlertIfS4Hash"
-        Me.chkAlertIfS4Hash.Size = New System.Drawing.Size(114, 24)
-        Me.chkAlertIfS4Hash.TabIndex = 35
-        Me.chkAlertIfS4Hash.Text = "Hash Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS4Hash, "Avg Hash is equal to or less than")
-        Me.chkAlertIfS4Hash.UseVisualStyleBackColor = True
-        '
-        'txtAlertS4Temp
-        '
-        Me.txtAlertS4Temp.Location = New System.Drawing.Point(141, 101)
-        Me.txtAlertS4Temp.Name = "txtAlertS4Temp"
-        Me.txtAlertS4Temp.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS4Temp.TabIndex = 32
-        Me.txtAlertS4Temp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'txtAlertS4Hash
-        '
-        Me.txtAlertS4Hash.Location = New System.Drawing.Point(141, 70)
-        Me.txtAlertS4Hash.Name = "txtAlertS4Hash"
-        Me.txtAlertS4Hash.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS4Hash.TabIndex = 36
-        Me.txtAlertS4Hash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfS4Temp
-        '
-        Me.chkAlertIfS4Temp.AutoSize = True
-        Me.chkAlertIfS4Temp.Location = New System.Drawing.Point(12, 105)
-        Me.chkAlertIfS4Temp.Name = "chkAlertIfS4Temp"
-        Me.chkAlertIfS4Temp.Size = New System.Drawing.Size(116, 24)
-        Me.chkAlertIfS4Temp.TabIndex = 31
-        Me.chkAlertIfS4Temp.Text = "Temp Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfS4Temp, "Equal to or greater than")
-        Me.chkAlertIfS4Temp.UseVisualStyleBackColor = True
-        '
-        'txtAlertS4FanHigh
-        '
-        Me.txtAlertS4FanHigh.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertS4FanHigh.Name = "txtAlertS4FanHigh"
-        Me.txtAlertS4FanHigh.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertS4FanHigh.TabIndex = 34
-        Me.txtAlertS4FanHigh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'tabSPAlerts
-        '
-        Me.tabSPAlerts.Controls.Add(Me.cmdSaveAlerts8)
-        Me.tabSPAlerts.Controls.Add(Me.chkAlertIfSPHash)
-        Me.tabSPAlerts.Controls.Add(Me.txtAlertSPTemp)
-        Me.tabSPAlerts.Controls.Add(Me.txtAlertSPHash)
-        Me.tabSPAlerts.Controls.Add(Me.chkAlertIfSPTemp)
-        Me.tabSPAlerts.Location = New System.Drawing.Point(4, 4)
-        Me.tabSPAlerts.Name = "tabSPAlerts"
-        Me.tabSPAlerts.Size = New System.Drawing.Size(1136, 284)
-        Me.tabSPAlerts.TabIndex = 7
-        Me.tabSPAlerts.Text = "SP Alerts"
-        Me.tabSPAlerts.UseVisualStyleBackColor = True
-        '
-        'cmdSaveAlerts8
-        '
-        Me.cmdSaveAlerts8.Location = New System.Drawing.Point(12, 216)
-        Me.cmdSaveAlerts8.Name = "cmdSaveAlerts8"
-        Me.cmdSaveAlerts8.Size = New System.Drawing.Size(121, 32)
-        Me.cmdSaveAlerts8.TabIndex = 50
-        Me.cmdSaveAlerts8.Text = "Save Config"
-        Me.cmdSaveAlerts8.UseVisualStyleBackColor = True
-        '
-        'chkAlertIfSPHash
-        '
-        Me.chkAlertIfSPHash.AutoSize = True
-        Me.chkAlertIfSPHash.Location = New System.Drawing.Point(12, 12)
-        Me.chkAlertIfSPHash.Name = "chkAlertIfSPHash"
-        Me.chkAlertIfSPHash.Size = New System.Drawing.Size(114, 24)
-        Me.chkAlertIfSPHash.TabIndex = 46
-        Me.chkAlertIfSPHash.Text = "Hash Is <="
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfSPHash, "Avg Hash is equal to or less than")
-        Me.chkAlertIfSPHash.UseVisualStyleBackColor = True
-        '
-        'txtAlertSPTemp
-        '
-        Me.txtAlertSPTemp.Location = New System.Drawing.Point(141, 39)
-        Me.txtAlertSPTemp.Name = "txtAlertSPTemp"
-        Me.txtAlertSPTemp.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertSPTemp.TabIndex = 43
-        Me.txtAlertSPTemp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'txtAlertSPHash
-        '
-        Me.txtAlertSPHash.Location = New System.Drawing.Point(141, 8)
-        Me.txtAlertSPHash.Name = "txtAlertSPHash"
-        Me.txtAlertSPHash.Size = New System.Drawing.Size(54, 27)
-        Me.txtAlertSPHash.TabIndex = 47
-        Me.txtAlertSPHash.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'chkAlertIfSPTemp
-        '
-        Me.chkAlertIfSPTemp.AutoSize = True
-        Me.chkAlertIfSPTemp.Location = New System.Drawing.Point(12, 43)
-        Me.chkAlertIfSPTemp.Name = "chkAlertIfSPTemp"
-        Me.chkAlertIfSPTemp.Size = New System.Drawing.Size(116, 24)
-        Me.chkAlertIfSPTemp.TabIndex = 42
-        Me.chkAlertIfSPTemp.Text = "Temp Is =>"
-        Me.ToolTip1.SetToolTip(Me.chkAlertIfSPTemp, "Equal to or greater than")
-        Me.chkAlertIfSPTemp.UseVisualStyleBackColor = True
         '
         'tabAlertTypes
         '
@@ -2304,8 +1716,8 @@ Partial Class frmMain
         Me.Label27.Size = New System.Drawing.Size(449, 90)
         Me.Label27.TabIndex = 39
         Me.Label27.Text = "- Rebooting at a certain time will trigger up to 15 minutes after the time entere" & _
-    "d.  That means you can trigger an immediate reboot of all Ants by entering a val" & _
-    "id time within the last 15 minutes."
+    "d.  That means you can trigger an immediate reboot of all miners by entering a v" & _
+    "alid time within the last 15 minutes."
         '
         'Label26
         '
@@ -2393,9 +1805,9 @@ Partial Class frmMain
         Me.chkRebootAllAntsAtAlso.AutoSize = True
         Me.chkRebootAllAntsAtAlso.Location = New System.Drawing.Point(12, 169)
         Me.chkRebootAllAntsAtAlso.Name = "chkRebootAllAntsAtAlso"
-        Me.chkRebootAllAntsAtAlso.Size = New System.Drawing.Size(201, 24)
+        Me.chkRebootAllAntsAtAlso.Size = New System.Drawing.Size(218, 24)
         Me.chkRebootAllAntsAtAlso.TabIndex = 29
-        Me.chkRebootAllAntsAtAlso.Text = "Also reboot all Ants at:"
+        Me.chkRebootAllAntsAtAlso.Text = "Also reboot all miners at:"
         Me.chkRebootAllAntsAtAlso.UseVisualStyleBackColor = True
         '
         'chkRebootAllAntsAt
@@ -2403,9 +1815,9 @@ Partial Class frmMain
         Me.chkRebootAllAntsAt.AutoSize = True
         Me.chkRebootAllAntsAt.Location = New System.Drawing.Point(12, 139)
         Me.chkRebootAllAntsAt.Name = "chkRebootAllAntsAt"
-        Me.chkRebootAllAntsAt.Size = New System.Drawing.Size(169, 24)
+        Me.chkRebootAllAntsAt.Size = New System.Drawing.Size(186, 24)
         Me.chkRebootAllAntsAt.TabIndex = 28
-        Me.chkRebootAllAntsAt.Text = "Reboot all Ants at:"
+        Me.chkRebootAllAntsAt.Text = "Reboot all miners at:"
         Me.chkRebootAllAntsAt.UseVisualStyleBackColor = True
         '
         'chkRebootAntsByUptime
@@ -2413,9 +1825,9 @@ Partial Class frmMain
         Me.chkRebootAntsByUptime.AutoSize = True
         Me.chkRebootAntsByUptime.Location = New System.Drawing.Point(12, 109)
         Me.chkRebootAntsByUptime.Name = "chkRebootAntsByUptime"
-        Me.chkRebootAntsByUptime.Size = New System.Drawing.Size(281, 24)
+        Me.chkRebootAntsByUptime.Size = New System.Drawing.Size(289, 24)
         Me.chkRebootAntsByUptime.TabIndex = 27
-        Me.chkRebootAntsByUptime.Text = "Reboot an Ant when Uptime hits: "
+        Me.chkRebootAntsByUptime.Text = "Reboot a miner when Uptime hits: "
         Me.chkRebootAntsByUptime.UseVisualStyleBackColor = True
         '
         'chkRebootAntOnError
@@ -2423,9 +1835,9 @@ Partial Class frmMain
         Me.chkRebootAntOnError.AutoSize = True
         Me.chkRebootAntOnError.Location = New System.Drawing.Point(12, 69)
         Me.chkRebootAntOnError.Name = "chkRebootAntOnError"
-        Me.chkRebootAntOnError.Size = New System.Drawing.Size(449, 24)
+        Me.chkRebootAntOnError.Size = New System.Drawing.Size(468, 24)
         Me.chkRebootAntOnError.TabIndex = 9
-        Me.chkRebootAntOnError.Text = "Attempt to reboot ants that get an ERROR on refreshing"
+        Me.chkRebootAntOnError.Text = "Attempt to reboot miners that get an ERROR on refreshing"
         Me.chkRebootAntOnError.UseVisualStyleBackColor = True
         '
         'txtAlertRebootGovernor
@@ -2455,9 +1867,9 @@ Partial Class frmMain
         Me.chkAlertRebootAntsOnHashAlert.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkAlertRebootAntsOnHashAlert.Location = New System.Drawing.Point(12, 39)
         Me.chkAlertRebootAntsOnHashAlert.Name = "chkAlertRebootAntsOnHashAlert"
-        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(367, 24)
+        Me.chkAlertRebootAntsOnHashAlert.Size = New System.Drawing.Size(384, 24)
         Me.chkAlertRebootAntsOnHashAlert.TabIndex = 8
-        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot Ants that trigger low/high Hash alerts"
+        Me.chkAlertRebootAntsOnHashAlert.Text = "Reboot miners that trigger low/high Hash alerts"
         Me.chkAlertRebootAntsOnHashAlert.UseVisualStyleBackColor = True
         '
         'Label8
@@ -2908,18 +2320,8 @@ Partial Class frmMain
         Me.tabPools.PerformLayout()
         Me.tabAlerts.ResumeLayout(False)
         Me.tabAlertsAndReboots.ResumeLayout(False)
-        Me.tabC1Alerts.ResumeLayout(False)
-        Me.tabC1Alerts.PerformLayout()
-        Me.tabS1Alerts.ResumeLayout(False)
-        Me.tabS1Alerts.PerformLayout()
-        Me.tabS2Alerts.ResumeLayout(False)
-        Me.tabS2Alerts.PerformLayout()
-        Me.tabS3Alerts.ResumeLayout(False)
-        Me.tabS3Alerts.PerformLayout()
-        Me.tabS4Alerts.ResumeLayout(False)
-        Me.tabS4Alerts.PerformLayout()
-        Me.tabSPAlerts.ResumeLayout(False)
-        Me.tabSPAlerts.PerformLayout()
+        Me.tabAlertSettings.ResumeLayout(False)
+        Me.tabAlertSettings.PerformLayout()
         Me.tabAlertTypes.ResumeLayout(False)
         Me.tabAlertTypes.PerformLayout()
         Me.tabReboots.ResumeLayout(False)
@@ -2943,11 +2345,11 @@ Partial Class frmMain
     Friend WithEvents tabConfig As System.Windows.Forms.TabPage
     Friend WithEvents cmdDelAnt As System.Windows.Forms.Button
     Friend WithEvents cmdAddAnt As System.Windows.Forms.Button
-    Friend WithEvents txtAntAddress As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerAddress As System.Windows.Forms.TextBox
     Friend WithEvents cmdPause As System.Windows.Forms.Button
-    Friend WithEvents txtAntSSHPassword As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerSSHPassword As System.Windows.Forms.TextBox
     Friend WithEvents lblWBPassword As System.Windows.Forms.Label
-    Friend WithEvents txtAntSSHUsername As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerSSHUsername As System.Windows.Forms.TextBox
     Friend WithEvents lblWBUserName As System.Windows.Forms.Label
     Friend WithEvents cmdSaveConfig As System.Windows.Forms.Button
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
@@ -2981,26 +2383,10 @@ Partial Class frmMain
     Friend WithEvents mnuExit As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents menuStripMain As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents mnuMainExit As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents txtAlertS2Temp As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertS1Temp As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS2Temp As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAlertIfS1Temp As System.Windows.Forms.CheckBox
     Friend WithEvents chkAlertHighlightField As System.Windows.Forms.CheckBox
     Friend WithEvents chkAlertShowNotifyPopup As System.Windows.Forms.CheckBox
     Friend WithEvents chkAlertShowAnnoyingPopup As System.Windows.Forms.CheckBox
     Friend WithEvents cmdSaveAlerts4 As System.Windows.Forms.Button
-    Friend WithEvents chkAlertIfS1FanHigh As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAlertIfS2FanHigh As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS1FanHigh As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertS2FanHigh As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS2Hash As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS2Hash As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS1Hash As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS1Hash As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS2XCount As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS2XCount As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS1XCount As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS1XCount As System.Windows.Forms.TextBox
     Friend WithEvents chkAlertStartProcess As System.Windows.Forms.CheckBox
     Friend WithEvents cmdAlertProcessFileFinder As System.Windows.Forms.Button
     Friend WithEvents Label77 As System.Windows.Forms.Label
@@ -3009,10 +2395,6 @@ Partial Class frmMain
     Friend WithEvents txtAlertStartProcessParms As System.Windows.Forms.TextBox
     Friend WithEvents Label40 As System.Windows.Forms.Label
     Friend WithEvents tabAlertsAndReboots As System.Windows.Forms.TabControl
-    Friend WithEvents tabS1Alerts As System.Windows.Forms.TabPage
-    Friend WithEvents cmdSaveAlerts1 As System.Windows.Forms.Button
-    Friend WithEvents tabS2Alerts As System.Windows.Forms.TabPage
-    Friend WithEvents cmdSaveAlerts2 As System.Windows.Forms.Button
     Friend WithEvents tabAlertTypes As System.Windows.Forms.TabPage
     Friend WithEvents cmdSaveAlerts3 As System.Windows.Forms.Button
     Friend WithEvents tabEmail As System.Windows.Forms.TabPage
@@ -3050,8 +2432,8 @@ Partial Class frmMain
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents chkShowDifficulty As System.Windows.Forms.CheckBox
     Friend WithEvents Label7 As System.Windows.Forms.Label
-    Friend WithEvents txtAntWebPassword As System.Windows.Forms.TextBox
-    Friend WithEvents txtAntWebUsername As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerWebPassword As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerWebUsername As System.Windows.Forms.TextBox
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents cmdSaveAnt As System.Windows.Forms.Button
     Friend WithEvents chkShowACount As System.Windows.Forms.CheckBox
@@ -3063,10 +2445,6 @@ Partial Class frmMain
     Friend WithEvents mnuAntMenu As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents mnuRebootAnt As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents mnuRebootMultiple As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents chkAlertIfS1FanLow As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS1FanLow As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS2FanLow As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS2FanLow As System.Windows.Forms.TextBox
     Friend WithEvents mnuShutdownS2 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents tabPools As System.Windows.Forms.TabPage
     Friend WithEvents cmdPoolDelete As System.Windows.Forms.Button
@@ -3092,18 +2470,6 @@ Partial Class frmMain
     Friend WithEvents lblPools1 As System.Windows.Forms.Label
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
-    Friend WithEvents tabS3Alerts As System.Windows.Forms.TabPage
-    Friend WithEvents chkAlertIfS3FanLow As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS3FanLow As System.Windows.Forms.TextBox
-    Friend WithEvents cmdSaveAlerts5 As System.Windows.Forms.Button
-    Friend WithEvents chkAlertIfS3XCount As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS3XCount As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS3FanHigh As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAlertIfS3Hash As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS3Temp As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertS3Hash As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS3Temp As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS3FanHigh As System.Windows.Forms.TextBox
     Friend WithEvents timerDoStuff As System.Windows.Forms.Timer
     Friend WithEvents cmdChangeThreads As System.Windows.Forms.Button
     Friend WithEvents trackThreadCount As System.Windows.Forms.TrackBar
@@ -3122,17 +2488,17 @@ Partial Class frmMain
     Friend WithEvents Label17 As System.Windows.Forms.Label
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents chkAntRebootViaSSH As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAntUseAPI As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAntActive As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMinerRebootViaSSH As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMinerUseAPI As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMinerActive As System.Windows.Forms.CheckBox
     Friend WithEvents Label20 As System.Windows.Forms.Label
-    Friend WithEvents txtAntName As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerName As System.Windows.Forms.TextBox
     Friend WithEvents Label19 As System.Windows.Forms.Label
     Friend WithEvents lblMinerID As System.Windows.Forms.Label
-    Friend WithEvents txtAntSSHPort As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerSSHPort As System.Windows.Forms.TextBox
     Friend WithEvents Label23 As System.Windows.Forms.Label
-    Friend WithEvents txtAntWebPort As System.Windows.Forms.TextBox
-    Friend WithEvents txtAntAPIPort As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerWebPort As System.Windows.Forms.TextBox
+    Friend WithEvents txtMinerAPIPort As System.Windows.Forms.TextBox
     Friend WithEvents Label21 As System.Windows.Forms.Label
     Friend WithEvents cmdAntClear As System.Windows.Forms.Button
     Friend WithEvents cmbAntScanStop As System.Windows.Forms.ComboBox
@@ -3154,38 +2520,22 @@ Partial Class frmMain
     Friend WithEvents Label27 As System.Windows.Forms.Label
     Friend WithEvents Label26 As System.Windows.Forms.Label
     Friend WithEvents Label25 As System.Windows.Forms.Label
-    Friend WithEvents tabC1Alerts As System.Windows.Forms.TabPage
-    Friend WithEvents chkAlertIfC1FanLow As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertC1FanLow As System.Windows.Forms.TextBox
+    Friend WithEvents tabAlertSettings As System.Windows.Forms.TabPage
     Friend WithEvents cmdSaveAlerts6 As System.Windows.Forms.Button
-    Friend WithEvents chkAlertIfC1XCount As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertC1XCount As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfC1Temp As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAlertIfC1Hash As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertC1FanHigh As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertC1Hash As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfC1FanHigh As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertC1Temp As System.Windows.Forms.TextBox
     Friend WithEvents txtIPToGetInfo As System.Windows.Forms.TextBox
     Friend WithEvents cmdGetMinerInfo As System.Windows.Forms.Button
-    Friend WithEvents tabS4Alerts As System.Windows.Forms.TabPage
-    Friend WithEvents tabSPAlerts As System.Windows.Forms.TabPage
-    Friend WithEvents chkAlertIfS4FanLow As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS4FanLow As System.Windows.Forms.TextBox
-    Friend WithEvents cmdSaveAlerts7 As System.Windows.Forms.Button
-    Friend WithEvents chkAlertIfS4XCount As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS4XCount As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS4FanHigh As System.Windows.Forms.CheckBox
-    Friend WithEvents chkAlertIfS4Hash As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS4Temp As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertS4Hash As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfS4Temp As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertS4FanHigh As System.Windows.Forms.TextBox
-    Friend WithEvents cmdSaveAlerts8 As System.Windows.Forms.Button
-    Friend WithEvents chkAlertIfSPHash As System.Windows.Forms.CheckBox
-    Friend WithEvents txtAlertSPTemp As System.Windows.Forms.TextBox
-    Friend WithEvents txtAlertSPHash As System.Windows.Forms.TextBox
-    Friend WithEvents chkAlertIfSPTemp As System.Windows.Forms.CheckBox
     Friend WithEvents cmbMinerType As System.Windows.Forms.ComboBox
+    Friend WithEvents chkAlertLowFan As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertLowFanValue As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertXCount As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertXCountValue As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertTempHigh As System.Windows.Forms.CheckBox
+    Friend WithEvents chkAlertHashLow As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertHighFanValue As System.Windows.Forms.TextBox
+    Friend WithEvents txtAlertHashLowValue As System.Windows.Forms.TextBox
+    Friend WithEvents chkAlertHighFan As System.Windows.Forms.CheckBox
+    Friend WithEvents txtAlertTempHighValue As System.Windows.Forms.TextBox
+    Friend WithEvents cmbAlertMinerType As System.Windows.Forms.ComboBox
+    Friend WithEvents Label28 As System.Windows.Forms.Label
 
 End Class
