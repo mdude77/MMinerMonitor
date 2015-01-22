@@ -1,3 +1,12 @@
+v4.4
+- Added a new miner flag "Do Not Reboot".  If that's checked off, no matter how you try, it will not reboot.
+- Fixed numerous problems with the update pool logic.  Note that the pool update functionality operates via the API, which means API update access must be enabled (W: in your cgminer config).  Also note this is not a permanent update; changes will be lost if you update the miner via the UI or the miner is
+rebooted.
+- Added a "Queue" output option to show the current queue size of your miner.
+- Added a "ATemp" output option to show the average temperature of the individual temperature readings for that miner.
+- Changed to display the hash speeds formatted, ie, 2.01 TH/s instead of 2012.
+- Added support for the Scrypt miner Innosilicon A2 88MH.
+
 v4.3
 - Fixed the problem with errors being thrown on startup if you've never used it before.  Forgot to check for this before publishing the prior version. :(
 

@@ -86,10 +86,10 @@
     <Compile Include="frmAnnoyingPopup.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmAntMonitor.designer.vb">
-      <DependentUpon>frmAntMonitor.vb</DependentUpon>
+    <Compile Include="frmMinerMonitor.designer.vb">
+      <DependentUpon>frmMinerMonitor.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmAntMonitor.vb">
+    <Compile Include="frmMinerMonitor.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmGetMinerInfo.Designer.vb">
@@ -121,8 +121,8 @@
     <EmbeddedResource Include="frmAnnoyingPopup.resx">
       <DependentUpon>frmAnnoyingPopup.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAntMonitor.resx">
-      <DependentUpon>frmAntMonitor.vb</DependentUpon>
+    <EmbeddedResource Include="frmMinerMonitor.resx">
+      <DependentUpon>frmMinerMonitor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmGetMinerInfo.resx">
       <DependentUpon>frmGetMinerInfo.vb</DependentUpon>

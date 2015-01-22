@@ -28,6 +28,7 @@ Partial Class frmGetMinerInfo
         Me.txt2 = New System.Windows.Forms.TextBox()
         Me.txt3 = New System.Windows.Forms.TextBox()
         Me.cmdCopy = New System.Windows.Forms.Button()
+        Me.txt4 = New System.Windows.Forms.TextBox()
         Me.SuspendLayout()
         '
         'Label1
@@ -81,11 +82,23 @@ Partial Class frmGetMinerInfo
         Me.cmdCopy.Text = "Copy To Clipboard"
         Me.cmdCopy.UseVisualStyleBackColor = True
         '
+        'txt4
+        '
+        Me.txt4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txt4.Location = New System.Drawing.Point(12, 493)
+        Me.txt4.Multiline = True
+        Me.txt4.Name = "txt4"
+        Me.txt4.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txt4.Size = New System.Drawing.Size(893, 121)
+        Me.txt4.TabIndex = 6
+        '
         'frmGetMinerInfo
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(917, 497)
+        Me.ClientSize = New System.Drawing.Size(917, 622)
+        Me.Controls.Add(Me.txt4)
         Me.Controls.Add(Me.cmdCopy)
         Me.Controls.Add(Me.txt3)
         Me.Controls.Add(Me.txt2)
@@ -93,7 +106,7 @@ Partial Class frmGetMinerInfo
         Me.Controls.Add(Me.Label1)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.Margin = New System.Windows.Forms.Padding(4)
         Me.Name = "frmGetMinerInfo"
         Me.Text = "Get Miner Info"
         Me.ResumeLayout(False)
@@ -105,4 +118,5 @@ Partial Class frmGetMinerInfo
     Friend WithEvents txt2 As System.Windows.Forms.TextBox
     Friend WithEvents txt3 As System.Windows.Forms.TextBox
     Friend WithEvents cmdCopy As System.Windows.Forms.Button
+    Friend WithEvents txt4 As System.Windows.Forms.TextBox
 End Class
