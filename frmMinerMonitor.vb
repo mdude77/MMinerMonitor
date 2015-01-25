@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v4.4"
+    Private Const csVersion As String = "M's Miner Monitor v4.7"
 
     'alert string   
     Private sAlerts As String
@@ -381,7 +381,7 @@ Public Class frmMain
                         Me.xAlertTypes.Fans = False
                         Me.xAlertTypes.Hash = True
                         Me.xAlertTypes.Temps = True
-                        Me.xAlertTypes.XCount = False
+                        Me.xAlertTypes.XCount = True
 
                         With Me.xAlerts
                             .TempHigh.Initialize("AlertIfSP10Temp", "AlertValueSP10Temp", "", False)
@@ -399,7 +399,7 @@ Public Class frmMain
                         Me.xAlertTypes.Fans = False
                         Me.xAlertTypes.Hash = True
                         Me.xAlertTypes.Temps = True
-                        Me.xAlertTypes.XCount = False
+                        Me.xAlertTypes.XCount = True
 
                         With Me.xAlerts
                             .TempHigh.Initialize("AlertIfSP20Temp", "AlertValueSP20Temp", "", False)
@@ -417,7 +417,7 @@ Public Class frmMain
                         Me.xAlertTypes.Fans = False
                         Me.xAlertTypes.Hash = True
                         Me.xAlertTypes.Temps = True
-                        Me.xAlertTypes.XCount = False
+                        Me.xAlertTypes.XCount = True
 
                         With Me.xAlerts
                             .TempHigh.Initialize("AlertIfSP30Temp", "AlertValueSP30Temp", "", False)
@@ -435,7 +435,7 @@ Public Class frmMain
                         Me.xAlertTypes.Fans = False
                         Me.xAlertTypes.Hash = True
                         Me.xAlertTypes.Temps = True
-                        Me.xAlertTypes.XCount = False
+                        Me.xAlertTypes.XCount = True
 
                         With Me.xAlerts
                             .TempHigh.Initialize("AlertIfSP31Temp", "AlertValueSP31Temp", "", False)
@@ -453,7 +453,7 @@ Public Class frmMain
                         Me.xAlertTypes.Fans = False
                         Me.xAlertTypes.Hash = True
                         Me.xAlertTypes.Temps = True
-                        Me.xAlertTypes.XCount = False
+                        Me.xAlertTypes.XCount = True
 
                         With Me.xAlerts
                             .TempHigh.Initialize("AlertIfSP35Temp", "AlertValueSP35Temp", "", False)
@@ -800,8 +800,8 @@ Public Class frmMain
             End Get
         End Property
 
-        Public Property HFan As Integer
-            Set(value As Integer)
+        Public Property HFan As Object
+            Set(value As Object)
                 Me.xDatarow.Item("HFan") = value
             End Set
             Get
@@ -845,8 +845,8 @@ Public Class frmMain
             End Get
         End Property
 
-        Public Property Freq As Double
-            Set(value As Double)
+        Public Property Freq As Object
+            Set(value As Object)
                 Me.xDatarow.Item("Freq") = value
             End Set
             Get
@@ -932,6 +932,15 @@ Public Class frmMain
             End Set
             Get
                 Return Me.xDatarow.Item("Queue")
+            End Get
+        End Property
+
+        Public Property Name As String
+            Set(value As String)
+                Me.xDatarow.Item("Name") = value
+            End Set
+            Get
+                Return Me.xDatarow.Item("Name")
             End Get
         End Property
     End Class
@@ -1339,6 +1348,7 @@ Public Class frmMain
                 .Add("UseAPI")
                 .Add("RebootViaSSH")
                 .Add("DoNotReboot")
+                .Add("HTTPS")
             End With
         End With
 
@@ -1352,6 +1362,7 @@ Public Class frmMain
         Me.dataMinerConfig.Columns("UseAPI").Visible = False
         Me.dataMinerConfig.Columns("RebootViaSSH").Visible = False
         Me.dataMinerConfig.Columns("DoNotReboot").Visible = False
+        Me.dataMinerConfig.Columns("HTTPS").Visible = False
 
         With Me.dataMinerConfig
             .Columns("Active").Width = 62
@@ -1418,6 +1429,7 @@ Public Class frmMain
                 dr("UseAPI") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "UseAPI", "")
                 dr("RebootViaSSH") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "RebootViaSSH", "")
                 dr("DoNotReboot") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "DoNotReboot", "")
+                dr("HTTPS") = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & sKey, "HTTPS", "")
 
                 dsMinerConfig.Tables(0).Rows.Add(dr)
             Next
@@ -1484,7 +1496,7 @@ Public Class frmMain
                           Optional ByVal sSSHUserName As String = "root", Optional ByVal sSSHPassword As String = "", _
                           Optional ByVal sAPIPort As String = "4028", Optional ByVal sSSHPort As String = "22", _
                           Optional ByVal sUseAPI As String = "Y", Optional ByVal sRebootViaSSH As String = "Y", _
-                          Optional ByVal sDoNotReboot As String = "N") As Integer
+                          Optional ByVal sDoNotReboot As String = "N", Optional ByVal sHTTPS As String = "N") As Integer
 
         Dim x As Integer
 
@@ -1532,6 +1544,7 @@ Public Class frmMain
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "UseAPI", sUseAPI, Microsoft.Win32.RegistryValueKind.String)
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "RebootViaSSH", sRebootViaSSH, Microsoft.Win32.RegistryValueKind.String)
             My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "DoNotReboot", sRebootViaSSH, Microsoft.Win32.RegistryValueKind.String)
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2\" & x, "HTTPS", sHTTPS, Microsoft.Win32.RegistryValueKind.String)
 
             If ID = -1 Then 'adding an ant, need to increment the counter
                 My.Computer.Registry.SetValue("HKEY_CURRENT_USER\" & csRegKey & "\AntsV2", "Count", x + 1)
@@ -1639,21 +1652,22 @@ Public Class frmMain
 
         Dim dr As DataRow
         Dim x, y, z As Integer
-        'Dim sAnt As String
-        'Dim bAntFound As Boolean
         Dim wb As WebBrowser
-        Dim sbTemp As System.Text.StringBuilder
+        Dim sbTemp, sbTemp2, sbTemp3 As System.Text.StringBuilder
         Dim count(0 To 9) As Integer
-        'Dim sWebUN, sWebPW As String
         Dim sIP As String
         Dim s(), p() As String
-        'Dim sFullAntName, sTemp As String
         Dim antConfigRow As DataRow
+        Dim avg As clsAverage
 
         Try
             wb = sender
 
             sbTemp = New System.Text.StringBuilder
+            sbTemp2 = New System.Text.StringBuilder
+            sbTemp3 = New System.Text.StringBuilder
+
+            avg = New clsAverage
 
             'first slash slash
             x = InStr(wb.Url.AbsoluteUri, "/")
@@ -1682,18 +1696,8 @@ Public Class frmMain
 
             antConfigRow = wb.Tag
 
-            'sFullAntName = antConfigRow("Name")
-
-            'If p.Count = 2 Then
-            '    sAnt = s(2) & "." & s(3).Substring(0, InStr(s(3), "/") - 1) & ":" & p(1)
-            'Else
-            '    sAnt = s(2) & "." & s(3).Substring(0, InStr(s(3), "/") - 1) & ":" & "80"
-            'End If
-
             If wb.Document.All(1).OuterHtml.ToLower.Contains("authorization") Then
                 AddToLogQueue(antConfigRow("Type") & ":" & antConfigRow("Name") & " responded with login page")
-
-                'Call GetWebCredentials(sFullAntName, sWebUN, sWebPW)
 
                 wb.Document.All("username").SetAttribute("value", antConfigRow("WebUsername"))
                 wb.Document.All("password").SetAttribute("value", antConfigRow("WebPassword"))
@@ -1707,113 +1711,217 @@ Public Class frmMain
                     Debug.Print(x & " -- " & wb.Document.All(x).OuterHtml)
                 Next
 #End If
+                dr = FindDisplayMinerByID(antConfigRow("ID"))
+
+                dr.Item("Name") = antConfigRow("Name")
+
                 If wb.Url.AbsoluteUri.Contains("minerStatus.cgi") Then
-                    'sAnt = "S2:" & sAnt
-
-                    dr = FindDisplayMinerByID(antConfigRow("ID"))
-
-                    'For Each dr In ds.Tables(0).Rows
-                    '    If dr.Item("ID") = antConfigRow("ID") Then
-                    '        bAntFound = True
-
-                    '        Exit For
-                    '    End If
-                    'Next
-
-                    'If bAntFound = False Then
-                    '    dr = ds.Tables(0).NewRow
-                    'End If
-
-                    dr.Item("Name") = antConfigRow("Name")
-                    'dr.Item("IPAddress") = "S2: " & sIP
-
-                    'S2 status code
+                    'S2/S4 status code
                     AddToLogQueue(antConfigRow("Type") & ":" & antConfigRow("Name") & " responded with status page")
 
-                    dr.Item("Uptime") = wb.Document.All(88).OuterText
-                    dr.Item("Speed(5s)") = wb.Document.All(91).OuterText
-                    dr.Item("Speed(avg)") = wb.Document.All(94).OuterText
-                    dr.Item("Blocks") = wb.Document.All(97).OuterText
-                    dr.Item("HWE%") = Format(UInt64.Parse(wb.Document.All(109).OuterText) / _
-                            (UInt64.Parse(wb.Document.All(127).OuterText) + UInt64.Parse(wb.Document.All(130).OuterText) + UInt64.Parse(wb.Document.All(109).OuterText)), "##0.###%")
-                    dr.Item("BestShare") = Format(UInt64.Parse(wb.Document.All(137).OuterText), "###,###,###,###,###,##0")
+                    Select Case antConfigRow("Type")
+                        Case "S2"
+                            dr.Item("Uptime") = wb.Document.All(88).OuterText
+                            dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(91).OuterText) * 1000)
+                            dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(94).OuterText) * 1000)
 
-                    Select Case wb.Document.All(193).OuterText
-                        Case "Alive"
-                            sbTemp.Append("U")
+                            dr.Item("HashSHA256") = Val(wb.Document.All(94).OuterText) * 1000000
+                            dr.Item("HashScrypt") = 0
 
-                        Case "Dead"
-                            sbTemp.Append("D")
+                            dr.Item("Blocks") = wb.Document.All(97).OuterText
+                            dr.Item("HWE%") = Format(UInt64.Parse(wb.Document.All(109).OuterText) / _
+                                    (UInt64.Parse(wb.Document.All(127).OuterText) + UInt64.Parse(wb.Document.All(130).OuterText) + UInt64.Parse(wb.Document.All(109).OuterText)), "##0.###%")
+                            dr.Item("BestShare") = Format(UInt64.Parse(wb.Document.All(137).OuterText), "###,###,###,###,###,##0")
+
+                            Select Case wb.Document.All(193).OuterText
+                                Case "Alive"
+                                    sbTemp.Append("U")
+
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                            End Select
+
+                            If wb.Document.All.Count > 224 Then
+                                Select Case wb.Document.All(245).OuterText
+                                    Case "Alive"
+                                        sbTemp.Append("U")
+
+                                    Case "Dead"
+                                        sbTemp.Append("D")
+
+                                End Select
+
+                                Select Case wb.Document.All(297).OuterText
+                                    Case "Alive"
+                                        sbTemp.Append("U")
+
+                                    Case "Dead"
+                                        sbTemp.Append("D")
+
+                                End Select
+
+                                dr.Item("Pools") = sbTemp.ToString
+
+                                sbTemp.Clear()
+
+                                dr.Item("Diff") = wb.Document.All(215).OuterText & " " & wb.Document.All(267).OuterText & " " & wb.Document.All(319).OuterText
+
+                                dr.Item("Rej%") = Format(Val(wb.Document.All(107).OuterText) / (Val(wb.Document.All(104).OuterText) + Val(wb.Document.All(107).OuterText)) * 100, "##0.###")
+
+                                dr.Item("Stale%") = Format(Val(wb.Document.All(119).OuterText) / (Val(wb.Document.All(104).OuterText) + Val(wb.Document.All(119).OuterText)) * 100, "##0.###")
+
+                                dr.Item("HFan") = GetHighValue(wb.Document.All(530).OuterText, wb.Document.All(531).OuterText, wb.Document.All(532).OuterText, wb.Document.All(533).OuterText)
+
+                                dr.Item("Fans") = wb.Document.All(530).OuterText & " " & wb.Document.All(531).OuterText & " " & wb.Document.All(532).OuterText & " " & wb.Document.All(533).OuterText
+
+                                dr.Item("Freq") = Val(wb.Document.All(366).OuterText)
+
+                                dr.Item("HTemp") = GetHighValue(wb.Document.All(369).OuterText, wb.Document.All(385).OuterText, wb.Document.All(401).OuterText, wb.Document.All(417).OuterText, _
+                                                                wb.Document.All(433).OuterText, wb.Document.All(449).OuterText, wb.Document.All(465).OuterText, wb.Document.All(481).OuterText, _
+                                                                wb.Document.All(497).OuterText, wb.Document.All(513).OuterText)
+
+                                dr.Item("Temps") = wb.Document.All(369).OuterText & " " & wb.Document.All(385).OuterText & " " & wb.Document.All(401).OuterText & " " & wb.Document.All(417).OuterText & " " & _
+                                                   wb.Document.All(433).OuterText & " " & wb.Document.All(449).OuterText & " " & wb.Document.All(465).OuterText & " " & wb.Document.All(481).OuterText & " " & _
+                                                   wb.Document.All(497).OuterText & " " & wb.Document.All(513).OuterText
+
+                                avg.AddNumber(Val(wb.Document.All(369).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(385).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(401).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(417).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(433).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(449).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(465).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(481).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(497).OuterText))
+                                avg.AddNumber(Val(wb.Document.All(513).OuterText))
+
+                                dr.Item("ATemp") = avg.GetAverage
+
+                                count(0) = HowManyInString(wb.Document.All(372).OuterText, "x") + HowManyInString(wb.Document.All(372).OuterText, "-")
+                                count(1) = HowManyInString(wb.Document.All(388).OuterText, "x") + HowManyInString(wb.Document.All(388).OuterText, "-")
+                                count(2) = HowManyInString(wb.Document.All(404).OuterText, "x") + HowManyInString(wb.Document.All(404).OuterText, "-")
+                                count(3) = HowManyInString(wb.Document.All(420).OuterText, "x") + HowManyInString(wb.Document.All(420).OuterText, "-")
+                                count(4) = HowManyInString(wb.Document.All(436).OuterText, "x") + HowManyInString(wb.Document.All(436).OuterText, "-")
+                                count(5) = HowManyInString(wb.Document.All(452).OuterText, "x") + HowManyInString(wb.Document.All(452).OuterText, "-")
+                                count(6) = HowManyInString(wb.Document.All(468).OuterText, "x") + HowManyInString(wb.Document.All(468).OuterText, "-")
+                                count(7) = HowManyInString(wb.Document.All(484).OuterText, "x") + HowManyInString(wb.Document.All(484).OuterText, "-")
+                                count(8) = HowManyInString(wb.Document.All(500).OuterText, "x") + HowManyInString(wb.Document.All(500).OuterText, "-")
+                                count(9) = HowManyInString(wb.Document.All(516).OuterText, "x") + HowManyInString(wb.Document.All(516).OuterText, "-")
+
+                                dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
+
+                                dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
+                                                    count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
+
+                                If (count(0) <> 0 OrElse count(1) <> 0 OrElse count(2) <> 0 OrElse count(3) <> 0 OrElse count(4) <> 0 OrElse count(5) <> 0 _
+                                    OrElse count(6) <> 0 OrElse count(7) <> 0 OrElse count(8) <> 0 OrElse count(9) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
+                                    'only reboot once every x minutes
+                                    Call RebootMiner(antConfigRow, False, False, wb)
+                                End If
+                            End If
+
+                        Case "S4"
+                            dr.Item("Uptime") = wb.Document.All(70).OuterText
+                            dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(74).OuterText * 1000))
+                            dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(77).OuterText * 1000))
+
+                            dr.Item("HashSHA256") = Val(wb.Document.All(77).OuterText) * 1000000
+                            dr.Item("HashScrypt") = 0
+
+                            dr.Item("Blocks") = wb.Document.All(80).OuterText
+
+                            'HW / (diffA + diffR + HW) * 100
+                            dr.Item("HWE%") = Format(Val(wb.Document.All(350).OuterText.Replace(",", "")) / (Val(wb.Document.All(350).OuterText.Replace(",", "")) + _
+                                              Val(wb.Document.All(322).OuterText.Replace(",", "")) + Val(wb.Document.All(325).OuterText.Replace(",", ""))), "##0.000%")
+
+                            dr.Item("BestShare") = Format(UInt64.Parse(wb.Document.All(91).OuterText), "###,###,###,###,###,##0")
+
+                            Select Case wb.Document.All(148).OuterText
+                                Case "Alive"
+                                    sbTemp.Append("U")
+
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                            End Select
+
+                            'reject
+                            sbTemp2.Append(Format(Val(wb.Document.All(175).OuterText.Replace(",", "")) / (Val(wb.Document.All(160).OuterText.Replace(",", "")) + Val(wb.Document.All(175).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                            'stale
+                            sbTemp3.Append(Format(Val(wb.Document.All(181).OuterText.Replace(",", "")) / (Val(wb.Document.All(160).OuterText.Replace(",", "")) + Val(wb.Document.All(181).OuterText.Replace(",", ""))) * 100, "##0.0"))
+
+                            Select Case wb.Document.All(200).OuterText
+                                Case "Alive"
+                                    sbTemp.Append("U")
+
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                            End Select
+
+                            'reject
+                            sbTemp2.Append(" " & Format(Val(wb.Document.All(227).OuterText.Replace(",", "")) / (Val(wb.Document.All(212).OuterText.Replace(",", "")) + Val(wb.Document.All(227).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                            'stale
+                            sbTemp3.Append(" " & Format(Val(wb.Document.All(233).OuterText.Replace(",", "")) / (Val(wb.Document.All(212).OuterText.Replace(",", "")) + Val(wb.Document.All(233).OuterText.Replace(",", ""))) * 100, "##0.0"))
+
+                            Select Case wb.Document.All(252).OuterText
+                                Case "Alive"
+                                    sbTemp.Append("U")
+
+                                Case "Dead"
+                                    sbTemp.Append("D")
+
+                            End Select
+
+                            'reject
+                            sbTemp2.Append(" " & Format(Val(wb.Document.All(279).OuterText.Replace(",", "")) / (Val(wb.Document.All(264).OuterText.Replace(",", "")) + Val(wb.Document.All(279).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                            'stale
+                            sbTemp3.Append(" " & Format(Val(wb.Document.All(285).OuterText.Replace(",", "")) / (Val(wb.Document.All(264).OuterText.Replace(",", "")) + Val(wb.Document.All(285).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                
+                            dr.Item("Pools") = sbTemp.ToString
+
+                            sbTemp.Clear()
+
+                            dr.Item("Diff") = wb.Document.All(184).OuterText & " " & wb.Document.All(236).OuterText & " " & wb.Document.All(288).OuterText
+
+                            dr.Item("Rej%") = sbTemp2.ToString.Replace("NaN", "").Trim
+
+                            dr.Item("Stale%") = sbTemp3.ToString.Replace("NaN", "").Trim
+
+                            dr.Item("HFan") = GetHighValue(wb.Document.All(494).OuterText.Replace(",", ""), wb.Document.All(495).OuterText.Replace(",", ""), wb.Document.All(496).OuterText.Replace(",", ""), wb.Document.All(497).OuterText.Replace(",", ""))
+
+                            dr.Item("Fans") = wb.Document.All(494).OuterText & " " & wb.Document.All(495).OuterText & " " & wb.Document.All(496).OuterText & " " & wb.Document.All(497).OuterText
+
+                            dr.Item("Freq") = Val(wb.Document.All(425).OuterText)
+
+                            dr.Item("HTemp") = GetHighValue(wb.Document.All(428).OuterText, wb.Document.All(444).OuterText, wb.Document.All(460).OuterText, wb.Document.All(476).OuterText)
+
+                            dr.Item("Temps") = wb.Document.All(428).OuterText & " " & wb.Document.All(444).OuterText & " " & wb.Document.All(460).OuterText & " " & wb.Document.All(476).OuterText
+
+                            avg.AddNumber(Val(wb.Document.All(428).OuterText))
+                            avg.AddNumber(Val(wb.Document.All(444).OuterText))
+                            avg.AddNumber(Val(wb.Document.All(460).OuterText))
+                            avg.AddNumber(Val(wb.Document.All(476).OuterText))
+
+                            dr.Item("ATemp") = avg.GetAverage
+
+                            count(0) = HowManyInString(wb.Document.All(431).OuterText, "x") + HowManyInString(wb.Document.All(431).OuterText, "-")
+                            count(1) = HowManyInString(wb.Document.All(447).OuterText, "x") + HowManyInString(wb.Document.All(447).OuterText, "-")
+                            count(2) = HowManyInString(wb.Document.All(463).OuterText, "x") + HowManyInString(wb.Document.All(463).OuterText, "-")
+                            count(3) = HowManyInString(wb.Document.All(479).OuterText, "x") + HowManyInString(wb.Document.All(479).OuterText, "-")
+
+                            dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) & "X"
+
+                            dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X "
+
+                            If (count(0) <> 0 OrElse count(1) <> 0 OrElse count(2) <> 0 OrElse count(3) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
+                                Call RebootMiner(antConfigRow, False, False, wb)
+                            End If
 
                     End Select
-
-                    If wb.Document.All.Count > 224 Then
-                        Select Case wb.Document.All(245).OuterText
-                            Case "Alive"
-                                sbTemp.Append("U")
-
-                            Case "Dead"
-                                sbTemp.Append("D")
-
-                        End Select
-
-                        Select Case wb.Document.All(297).OuterText
-                            Case "Alive"
-                                sbTemp.Append("U")
-
-                            Case "Dead"
-                                sbTemp.Append("D")
-
-                        End Select
-
-                        dr.Item("Pools") = sbTemp.ToString
-
-                        sbTemp.Clear()
-
-                        dr.Item("Diff") = wb.Document.All(215).OuterText & " " & wb.Document.All(267).OuterText & " " & wb.Document.All(319).OuterText
-
-                        dr.Item("Rej%") = Format(Val(wb.Document.All(107).OuterText) / (Val(wb.Document.All(104).OuterText) + Val(wb.Document.All(107).OuterText)) * 100, "##0.###")
-
-                        dr.Item("Stale%") = Format(Val(wb.Document.All(119).OuterText) / (Val(wb.Document.All(104).OuterText) + Val(wb.Document.All(119).OuterText)) * 100, "##0.###")
-
-                        dr.Item("HFan") = GetHighValue(wb.Document.All(530).OuterText, wb.Document.All(531).OuterText, wb.Document.All(532).OuterText, wb.Document.All(533).OuterText)
-
-                        dr.Item("Fans") = wb.Document.All(530).OuterText & " " & wb.Document.All(531).OuterText & " " & wb.Document.All(532).OuterText & " " & wb.Document.All(533).OuterText
-
-                        dr.Item("Freq") = Val(wb.Document.All(366).OuterText)
-
-                        dr.Item("HTemp") = GetHighValue(wb.Document.All(369).OuterText, wb.Document.All(385).OuterText, wb.Document.All(401).OuterText, wb.Document.All(417).OuterText, _
-                                                        wb.Document.All(433).OuterText, wb.Document.All(449).OuterText, wb.Document.All(465).OuterText, wb.Document.All(481).OuterText, _
-                                                        wb.Document.All(497).OuterText, wb.Document.All(513).OuterText)
-
-                        dr.Item("Temps") = wb.Document.All(369).OuterText & " " & wb.Document.All(385).OuterText & " " & wb.Document.All(401).OuterText & " " & wb.Document.All(417).OuterText & " " & _
-                                           wb.Document.All(433).OuterText & " " & wb.Document.All(449).OuterText & " " & wb.Document.All(465).OuterText & " " & wb.Document.All(481).OuterText & " " & _
-                                           wb.Document.All(497).OuterText & " " & wb.Document.All(513).OuterText
-
-                        count(0) = HowManyInString(wb.Document.All(372).OuterText, "x") + HowManyInString(wb.Document.All(372).OuterText, "-")
-                        count(1) = HowManyInString(wb.Document.All(388).OuterText, "x") + HowManyInString(wb.Document.All(388).OuterText, "-")
-                        count(2) = HowManyInString(wb.Document.All(404).OuterText, "x") + HowManyInString(wb.Document.All(404).OuterText, "-")
-                        count(3) = HowManyInString(wb.Document.All(420).OuterText, "x") + HowManyInString(wb.Document.All(420).OuterText, "-")
-                        count(4) = HowManyInString(wb.Document.All(436).OuterText, "x") + HowManyInString(wb.Document.All(436).OuterText, "-")
-                        count(5) = HowManyInString(wb.Document.All(452).OuterText, "x") + HowManyInString(wb.Document.All(452).OuterText, "-")
-                        count(6) = HowManyInString(wb.Document.All(468).OuterText, "x") + HowManyInString(wb.Document.All(468).OuterText, "-")
-                        count(7) = HowManyInString(wb.Document.All(484).OuterText, "x") + HowManyInString(wb.Document.All(484).OuterText, "-")
-                        count(8) = HowManyInString(wb.Document.All(500).OuterText, "x") + HowManyInString(wb.Document.All(500).OuterText, "-")
-                        count(9) = HowManyInString(wb.Document.All(516).OuterText, "x") + HowManyInString(wb.Document.All(516).OuterText, "-")
-
-                        dr.Item("XCount") = count(0) + count(1) + count(2) + count(3) + count(4) + count(5) + count(6) + count(7) + count(8) + count(9) & "X"
-
-                        dr.Item("Status") = count(0) & "X " & count(1) & "X " & count(2) & "X " & count(3) & "X " & count(4) & "X " & count(5) & "X " & _
-                                            count(6) & "X " & count(7) & "X " & count(8) & "X " & count(9) & "X"
-
-                        If (count(0) <> 0 OrElse count(1) <> 0 OrElse count(2) <> 0 OrElse count(3) <> 0 OrElse count(4) <> 0 OrElse count(5) <> 0 _
-                            OrElse count(6) <> 0 OrElse count(7) <> 0 OrElse count(8) <> 0 OrElse count(9) <> 0) AndAlso Me.chkAlertRebootIfXd.Checked = True Then
-                            'only reboot once every x minutes
-                            Call RebootMiner(antConfigRow, False, False, wb)
-                        End If
-                    End If
                 ElseIf wb.Url.AbsoluteUri.Contains("/reboot.html") = True Then
-                    'S2 reboot
+                    'S2/S4 reboot
                     wb.Document.All(66).InvokeMember("click")
 
                     Call wbFinished(wb)
@@ -1825,29 +1933,16 @@ Public Class frmMain
 
                     AddToLogQueue(antConfigRow("Type") & ":" & antConfigRow("Name") & " responded with status page")
 
-                    dr = FindDisplayMinerByID(antConfigRow("ID"))
-
-                    'For Each dr In ds.Tables(0).Rows
-                    '    If dr.Item("ID") = antConfigRow("ID") Then
-                    '        bAntFound = True
-
-                    '        Exit For
-                    '    End If
-                    'Next
-
-                    'If bAntFound = False Then
-                    '    dr = ds.Tables(0).NewRow
-                    'End If
-
-                    dr.Item("Name") = antConfigRow("Name")
-                    'dr.Item("IPAddress") = antConfigRow("IP")
-
                     If wb.Url.AbsoluteUri.Contains("minerstatus") AndAlso wb.Document.All.Count > 75 Then
                         dr.Item("Uptime") = wb.Document.All(122).OuterText.TrimEnd
 
                         If wb.Document.All(84).Children(2).Children.Count <> 1 Then
-                            dr.Item("Speed(5s)") = wb.Document.All(126).OuterText.TrimEnd
-                            dr.Item("Speed(avg)") = wb.Document.All(130).OuterText.TrimEnd
+                            dr.Item("Speed(5s)") = FormatHashRate(wb.Document.All(126).OuterText.TrimEnd * 1000)
+                            dr.Item("Speed(avg)") = FormatHashRate(wb.Document.All(130).OuterText.TrimEnd * 1000)
+
+                            dr.Item("HashSHA256") = Val(wb.Document.All(130).OuterText) * 1000000
+                            dr.Item("HashScrypt") = 0
+
                             dr.Item("Blocks") = wb.Document.All(134).OuterText.TrimEnd
                             dr.Item("HWE%") = Format(UInt64.Parse(wb.Document.All(150).OuterText.TrimEnd.Replace(",", "")) / _
                                              (UInt64.Parse(wb.Document.All(174).OuterText.TrimEnd.Replace(",", "")) + _
@@ -1908,8 +2003,6 @@ Public Class frmMain
 
                             sbTemp.Clear()
 
-
-
                             dr.Item("Rej%") = Format(Val(wb.Document.All(147).OuterText.Replace(",", "")) / (Val(wb.Document.All(143).OuterText.Replace(",", "")) + Val(wb.Document.All(147).OuterText.Replace(",", ""))) * 100, "##0.###")
 
                             dr.Item("Stale%") = Format(Val(wb.Document.All(163).OuterText.Replace(",", "")) / (Val(wb.Document.All(143).OuterText.Replace(",", "")) + Val(wb.Document.All(163).OuterText.Replace(",", ""))) * 100, "##0.###")
@@ -1923,6 +2016,11 @@ Public Class frmMain
 
                             dr.Item("Temps") = wb.Document.All(x + 37).OuterText.TrimEnd & " " & _
                                                wb.Document.All(x + 62).OuterText.TrimEnd
+
+                            avg.AddNumber(Val(wb.Document.All(x + 37).OuterText))
+                            avg.AddNumber(Val(wb.Document.All(x + 62).OuterText))
+
+                            dr.Item("ATemp") = avg.GetAverage
 
                             dr.Item("Freq") = Val(wb.Document.All(x + 29).OuterText.TrimEnd)
 
@@ -1965,27 +2063,6 @@ Public Class frmMain
         End Try
 
     End Sub
-
-    'Private Sub RebootViaReboot(ByRef antConfigRow As DataRow, ByRef wb As WebBrowser)
-
-    '    'Dim sWebUN, sWebPW As String
-
-    '    If TryGovernor(RebootInfo, antConfigRow("ID"), Me.cmbAlertRebootGovernor, Me.txtAlertRebootGovernor, 60 * 30) = True Then
-    '        AddToLogQueue("REBOOTING " & antConfigRow("Name"))
-
-    '        Select Case antConfigRow("Type")
-    '            Case "S1", "S3"
-    '                wb.Navigate("http://" & antConfigRow("IP") & ":" & antConfigRow("HTTPPort") & "/cgi-bin/luci/;stok=/admin/system/reboot?reboot=1")
-
-    '            Case "S2"
-    '                wb.Navigate(String.Format("http://{0}:{1}@" & antConfigRow("IP") & ":" & antConfigRow("HTTPPort") & "/reboot.html", antConfigRow("WebUsername"), antConfigRow("WebPassword"), Nothing, Nothing, GetHeader))
-
-    '        End Select
-    '    Else
-    '        AddToLogQueue("Need to reboot " & antConfigRow("Name") & " but it hasn't been long enough since last reboot")
-    '    End If
-
-    'End Sub
 
     Private Sub wbFinished(ByRef wb As WebBrowser)
 
@@ -2085,7 +2162,6 @@ Public Class frmMain
 
     Private Sub TimerRefresh_Tick(sender As Object, e As System.EventArgs) Handles TimerRefresh.Tick
 
-        'Dim AntData As clsMinerRefreshData
         Dim antConfig As stMinerConfig
         Dim antConfigRow As DataRow
         Dim x As Integer
@@ -2094,6 +2170,8 @@ Public Class frmMain
         Dim s() As String
         Dim dTemp As Date
         Dim bGoodToCheckReboot, bRebootAnt, bValidRebootTime, bValidRebootTimeAlso As Boolean
+        Dim wc As eWebClient
+        Dim sTemp As String
 
         Static dRefreshTime As Date
         Static bRefresh As Boolean
@@ -2315,43 +2393,66 @@ Public Class frmMain
                                 minersToCheckQueue.Enqueue(antConfig)
                             End SyncLock
                         Else
-                            'wait for one of the 3 browsers to become available
-                            While wbData(0).IsBusy = True AndAlso wbData(1).IsBusy = True AndAlso wbData(2).IsBusy = True
-                                My.Application.DoEvents()
-                            End While
+                            Select Case dr("Type")
+                                Case "SP10", "SP20", "SP30", "SP31", "SP35"
+                                    wc = New eWebClient
+                                    wc.Credentials = New System.Net.NetworkCredential(dr("WebUsername").ToString, dr("WebPassword").ToString)
 
-                            'browser logic
-                            'Call GetWebCredentials(AntData.sAnt, sWebUN, sWebPW)
+                                    System.Net.ServicePointManager.ServerCertificateValidationCallback = AddressOf WCIgnoreInvalidCertCheck
 
-                            If wbData(0).IsBusy = False Then
-                                x = 0
-                            ElseIf wbData(1).IsBusy = False Then
-                                x = 1
-                            ElseIf wbData(2).IsBusy = False Then
-                                x = 2
-                            Else
-                                x = 100
-                            End If
+                                    AddHandler wc.DownloadStringCompleted, AddressOf Me.WebClientDownloadStringCompleted
 
-                            If x <> 100 Then
-                                wbData(x).IsBusy = True
-                                wbData(x).StartTime = Now
+                                    If dr("HTTPS").ToString = "Y" Then
+                                        sTemp = "https://"
+                                    Else
+                                        sTemp = "http://"
+                                    End If
 
-                                wb(x).Tag = dr
+                                    If dr("HTTPPort") <> "80" Then
+                                        wc.DownloadStringAsync(New System.Uri(sTemp & dr("IPAddress").ToString & ":" & dr("HTTPPort").ToString & "/monitor.php"), dr)
+                                    Else
+                                        wc.DownloadStringAsync(New System.Uri(sTemp & dr("IPAddress").ToString & "/monitor.php"), dr)
+                                    End If
 
-                                Select Case dr("Type")
-                                    Case "S1", "S3"
-                                        wb(x).Navigate("http://" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+                                Case Else
 
-                                    Case "S2"
-                                        wb(x).Navigate(String.Format("http://{0}:{1}@" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/minerStatus.cgi", dr("WebUsername"), dr("WebPassword")), Nothing, Nothing, GetHeader)
+                                    'wait for one of the 3 browsers to become available
+                                    While wbData(0).IsBusy = True AndAlso wbData(1).IsBusy = True AndAlso wbData(2).IsBusy = True
+                                        My.Application.DoEvents()
+                                    End While
 
-                                End Select
+                                    'browser logic
+                                    'Call GetWebCredentials(AntData.sAnt, sWebUN, sWebPW)
 
-                                AddToLogQueue("Submitted " & dr("Name") & " on web browser instance " & x)
-                            End If
+                                    If wbData(0).IsBusy = False Then
+                                        x = 0
+                                    ElseIf wbData(1).IsBusy = False Then
+                                        x = 1
+                                    ElseIf wbData(2).IsBusy = False Then
+                                        x = 2
+                                    Else
+                                        x = 100
+                                    End If
 
-                            'Call RefreshGrid(dr)
+                                    If x <> 100 Then
+                                        wbData(x).IsBusy = True
+                                        wbData(x).StartTime = Now
+
+                                        wb(x).Tag = dr
+
+                                        Select Case dr("Type")
+                                            Case "S1", "S3"
+                                                wb(x).Navigate("http://" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/luci/;stok=/admin/status/minerstatus/", False)
+
+                                            Case "S2", "S4"
+                                                wb(x).Navigate(String.Format("http://{0}:{1}@" & dr("IPAddress") & ":" & dr("HTTPPort") & "/cgi-bin/minerStatus.cgi", dr("WebUsername"), dr("WebPassword")), Nothing, Nothing, GetHeader)
+
+                                        End Select
+
+                                        AddToLogQueue("Submitted " & dr("Name") & " on web browser instance " & x)
+                                    End If
+
+                            End Select
                         End If
                     End If
                 Next
@@ -2362,11 +2463,213 @@ Public Class frmMain
             End If
 
             Me.cmdRefresh.Text = "Refreshing in " & iCountDown
+
+            If Me.cmdPause.Text = "Resume" Then
+                Me.TimerRefresh.Enabled = False
+            End If
         Catch ex As Exception When bErrorHandle = True
             Call AddToLogQueue("Internal error on TimerRefresh: " & ex.Message)
         End Try
 
     End Sub
+
+    Private Function WCIgnoreInvalidCertCheck(sender As Object, cert As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, sslPolicyErrors As System.Net.Security.SslPolicyErrors) As Boolean
+
+        Debug.Print("Ignoring cert error on HTTPS")
+
+        Return True
+
+    End Function
+
+    Private Sub WebClientDownloadStringCompleted(ByVal sender As Object, ByVal e As System.Net.DownloadStringCompletedEventArgs)
+
+        Dim configRow As DataRow
+        Dim dr As DataRow
+        Dim j, jp1 As Newtonsoft.Json.Linq.JObject
+        Dim ja As Newtonsoft.Json.Linq.JArray
+        Dim ts As TimeSpan
+        Dim avg As clsAverage
+        Dim count(0 To 2) As Integer
+        Dim DisplayColumns As clsDisplayColumns
+        Dim sbTemp, sbTemp2 As System.Text.StringBuilder
+        Dim dBestShare As Double
+        Dim pd As clsPoolData
+        Dim pdl As System.Collections.Generic.List(Of clsPoolData)
+        Dim bStep As Byte
+
+        Try
+            configRow = e.UserState
+
+            If e.Cancelled = False AndAlso e.Error Is Nothing Then
+                dr = FindDisplayMinerByID(configRow("ID"))
+
+                DisplayColumns = New clsDisplayColumns(dr)
+
+                j = Newtonsoft.Json.Linq.JObject.Parse(e.Result)
+
+                avg = New clsAverage
+                sbTemp = New System.Text.StringBuilder
+                sbTemp2 = New System.Text.StringBuilder
+
+                dr.Item("Name") = configRow("Name")
+                DisplayColumns.Type = configRow("Type")
+
+                bStep = 1
+
+                For Each jp1 In j.Property("stats")
+                    ts = New TimeSpan(0, 0, jp1.Value(Of Integer)("Elapsed"))
+
+                    DisplayColumns.Uptime = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
+
+                    count(0) = jp1.Value(Of Integer)("Temperaturefront")
+                    count(1) = jp1.Value(Of Integer)("Temperaturereartop")
+                    count(2) = jp1.Value(Of Integer)("Temperaturerearbot")
+
+                    avg.AddNumber(count(0))
+                    avg.AddNumber(count(1))
+                    avg.AddNumber(count(2))
+
+                    DisplayColumns.ATemp = avg.GetAverage
+
+                    DisplayColumns.HTemp = GetHighValue(count(0), count(1), count(2))
+
+                    DisplayColumns.Temps = count(0).ToString & " " & count(1).ToString & " " & count(2).ToString
+                Next
+
+                DisplayColumns.Freq = DBNull.Value
+                DisplayColumns.HFan = DBNull.Value
+                DisplayColumns.Fans = ""
+
+                bStep = 2
+
+                For Each ja In j.Property("summary")
+                    For Each jp1 In ja
+                        DisplayColumns.HWE = jp1.Value(Of String)("DeviceHardware%") & "%"
+
+                        DisplayColumns.Speed5s = FormatHashRate(jp1.Value(Of String)("MHS5s"))
+                        DisplayColumns.SpeedAvg = FormatHashRate(jp1.Value(Of String)("MHSav"))
+
+                        DisplayColumns.HashSHA256 = Val(jp1.Value(Of String)("MHSav"))
+                        DisplayColumns.HashScrypt = 0
+
+                        DisplayColumns.Rej = jp1.Value(Of String)("PoolRejected%")
+                        DisplayColumns.Stale = jp1.Value(Of String)("PoolStale%")
+
+                        DisplayColumns.Blocks = jp1.Value(Of String)("FoundBlocks")
+                    Next
+                Next
+
+                bStep = 3
+
+                For Each ja In j.Property("notify")
+                    For Each jp1 In ja
+                        If jp1.Value(Of String)("ReasonNotWell") = "None" Then
+                            DisplayColumns.Status = "Good"
+                            DisplayColumns.XCount = 0
+                        Else
+                            DisplayColumns.XCount = WCHelper(jp1, "*ThreadFailInit", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*ThreadZeroHash", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*ThreadFailQueue", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevSickIdle60s", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevDeadIdle600s", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevNostart", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevOverHeat", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevThermalCutoff", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevCommsError", sbTemp)
+                            DisplayColumns.XCount += WCHelper(jp1, "*DevThrottle", sbTemp)
+
+                            DisplayColumns.Status = jp1.Value(Of String)("ReasonNotWell") & " -- " & sbTemp.ToString
+                        End If
+                    Next
+                Next
+
+                bStep = 3
+
+                sbTemp.Clear()
+
+                If IsDBNull(dr.Item("PoolData2")) = True Then
+                    dr.Item("PoolData2") = New System.Collections.Generic.List(Of clsPoolData)
+                End If
+
+                pdl = dr.Item("PoolData2")
+                pdl.Clear()
+
+                For Each ja In j.Property("pools")
+                    For Each jp1 In ja
+                        If jp1.Value(Of Double)("BestShare") > dBestShare Then
+                            dBestShare = jp1.Value(Of Double)("BestShare")
+                        End If
+
+                        Select Case jp1.Value(Of String)("Status")
+                            Case "Alive"
+                                If sbTemp.ToString.Contains("U") = False Then
+                                    DisplayColumns.Diff = Format(jp1.Value(Of Double)("LastShareDifficulty"), "#,###,###")
+                                End If
+
+                                sbTemp.Append("U")
+
+                            Case "Dead"
+                                sbTemp.Append("D")
+
+                            Case Else
+                                sbTemp.Append("U")
+
+                        End Select
+
+                        If sbTemp2.Length <> 0 Then
+                            sbTemp2.Append(vbCrLf)
+                        End If
+
+                        sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
+
+                        pd = New clsPoolData
+
+                        pd.URL = jp1.Value(Of String)("URL")
+                        pd.UID = jp1.Value(Of String)("User")
+
+                        pdl.Add(pd)
+                    Next
+                Next
+
+                bStep = 4
+
+                DisplayColumns.BestShare = Format(dBestShare, "###,###,###,###,###,##0")
+                DisplayColumns.Pools = sbTemp.ToString
+                DisplayColumns.PoolData = sbTemp2.ToString
+
+                If dr("ID") = -1 Then
+                    dr("ID") = configRow("ID")
+
+                    ds.Tables(0).Rows.Add(dr)
+                End If
+
+                Call HandleAlerts(dr, configRow, Nothing)
+
+                Call RefreshTitle()
+            Else
+                AddToLogQueue("HTTP request for " & configRow("Name") & " failed: " & e.Error.Message)
+            End If
+        Catch ex As Exception When bErrorHandle = True
+            AddToLogQueue("ERROR when processing download string from " & configRow("Name") & ": " & ex.Message)
+        End Try
+
+        RemoveHandler DirectCast(sender, eWebClient).DownloadStringCompleted, AddressOf Me.WebClientDownloadStringCompleted
+
+    End Sub
+
+    Private Function WCHelper(ByRef jp1 As Newtonsoft.Json.Linq.JObject, ByVal sValue As String, ByRef sbTemp As System.Text.StringBuilder) As Integer
+
+        If jp1.Value(Of Integer)(sValue) <> 0 Then
+            If sbTemp.Length <> 0 Then
+                sbTemp.Append("; ")
+            End If
+
+            sbTemp.Append(sValue & ": " & jp1.Value(Of Integer)(sValue))
+        End If
+
+        Return jp1.Value(Of Integer)(sValue)
+
+    End Function
 
     Private Function GetMinerConfigByConfigRow(ByRef dr As DataRow) As stMinerConfig
 
@@ -2408,7 +2711,6 @@ Public Class frmMain
             Me.TimerRefresh.Enabled = True
 
             Me.TabControl1.SelectTab(0)
-
         End If
 
     End Sub
@@ -2423,7 +2725,6 @@ Public Class frmMain
     'this runs on the UI thread
     Private Sub RefreshGrid(ByRef MinerData As clsMinerRefreshData)
 
-        'Dim bAntFound As Boolean
         Dim MinerConfig As DataRow
         Dim dr As DataRow
         Dim j, jp1 As Newtonsoft.Json.Linq.JObject
@@ -2737,7 +3038,7 @@ Public Class frmMain
                         DisplayColumns.Status = sbTemp.ToString
 
                         DisplayColumns.Data = New System.Collections.Generic.Dictionary(Of String, String)
-                        
+
                         With DirectCast(DisplayColumns.Data, Dictionary(Of String, String))
                             .Add("Temps", sbTemp2.ToString)
                             .Add("ATemps", sbTemp3.ToString)
@@ -3272,533 +3573,6 @@ Public Class frmMain
                     End If
                 Next
 
-                'If 1 = 2 Then
-                '    Select Case drMinerConfig("Type")
-                '        Case "S1"
-                '            If Me.chkAlertIfS1Temp.Checked = True Then
-                '                bStep = 1
-
-                '                x = Val(Me.txtAlertS1Temp.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S1 Temp Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS1FanHigh.Checked = True Then
-                '                bStep = 2
-
-                '                x = Val(Me.txtAlertS1FanHigh.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S1 Fan Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS1FanLow.Checked = True Then
-                '                bStep = 3
-
-                '                x = Val(Me.txtAlertS1FanLow.Text)
-
-                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                '                    iMinerAlertCount += 1
-
-                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S1 Fan Alert")
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS1Hash.Checked = True Then
-                '                bStep = 4
-
-                '                x = Val(Me.txtAlertS1Hash.Text)
-
-                '                If x > 0 Then
-                '                    If Val(dr.Cells("Speed(avg)").Value) <= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("Speed(avg)").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S1 Hash Alert")
-
-                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS1XCount.Checked = True Then
-                '                bStep = 5
-
-                '                x = Val(Me.txtAlertS1XCount.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S1 XCount Alert")
-
-                '                        'use SSH only if using the API, as the web code has its own reboot logic
-                '                        If Me.chkAlertRebootIfXd.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '        Case "S2"
-                '            If Me.chkAlertIfS2Temp.Checked = True Then
-                '                bStep = 6
-
-                '                x = Val(Me.txtAlertS2Temp.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S2 Temp Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS2FanHigh.Checked = True Then
-                '                bStep = 7
-
-                '                x = Val(Me.txtAlertS2FanHigh.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S2 Fan Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS2FanLow.Checked = True Then
-                '                bStep = 8
-
-                '                x = Val(Me.txtAlertS2FanLow.Text)
-
-                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                '                    iMinerAlertCount += 1
-
-                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S2 Fan Alert")
-                '                End If
-
-                '            End If
-
-                '            If Me.chkAlertIfS2Hash.Checked = True Then
-                '                bStep = 9
-
-                '                x = Val(Me.txtAlertS2Hash.Text)
-
-                '                If x > 0 Then
-                '                    If Val(dr.Cells("Speed(avg)").Value) <= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("Speed(avg)").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S2 Hash Alert")
-
-                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS2XCount.Checked = True Then
-                '                bStep = 10
-
-                '                x = Val(Me.txtAlertS2XCount.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S2 XCount Alert")
-
-                '                        'use SSH only if using the API, as the web code has its own reboot logic
-                '                        If Me.chkAlertRebootIfXd.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '        Case "S3"
-                '            If Me.chkAlertIfS3Temp.Checked = True Then
-                '                bStep = 1
-
-                '                x = Val(Me.txtAlertS3Temp.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S3 Temp Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS3FanHigh.Checked = True Then
-                '                bStep = 2
-
-                '                x = Val(Me.txtAlertS3FanHigh.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S3 Fan Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS3FanLow.Checked = True Then
-                '                bStep = 3
-
-                '                x = Val(Me.txtAlertS3FanLow.Text)
-
-                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                '                    iMinerAlertCount += 1
-
-                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S3 Fan Alert")
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS3Hash.Checked = True Then
-                '                bStep = 4
-
-                '                x = Val(Me.txtAlertS3Hash.Text)
-
-                '                If x > 0 Then
-                '                    If Val(dr.Cells("Speed(avg)").Value) <= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("Speed(avg)").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S3 Hash Alert")
-
-                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS3XCount.Checked = True Then
-                '                bStep = 5
-
-                '                x = Val(Me.txtAlertS3XCount.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S3 XCount Alert")
-
-                '                        'use SSH only if using the API, as the web code has its own reboot logic
-                '                        If Me.chkAlertRebootIfXd.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '        Case "S4"
-                '            If Me.chkAlertIfS4Temp.Checked = True Then
-                '                bStep = 1
-
-                '                x = Val(Me.txtAlertS4Temp.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "S4 Temp Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS4FanHigh.Checked = True Then
-                '                bStep = 2
-
-                '                x = Val(Me.txtAlertS4FanHigh.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "S4 Fan Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS4FanLow.Checked = True Then
-                '                bStep = 3
-
-                '                x = Val(Me.txtAlertS4FanLow.Text)
-
-                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                '                    iMinerAlertCount += 1
-
-                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "S4 Fan Alert")
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS4Hash.Checked = True Then
-                '                bStep = 4
-
-                '                x = Val(Me.txtAlertS4Hash.Text)
-
-                '                If x > 0 Then
-                '                    If Val(dr.Cells("Speed(avg)").Value) <= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("Speed(avg)").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "S4 Hash Alert")
-
-                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfS4XCount.Checked = True Then
-                '                bStep = 5
-
-                '                x = Val(Me.txtAlertS4XCount.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "S4 XCount Alert")
-
-                '                        'use SSH only if using the API, as the web code has its own reboot logic
-                '                        If Me.chkAlertRebootIfXd.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '        Case "C1"
-                '            If Me.chkAlertIfC1Temp.Checked = True Then
-                '                bStep = 1
-
-                '                x = Val(Me.txtAlertC1Temp.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "C1 Temp Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfC1FanHigh.Checked = True Then
-                '                bStep = 2
-
-                '                x = Val(Me.txtAlertC1FanHigh.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HFan").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " RPM", "C1 Fan Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfC1FanLow.Checked = True Then
-                '                bStep = 3
-
-                '                x = Val(Me.txtAlertC1FanLow.Text)
-
-                '                If Integer.Parse(dr.Cells("HFan").Value) <= x Then
-                '                    iMinerAlertCount += 1
-
-                '                    colHighlightColumns.Add(dr.Cells("HFan").ColumnIndex)
-
-                '                    Call ProcessAlerts(dr, dr.Cells("Name").Value & " is below " & x & " RPM", "C1 Fan Alert")
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfC1Hash.Checked = True Then
-                '                bStep = 4
-
-                '                x = Val(Me.txtAlertC1Hash.Text)
-
-                '                If x > 0 Then
-                '                    If Val(dr.Cells("Speed(avg)").Value) <= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("Speed(avg)").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "C1 Hash Alert")
-
-                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfC1XCount.Checked = True Then
-                '                bStep = 5
-
-                '                x = Val(Me.txtAlertC1XCount.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("XCount").Value.ToString.LeftMost(1)) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("XCount").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " X count", "C1 XCount Alert")
-
-                '                        'use SSH only if using the API, as the web code has its own reboot logic
-                '                        If Me.chkAlertRebootIfXd.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '        Case "SP"
-                '            If Me.chkAlertIfSPTemp.Checked = True Then
-                '                bStep = 1
-
-                '                x = Val(Me.txtAlertSPTemp.Text)
-
-                '                If x > 0 Then
-                '                    If Integer.Parse(dr.Cells("HTemp").Value) >= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("HTemp").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " exceeded " & x & " celcius", "SP Temp Alert")
-                '                    End If
-                '                End If
-                '            End If
-
-                '            If Me.chkAlertIfSPHash.Checked = True Then
-                '                bStep = 4
-
-                '                x = Val(Me.txtAlertSPHash.Text)
-
-                '                If x > 0 Then
-                '                    If Val(dr.Cells("Speed(avg)").Value) <= x Then
-                '                        iMinerAlertCount += 1
-
-                '                        colHighlightColumns.Add(dr.Cells("Speed(avg)").ColumnIndex)
-
-                '                        Call ProcessAlerts(dr, dr.Cells("Name").Value & " less than " & x & " GH/s", "SP Hash Alert")
-
-                '                        If Me.chkAlertRebootAntsOnHashAlert.Checked = True Then
-                '                            If drMinerConfig("RebootViaSSH") = "Y" Then
-                '                                Call RebootMiner(drMinerConfig, False, True, Nothing)
-                '                            Else
-                '                                Call RebootMiner(drMinerConfig, False, False, wb)
-                '                            End If
-                '                        End If
-                '                    End If
-                '                End If
-                '            End If
-
-                '    End Select
-                'End If
-
                 dr.Cells("ACount").Value = iMinerAlertCount
 
                 If dr.Tag IsNot Nothing Then
@@ -3835,14 +3609,14 @@ Public Class frmMain
     End Sub
 
     ''' <summary>
-    ''' Return s the seconds value of a drop down/text box combo for a governor rate
+    ''' Returns the seconds value of a drop down/text box combo for a governor rate
     ''' </summary>
     ''' <param name="dictList">The dictionary the data is in</param>
     ''' <param name="sKey">The key to search for in the dictionary</param>
     ''' <param name="cmbValueType">Seconds, Minutes, Hours, Days</param>
     ''' <param name="txtValue">Actual value, ie, 60</param>
     ''' <param name="iDefault">Which value to use if the end result is zero</param>
-    ''' <Return s>True if the action needs to be performed</Return s>
+    ''' <Returns>True if the action needs to be performed</Returns>
     ''' <remarks>Will update the dictionary as necessary</remarks>
     Private Function TryGovernor(ByRef dictList As Dictionary(Of String, Date), ByVal sKey As String, ByVal cmbValueType As ComboBox, ByVal txtValue As TextBox, ByVal iDefault As Integer) As Boolean
 
@@ -4189,10 +3963,7 @@ Public Class frmMain
 
     Private Sub cmdScan_Click(sender As System.Object, e As System.EventArgs) Handles cmdScan.Click
 
-        'Dim sResponse, sLocalNet As String
         Dim x, y As Integer
-        'Dim wc As eWebClient
-        'Dim sResponse As String
         Dim t As Threading.Thread
         Dim dStart As Date
         Dim j, jp1 As Newtonsoft.Json.Linq.JObject
@@ -4249,7 +4020,7 @@ Public Class frmMain
                             'y = InStr(sIPDataResponse, """Type"":""S3""}{""STATS")
 
 #If DEBUG Then
-                            sIPDataResponse = "{""STATUS"":[{""STATUS"":""S"",""When"":1420194081,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 3.9.0""}],""STATS"":[{""STATS"":0,""ID"":""BA10"",""Elapsed"":4855,""CS"":0,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":31.25,""TEMP(SOLO)"":""30-34-29-29-34-28-46-50""},{""STATS"":1,""ID"":""BA11"",""Elapsed"":4855,""CS"":1,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":31.50,""TEMP(SOLO)"":""29-34-29-34-34-34-44-43""},{""STATS"":2,""ID"":""BA12"",""Elapsed"":4855,""CS"":2,""ASIC"":8,""CORES(TOTAL)"":389,""CORES(SOLO)"":""53-53-37-53-49-40-53-51"",""TEMP(AVG)"":31.25,""TEMP(SOLO)"":""29-29-29-34-29-34-47-48""},{""STATS"":3,""ID"":""BA13"",""Elapsed"":4855,""CS"":3,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":32.00,""TEMP(SOLO)"":""29-34-29-34-34-34-43-48""},{""STATS"":4,""ID"":""BA14"",""Elapsed"":4855,""CS"":4,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":29.62,""TEMP(SOLO)"":""29-29-29-34-34-29-36-46""},{""STATS"":5,""ID"":""BA15"",""Elapsed"":4855,""CS"":5,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":29.88,""TEMP(SOLO)"":""29-29-29-29-29-34-43-46""},{""STATS"":6,""ID"":""POOL0"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":2048.00000000,""Min Diff"":16.00000000,""Max Diff"":2048.00000000,""Min Diff Count"":313,""Max Diff Count"":28835,""Times Sent"":3852,""Bytes Sent"":426659,""Times Recv"":8891,""Bytes Recv"":883114,""Net Bytes Sent"":426659,""Net Bytes Recv"":883114},{""STATS"":7,""ID"":""POOL1"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":1024.00000000,""Min Diff"":20.00000000,""Max Diff"":1024.00000000,""Min Diff Count"":533,""Max Diff Count"":218,""Times Sent"":159,""Bytes Sent"":19658,""Times Recv"":187,""Bytes Recv"":17716,""Net Bytes Sent"":19658,""Net Bytes Recv"":17716},{""STATS"":8,""ID"":""POOL2"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":4096.00000000,""Min Diff"":4096.00000000,""Max Diff"":4096.00000000,""Min Diff Count"":1,""Max Diff Count"":1,""Times Sent"":2,""Bytes Sent"":150,""Times Recv"":5,""Bytes Recv"":1385,""Net Bytes Sent"":150,""Net Bytes Recv"":1385}],""id"":1}"
+                            'sIPDataResponse = "{""STATUS"":[{""STATUS"":""S"",""When"":1420194081,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 3.9.0""}],""STATS"":[{""STATS"":0,""ID"":""BA10"",""Elapsed"":4855,""CS"":0,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":31.25,""TEMP(SOLO)"":""30-34-29-29-34-28-46-50""},{""STATS"":1,""ID"":""BA11"",""Elapsed"":4855,""CS"":1,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":31.50,""TEMP(SOLO)"":""29-34-29-34-34-34-44-43""},{""STATS"":2,""ID"":""BA12"",""Elapsed"":4855,""CS"":2,""ASIC"":8,""CORES(TOTAL)"":389,""CORES(SOLO)"":""53-53-37-53-49-40-53-51"",""TEMP(AVG)"":31.25,""TEMP(SOLO)"":""29-29-29-34-29-34-47-48""},{""STATS"":3,""ID"":""BA13"",""Elapsed"":4855,""CS"":3,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":32.00,""TEMP(SOLO)"":""29-34-29-34-34-34-43-48""},{""STATS"":4,""ID"":""BA14"",""Elapsed"":4855,""CS"":4,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":29.62,""TEMP(SOLO)"":""29-29-29-34-34-29-36-46""},{""STATS"":5,""ID"":""BA15"",""Elapsed"":4855,""CS"":5,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":29.88,""TEMP(SOLO)"":""29-29-29-29-29-34-43-46""},{""STATS"":6,""ID"":""POOL0"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":2048.00000000,""Min Diff"":16.00000000,""Max Diff"":2048.00000000,""Min Diff Count"":313,""Max Diff Count"":28835,""Times Sent"":3852,""Bytes Sent"":426659,""Times Recv"":8891,""Bytes Recv"":883114,""Net Bytes Sent"":426659,""Net Bytes Recv"":883114},{""STATS"":7,""ID"":""POOL1"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":1024.00000000,""Min Diff"":20.00000000,""Max Diff"":1024.00000000,""Min Diff Count"":533,""Max Diff Count"":218,""Times Sent"":159,""Bytes Sent"":19658,""Times Recv"":187,""Bytes Recv"":17716,""Net Bytes Sent"":19658,""Net Bytes Recv"":17716},{""STATS"":8,""ID"":""POOL2"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":4096.00000000,""Min Diff"":4096.00000000,""Max Diff"":4096.00000000,""Min Diff Count"":1,""Max Diff Count"":1,""Times Sent"":2,""Bytes Sent"":150,""Times Recv"":5,""Bytes Recv"":1385,""Net Bytes Sent"":150,""Net Bytes Recv"":1385}],""id"":1}"
 #End If
 
                             y = InStr(sIPDataResponse, "}{")
@@ -4398,8 +4169,13 @@ Public Class frmMain
 
                                         Case clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP10, _
                                              clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP20, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP30, _
-                                             clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35, _
-                                             clsSupportedMinerInfo.enSupportedMinerTypes.InnosiliconA288MH
+                                             clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP31, clsSupportedMinerInfo.enSupportedMinerTypes.SpondooliesSP35
+                                            Me.txtMinerWebPassword.Text = "admin"
+                                            Me.txtMinerWebUsername.Text = "admin"
+                                            Me.txtMinerSSHUsername.Text = ""
+                                            Me.txtMinerSSHPassword.Text = ""
+
+                                        Case clsSupportedMinerInfo.enSupportedMinerTypes.InnosiliconA288MH
                                             Me.txtMinerWebPassword.Text = ""
                                             Me.txtMinerWebUsername.Text = ""
                                             Me.txtMinerSSHUsername.Text = ""
@@ -4436,20 +4212,20 @@ Public Class frmMain
 
     End Sub
 
-    'Private Class eWebClient
+    Private Class eWebClient
 
-    '    Inherits System.Net.WebClient
+        Inherits System.Net.WebClient
 
-    '    Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
-    '        Dim w As System.Net.WebRequest
+        Protected Overrides Function GetWebRequest(address As System.Uri) As System.Net.WebRequest
+            Dim w As System.Net.WebRequest
 
-    '        w = MyBase.GetWebRequest(address)
-    '        w.Timeout = 5000
+            w = MyBase.GetWebRequest(address)
+            w.Timeout = 5000
 
-    '        Return  w
-    '    End Function
+            Return w
+        End Function
 
-    'End Class
+    End Class
 
     Private Sub cmdPause_Click(sender As System.Object, e As System.EventArgs) Handles cmdPause.Click
 
@@ -4518,7 +4294,11 @@ Public Class frmMain
 
     End Function
 
-    Private Function YNtoBoolean(ByVal sValue As String) As Boolean
+    Private Function YNtoBoolean(ByVal sValue As Object) As Boolean
+
+        If IsDBNull(sValue) = True Then
+            Return False
+        End If
 
         If sValue = "Y" Then
             Return True
@@ -4593,7 +4373,8 @@ Public Class frmMain
                     ID = AddOrSaveMiner(ID, Me.txtMinerName.Text, MinerInfo, Me.txtMinerAddress.Text, chkBoxToYN(Me.chkMinerActive), _
                                     Me.txtMinerWebPort.Text, Me.txtMinerWebUsername.Text, Me.txtMinerWebPassword.Text, _
                                     Me.txtMinerSSHUsername.Text, Me.txtMinerSSHPassword.Text, Me.txtMinerAPIPort.Text, _
-                                    Me.txtMinerSSHPort.Text, chkBoxToYN(Me.chkMinerUseAPI), chkBoxToYN(Me.chkMinerRebootViaSSH))
+                                    Me.txtMinerSSHPort.Text, chkBoxToYN(Me.chkMinerUseAPI), chkBoxToYN(Me.chkMinerRebootViaSSH), _
+                                    chkBoxToYN(Me.chkMinerDoNotReboot), chkBoxToYN(Me.chkMinerUseHTTPS))
 
                     MinerConfigRow("Name") = Me.txtMinerName.Text
                     MinerConfigRow("IPAddress") = Me.txtMinerAddress.Text
@@ -4608,6 +4389,7 @@ Public Class frmMain
                     MinerConfigRow("APIPort") = Me.txtMinerAPIPort.Text
                     MinerConfigRow("RebootViaSSH") = chkBoxToYN(Me.chkMinerRebootViaSSH)
                     MinerConfigRow("DoNotReboot") = chkBoxToYN(Me.chkMinerDoNotReboot)
+                    MinerConfigRow("HTTPS") = chkBoxToYN(Me.chkMinerUseHTTPS)
                     MinerConfigRow("ID") = ID
 
                     If bAddNewAnt = True Then
@@ -4872,330 +4654,6 @@ Public Class frmMain
                     Exit For
                 End If
             Next
-
-            ''s1
-            'If Me.chkAlertIfS1Temp.Checked = True Then
-            '    If Me.txtAlertS1Temp.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS1Temp.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS1Temp)
-            '.SetRegKeyByControl(Me.txtAlertS1Temp)
-
-            ''s2
-            'If Me.chkAlertIfS2Temp.Checked = True Then
-            '    If Me.txtAlertS2Temp.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S2 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS2Temp.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS2Temp)
-            '.SetRegKeyByControl(Me.txtAlertS2Temp)
-
-            ''s3
-            'If Me.chkAlertIfS3Temp.Checked = True Then
-            '    If Me.txtAlertS3Temp.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S3 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS3Temp.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS3Temp)
-            '.SetRegKeyByControl(Me.txtAlertS3Temp)
-
-            ''s4
-            'If Me.chkAlertIfS4Temp.Checked = True Then
-            '    If Me.txtAlertS4Temp.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S4 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS4Temp.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS4Temp)
-            '.SetRegKeyByControl(Me.txtAlertS4Temp)
-
-            ''c1
-            'If Me.chkAlertIfC1Temp.Checked = True Then
-            '    If Me.txtAlertC1Temp.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an C1 temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfC1Temp.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfC1Temp)
-            '.SetRegKeyByControl(Me.txtAlertC1Temp)
-
-            ''sp
-            'If Me.chkAlertIfSPTemp.Checked = True Then
-            '    If Me.txtAlertSPTemp.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an SP temp alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfSPTemp.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfSPTemp)
-            '.SetRegKeyByControl(Me.txtAlertSPTemp)
-
-            ''s1
-            'If Me.chkAlertIfS1FanHigh.Checked = True Then
-            '    If Me.txtAlertS1FanHigh.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS1FanHigh.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS1FanHigh)
-            '.SetRegKeyByControl(Me.txtAlertS1FanHigh)
-
-            ''s2
-            'If Me.chkAlertIfS2FanHigh.Checked = True Then
-            '    If Me.txtAlertS2FanHigh.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S2 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS2FanHigh.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS2FanHigh)
-            '.SetRegKeyByControl(Me.txtAlertS2FanHigh)
-
-            ''S3
-            'If Me.chkAlertIfS3FanHigh.Checked = True Then
-            '    If Me.txtAlertS3FanHigh.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S3 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS3FanHigh.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS3FanHigh)
-            '.SetRegKeyByControl(Me.txtAlertS3FanHigh)
-
-            ''S4
-            'If Me.chkAlertIfS4FanHigh.Checked = True Then
-            '    If Me.txtAlertS4FanHigh.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S4 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS4FanHigh.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS4FanHigh)
-            '.SetRegKeyByControl(Me.txtAlertS4FanHigh)
-
-            ''c1
-            'If Me.chkAlertIfC1FanHigh.Checked = True Then
-            '    If Me.txtAlertC1FanHigh.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an C1 high fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfC1FanHigh.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfC1FanHigh)
-            '.SetRegKeyByControl(Me.txtAlertC1FanHigh)
-
-            ''S1
-            'If Me.chkAlertIfS1FanLow.Checked = True Then
-            '    If Me.txtAlertS1FanLow.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS1FanLow.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS1FanLow)
-            '.SetRegKeyByControl(Me.txtAlertS1FanLow)
-
-            ''S2
-            'If Me.chkAlertIfS2FanLow.Checked = True Then
-            '    If Me.txtAlertS2FanLow.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S2 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS2FanLow.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS2FanLow)
-            '.SetRegKeyByControl(Me.txtAlertS2FanLow)
-
-            ''S3
-            'If Me.chkAlertIfS3FanLow.Checked = True Then
-            '    If Me.txtAlertS3FanLow.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S3 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS3FanLow.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS3FanLow)
-            '.SetRegKeyByControl(Me.txtAlertS3FanLow)
-
-            ''S4
-            'If Me.chkAlertIfS4FanLow.Checked = True Then
-            '    If Me.txtAlertS4FanLow.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S4 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS4FanLow.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS4FanLow)
-            '.SetRegKeyByControl(Me.txtAlertS4FanLow)
-
-            ''C1
-            'If Me.chkAlertIfC1FanLow.Checked = True Then
-            '    If Me.txtAlertC1FanLow.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an C1 low fan alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfC1FanLow.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfC1FanLow)
-            '.SetRegKeyByControl(Me.txtAlertC1FanLow)
-
-            ''s1
-            'If Me.chkAlertIfS1Hash.Checked = True Then
-            '    If Me.txtAlertS1Hash.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS1Hash.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS1Hash)
-            '.SetRegKeyByControl(Me.txtAlertS1Hash)
-
-            ''s2
-            'If Me.chkAlertIfS2Hash.Checked = True Then
-            '    If Me.txtAlertS2Hash.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S2 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS2Hash.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS2Hash)
-            '.SetRegKeyByControl(Me.txtAlertS2Hash)
-
-            ''S3
-            'If Me.chkAlertIfS3Hash.Checked = True Then
-            '    If Me.txtAlertS3Hash.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S3 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS3Hash.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS3Hash)
-            '.SetRegKeyByControl(Me.txtAlertS3Hash)
-
-            ''S4
-            'If Me.chkAlertIfS4Hash.Checked = True Then
-            '    If Me.txtAlertS4Hash.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S4 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS4Hash.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS4Hash)
-            '.SetRegKeyByControl(Me.txtAlertS4Hash)
-
-            ''C1
-            'If Me.chkAlertIfC1Hash.Checked = True Then
-            '    If Me.txtAlertC1Hash.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an C1 hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfC1Hash.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfC1Hash)
-            '.SetRegKeyByControl(Me.txtAlertC1Hash)
-
-            ''SP
-            'If Me.chkAlertIfSPHash.Checked = True Then
-            '    If Me.txtAlertSPHash.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an SP hash alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfSPHash.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfSPHash)
-            '.SetRegKeyByControl(Me.txtAlertSPHash)
-
-            ''S1
-            'If Me.chkAlertIfS1XCount.Checked = True Then
-            '    If Me.txtAlertS1XCount.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS1XCount.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS1XCount)
-            '.SetRegKeyByControl(Me.txtAlertS1XCount)
-
-            ''S2
-            'If Me.chkAlertIfS2XCount.Checked = True Then
-            '    If Me.txtAlertS2XCount.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S2 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS2XCount.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS2XCount)
-            '.SetRegKeyByControl(Me.txtAlertS2XCount)
-
-            ''S3
-            'If Me.chkAlertIfS3XCount.Checked = True Then
-            '    If Me.txtAlertS3XCount.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S3 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS3XCount.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS3XCount)
-            '.SetRegKeyByControl(Me.txtAlertS3XCount)
-
-            ''S4
-            'If Me.chkAlertIfS4XCount.Checked = True Then
-            '    If Me.txtAlertS4XCount.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an S4 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfS4XCount.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfS4XCount)
-            '.SetRegKeyByControl(Me.txtAlertS4XCount)
-
-            ''c1
-            'If Me.chkAlertIfC1XCount.Checked = True Then
-            '    If Me.txtAlertC1XCount.Text.IsNullOrEmpty Then
-            '        MsgBox("Please specify an C1 XCount alert value.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly, "Oops!")
-
-            '        Me.chkAlertIfC1XCount.Checked = False
-            '    End If
-            'End If
-
-            '.SetRegKeyByControl(Me.chkAlertIfC1XCount)
-            '.SetRegKeyByControl(Me.txtAlertC1XCount)
 
             'email notifications
             Call ctlsByKey.SetRegKeyByControl(Me.txtSMTPServer)
@@ -6199,6 +5657,7 @@ Public Class frmMain
                 Me.chkMinerRebootViaSSH.Checked = YNtoBoolean(dr.Cells("RebootViaSSH").Value)
                 Me.chkMinerActive.Checked = YNtoBoolean(dr.Cells("Active").Value)
                 Me.chkMinerDoNotReboot.Checked = YNtoBoolean(dr.Cells("DoNotReboot").Value)
+                Me.chkMinerUseHTTPS.Checked = YNtoBoolean(dr.Cells("HTTPS").Value)
 
                 Me.lblMinerID.Text = "ID #" & dr.Cells("ID").Value
                 Me.lblMinerID.Tag = dr.Cells("ID").Value
@@ -6518,6 +5977,21 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub chkMinerUseAPI_Click(sender As Object, e As System.EventArgs) Handles chkMinerUseAPI.Click
+
+        If Me.chkMinerUseAPI.Checked = False Then
+            Select Case Me.cmbMinerType.Text
+                Case SupportedMinerInfo.SpondoolieSP10.LongName, SupportedMinerInfo.SpondoolieSP20.LongName, SupportedMinerInfo.SpondoolieSP30.LongName, _
+                     SupportedMinerInfo.SpondoolieSP31.LongName, SupportedMinerInfo.SpondoolieSP35.LongName
+
+                    If Me.chkMinerUseHTTPS.Checked = False Then
+                        MsgBox("If your Spondoolie miner is remote, try enabling the HTTPS option to secure your web credentials." & vbCrLf & vbCrLf & "Note this may not work with all hosting configurations.", MsgBoxStyle.Information Or MsgBoxStyle.OkOnly)
+                    End If
+
+            End Select
+        End If
+
+    End Sub
 End Class
 
 'wrapper around the datagridview to allow disabling the paint event

@@ -36,6 +36,7 @@ Partial Class frmMain
         Me.tabMiners = New System.Windows.Forms.TabPage()
         Me.dataMiners = New MMinerMonitor.dgvWrapper()
         Me.tabMinerConfig = New System.Windows.Forms.TabPage()
+        Me.chkMinerUseHTTPS = New System.Windows.Forms.CheckBox()
         Me.chkMinerDoNotReboot = New System.Windows.Forms.CheckBox()
         Me.cmbMinerType = New System.Windows.Forms.ComboBox()
         Me.txtIPToGetInfo = New System.Windows.Forms.TextBox()
@@ -87,6 +88,7 @@ Partial Class frmMain
         Me.trackThreadCount = New System.Windows.Forms.TrackBar()
         Me.Label13 = New System.Windows.Forms.Label()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.chkShowATemp = New System.Windows.Forms.CheckBox()
         Me.chkShowGHs5s = New System.Windows.Forms.CheckBox()
         Me.chkShowHWE = New System.Windows.Forms.CheckBox()
         Me.cmdSaveConfig = New System.Windows.Forms.Button()
@@ -226,7 +228,6 @@ Partial Class frmMain
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.timerDoStuff = New System.Windows.Forms.Timer(Me.components)
-        Me.chkShowATemp = New System.Windows.Forms.CheckBox()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabMiners.SuspendLayout()
@@ -295,7 +296,7 @@ Partial Class frmMain
         'cmdRefresh
         '
         Me.cmdRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdRefresh.Location = New System.Drawing.Point(514, 366)
+        Me.cmdRefresh.Location = New System.Drawing.Point(514, 419)
         Me.cmdRefresh.Margin = New System.Windows.Forms.Padding(4)
         Me.cmdRefresh.Name = "cmdRefresh"
         Me.cmdRefresh.Size = New System.Drawing.Size(164, 29)
@@ -318,7 +319,7 @@ Partial Class frmMain
         Me.TabControl1.Location = New System.Drawing.Point(2, 1)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1161, 358)
+        Me.TabControl1.Size = New System.Drawing.Size(1306, 411)
         Me.TabControl1.TabIndex = 0
         '
         'tabMiners
@@ -327,7 +328,7 @@ Partial Class frmMain
         Me.tabMiners.Location = New System.Drawing.Point(4, 4)
         Me.tabMiners.Name = "tabMiners"
         Me.tabMiners.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabMiners.Size = New System.Drawing.Size(1153, 325)
+        Me.tabMiners.Size = New System.Drawing.Size(1298, 378)
         Me.tabMiners.TabIndex = 0
         Me.tabMiners.Text = "Miner Output"
         Me.tabMiners.UseVisualStyleBackColor = True
@@ -347,11 +348,13 @@ Partial Class frmMain
         Me.dataMiners.ReadOnly = True
         Me.dataMiners.RowHeadersVisible = False
         Me.dataMiners.RowTemplate.Height = 24
-        Me.dataMiners.Size = New System.Drawing.Size(1139, 246)
+        Me.dataMiners.Size = New System.Drawing.Size(1284, 364)
         Me.dataMiners.TabIndex = 0
         '
         'tabMinerConfig
         '
+        Me.tabMinerConfig.Controls.Add(Me.chkMinerRebootViaSSH)
+        Me.tabMinerConfig.Controls.Add(Me.chkMinerUseHTTPS)
         Me.tabMinerConfig.Controls.Add(Me.chkMinerDoNotReboot)
         Me.tabMinerConfig.Controls.Add(Me.cmbMinerType)
         Me.tabMinerConfig.Controls.Add(Me.txtIPToGetInfo)
@@ -367,7 +370,6 @@ Partial Class frmMain
         Me.tabMinerConfig.Controls.Add(Me.txtMinerWebPort)
         Me.tabMinerConfig.Controls.Add(Me.txtMinerAPIPort)
         Me.tabMinerConfig.Controls.Add(Me.Label21)
-        Me.tabMinerConfig.Controls.Add(Me.chkMinerRebootViaSSH)
         Me.tabMinerConfig.Controls.Add(Me.chkMinerUseAPI)
         Me.tabMinerConfig.Controls.Add(Me.chkMinerActive)
         Me.tabMinerConfig.Controls.Add(Me.Label20)
@@ -394,15 +396,26 @@ Partial Class frmMain
         Me.tabMinerConfig.Controls.Add(Me.lblWBUserName)
         Me.tabMinerConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabMinerConfig.Name = "tabMinerConfig"
-        Me.tabMinerConfig.Size = New System.Drawing.Size(1153, 325)
+        Me.tabMinerConfig.Size = New System.Drawing.Size(1298, 378)
         Me.tabMinerConfig.TabIndex = 5
         Me.tabMinerConfig.Text = "Miner Config"
         Me.tabMinerConfig.UseVisualStyleBackColor = True
         '
+        'chkMinerUseHTTPS
+        '
+        Me.chkMinerUseHTTPS.AutoSize = True
+        Me.chkMinerUseHTTPS.Location = New System.Drawing.Point(595, 225)
+        Me.chkMinerUseHTTPS.Name = "chkMinerUseHTTPS"
+        Me.chkMinerUseHTTPS.Size = New System.Drawing.Size(86, 24)
+        Me.chkMinerUseHTTPS.TabIndex = 95
+        Me.chkMinerUseHTTPS.Text = "HTTPS"
+        Me.ToolTip1.SetToolTip(Me.chkMinerUseHTTPS, "Use this if you can for remote Spondoolie hardware!")
+        Me.chkMinerUseHTTPS.UseVisualStyleBackColor = True
+        '
         'chkMinerDoNotReboot
         '
         Me.chkMinerDoNotReboot.AutoSize = True
-        Me.chkMinerDoNotReboot.Location = New System.Drawing.Point(595, 255)
+        Me.chkMinerDoNotReboot.Location = New System.Drawing.Point(595, 280)
         Me.chkMinerDoNotReboot.Name = "chkMinerDoNotReboot"
         Me.chkMinerDoNotReboot.Size = New System.Drawing.Size(133, 24)
         Me.chkMinerDoNotReboot.TabIndex = 94
@@ -485,7 +498,7 @@ Partial Class frmMain
         '
         Me.lblMinerID.AutoSize = True
         Me.lblMinerID.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblMinerID.Location = New System.Drawing.Point(591, 282)
+        Me.lblMinerID.Location = New System.Drawing.Point(591, 307)
         Me.lblMinerID.Name = "lblMinerID"
         Me.lblMinerID.Size = New System.Drawing.Size(73, 20)
         Me.lblMinerID.TabIndex = 84
@@ -518,7 +531,7 @@ Partial Class frmMain
         '
         'txtMinerAPIPort
         '
-        Me.txtMinerAPIPort.Location = New System.Drawing.Point(594, 222)
+        Me.txtMinerAPIPort.Location = New System.Drawing.Point(477, 247)
         Me.txtMinerAPIPort.Name = "txtMinerAPIPort"
         Me.txtMinerAPIPort.Size = New System.Drawing.Size(60, 27)
         Me.txtMinerAPIPort.TabIndex = 8
@@ -526,7 +539,7 @@ Partial Class frmMain
         '
         'Label21
         '
-        Me.Label21.Location = New System.Drawing.Point(541, 226)
+        Me.Label21.Location = New System.Drawing.Point(424, 251)
         Me.Label21.Name = "Label21"
         Me.Label21.Size = New System.Drawing.Size(47, 27)
         Me.Label21.TabIndex = 78
@@ -537,7 +550,7 @@ Partial Class frmMain
         Me.chkMinerRebootViaSSH.AutoSize = True
         Me.chkMinerRebootViaSSH.Checked = True
         Me.chkMinerRebootViaSSH.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkMinerRebootViaSSH.Location = New System.Drawing.Point(428, 249)
+        Me.chkMinerRebootViaSSH.Location = New System.Drawing.Point(428, 274)
         Me.chkMinerRebootViaSSH.Name = "chkMinerRebootViaSSH"
         Me.chkMinerRebootViaSSH.Size = New System.Drawing.Size(150, 24)
         Me.chkMinerRebootViaSSH.TabIndex = 77
@@ -561,7 +574,7 @@ Partial Class frmMain
         Me.chkMinerActive.AutoSize = True
         Me.chkMinerActive.Checked = True
         Me.chkMinerActive.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkMinerActive.Location = New System.Drawing.Point(428, 272)
+        Me.chkMinerActive.Location = New System.Drawing.Point(428, 297)
         Me.chkMinerActive.Name = "chkMinerActive"
         Me.chkMinerActive.Size = New System.Drawing.Size(77, 24)
         Me.chkMinerActive.TabIndex = 75
@@ -781,7 +794,7 @@ Partial Class frmMain
         Me.tabConfig.Location = New System.Drawing.Point(4, 4)
         Me.tabConfig.Name = "tabConfig"
         Me.tabConfig.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabConfig.Size = New System.Drawing.Size(1153, 325)
+        Me.tabConfig.Size = New System.Drawing.Size(1298, 378)
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
@@ -901,6 +914,18 @@ Partial Class frmMain
         Me.GroupBox1.TabIndex = 48
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Output options"
+        '
+        'chkShowATemp
+        '
+        Me.chkShowATemp.AutoSize = True
+        Me.chkShowATemp.Checked = True
+        Me.chkShowATemp.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkShowATemp.Location = New System.Drawing.Point(9, 47)
+        Me.chkShowATemp.Name = "chkShowATemp"
+        Me.chkShowATemp.Size = New System.Drawing.Size(84, 24)
+        Me.chkShowATemp.TabIndex = 1
+        Me.chkShowATemp.Text = "ATemp"
+        Me.chkShowATemp.UseVisualStyleBackColor = True
         '
         'chkShowGHs5s
         '
@@ -1174,7 +1199,7 @@ Partial Class frmMain
         Me.tabPools.Controls.Add(Me.lstPools)
         Me.tabPools.Location = New System.Drawing.Point(4, 4)
         Me.tabPools.Name = "tabPools"
-        Me.tabPools.Size = New System.Drawing.Size(1153, 325)
+        Me.tabPools.Size = New System.Drawing.Size(1298, 378)
         Me.tabPools.TabIndex = 4
         Me.tabPools.Text = "Pools"
         Me.tabPools.UseVisualStyleBackColor = True
@@ -1367,7 +1392,7 @@ Partial Class frmMain
         Me.tabAlerts.Controls.Add(Me.tabAlertsAndReboots)
         Me.tabAlerts.Location = New System.Drawing.Point(4, 4)
         Me.tabAlerts.Name = "tabAlerts"
-        Me.tabAlerts.Size = New System.Drawing.Size(1153, 325)
+        Me.tabAlerts.Size = New System.Drawing.Size(1298, 378)
         Me.tabAlerts.TabIndex = 3
         Me.tabAlerts.Text = "Alerts & Reboots"
         Me.tabAlerts.UseVisualStyleBackColor = True
@@ -1386,7 +1411,7 @@ Partial Class frmMain
         Me.tabAlertsAndReboots.Multiline = True
         Me.tabAlertsAndReboots.Name = "tabAlertsAndReboots"
         Me.tabAlertsAndReboots.SelectedIndex = 0
-        Me.tabAlertsAndReboots.Size = New System.Drawing.Size(1144, 317)
+        Me.tabAlertsAndReboots.Size = New System.Drawing.Size(1289, 368)
         Me.tabAlertsAndReboots.TabIndex = 18
         '
         'tabAlertSettings
@@ -1406,7 +1431,7 @@ Partial Class frmMain
         Me.tabAlertSettings.Controls.Add(Me.cmdSaveAlerts6)
         Me.tabAlertSettings.Location = New System.Drawing.Point(4, 4)
         Me.tabAlertSettings.Name = "tabAlertSettings"
-        Me.tabAlertSettings.Size = New System.Drawing.Size(1136, 284)
+        Me.tabAlertSettings.Size = New System.Drawing.Size(1281, 335)
         Me.tabAlertSettings.TabIndex = 6
         Me.tabAlertSettings.Text = "Alert Settings"
         Me.tabAlertSettings.UseVisualStyleBackColor = True
@@ -1563,7 +1588,7 @@ Partial Class frmMain
         Me.tabAlertTypes.Controls.Add(Me.txtAlertStartProcessParms)
         Me.tabAlertTypes.Location = New System.Drawing.Point(4, 4)
         Me.tabAlertTypes.Name = "tabAlertTypes"
-        Me.tabAlertTypes.Size = New System.Drawing.Size(1136, 284)
+        Me.tabAlertTypes.Size = New System.Drawing.Size(1281, 335)
         Me.tabAlertTypes.TabIndex = 2
         Me.tabAlertTypes.Text = "Alert Types"
         Me.tabAlertTypes.UseVisualStyleBackColor = True
@@ -1732,7 +1757,7 @@ Partial Class frmMain
         Me.tabReboots.Controls.Add(Me.cmbAlertRebootGovernor)
         Me.tabReboots.Location = New System.Drawing.Point(4, 4)
         Me.tabReboots.Name = "tabReboots"
-        Me.tabReboots.Size = New System.Drawing.Size(1136, 284)
+        Me.tabReboots.Size = New System.Drawing.Size(1281, 335)
         Me.tabReboots.TabIndex = 5
         Me.tabReboots.Text = "Reboots"
         Me.tabReboots.UseVisualStyleBackColor = True
@@ -1950,7 +1975,7 @@ Partial Class frmMain
         Me.tabEmail.Controls.Add(Me.Label97)
         Me.tabEmail.Location = New System.Drawing.Point(4, 4)
         Me.tabEmail.Name = "tabEmail"
-        Me.tabEmail.Size = New System.Drawing.Size(1136, 284)
+        Me.tabEmail.Size = New System.Drawing.Size(1281, 335)
         Me.tabEmail.TabIndex = 3
         Me.tabEmail.Text = "EMail Config"
         Me.tabEmail.UseVisualStyleBackColor = True
@@ -2202,7 +2227,7 @@ Partial Class frmMain
         Me.tabLog.Controls.Add(Me.txtLog)
         Me.tabLog.Location = New System.Drawing.Point(4, 4)
         Me.tabLog.Name = "tabLog"
-        Me.tabLog.Size = New System.Drawing.Size(1153, 325)
+        Me.tabLog.Size = New System.Drawing.Size(1298, 378)
         Me.tabLog.TabIndex = 2
         Me.tabLog.Text = "Log"
         Me.tabLog.UseVisualStyleBackColor = True
@@ -2216,7 +2241,7 @@ Partial Class frmMain
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtLog.Size = New System.Drawing.Size(1135, 316)
+        Me.txtLog.Size = New System.Drawing.Size(1281, 368)
         Me.txtLog.TabIndex = 0
         '
         'cmbRefreshRate
@@ -2224,7 +2249,7 @@ Partial Class frmMain
         Me.cmbRefreshRate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmbRefreshRate.FormattingEnabled = True
         Me.cmbRefreshRate.Items.AddRange(New Object() {"Seconds", "Minutes", "Hours"})
-        Me.cmbRefreshRate.Location = New System.Drawing.Point(995, 369)
+        Me.cmbRefreshRate.Location = New System.Drawing.Point(995, 422)
         Me.cmbRefreshRate.Name = "cmbRefreshRate"
         Me.cmbRefreshRate.Size = New System.Drawing.Size(94, 28)
         Me.cmbRefreshRate.TabIndex = 47
@@ -2233,7 +2258,7 @@ Partial Class frmMain
         'txtRefreshRate
         '
         Me.txtRefreshRate.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtRefreshRate.Location = New System.Drawing.Point(933, 370)
+        Me.txtRefreshRate.Location = New System.Drawing.Point(933, 423)
         Me.txtRefreshRate.Name = "txtRefreshRate"
         Me.txtRefreshRate.Size = New System.Drawing.Size(55, 27)
         Me.txtRefreshRate.TabIndex = 46
@@ -2243,7 +2268,7 @@ Partial Class frmMain
         '
         Me.Label16.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(812, 372)
+        Me.Label16.Location = New System.Drawing.Point(812, 425)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(118, 20)
         Me.Label16.TabIndex = 45
@@ -2252,7 +2277,7 @@ Partial Class frmMain
         'cmdPause
         '
         Me.cmdPause.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdPause.Location = New System.Drawing.Point(692, 366)
+        Me.cmdPause.Location = New System.Drawing.Point(692, 419)
         Me.cmdPause.Name = "cmdPause"
         Me.cmdPause.Size = New System.Drawing.Size(85, 28)
         Me.cmdPause.TabIndex = 3
@@ -2262,7 +2287,7 @@ Partial Class frmMain
         'txtPleaseSupport
         '
         Me.txtPleaseSupport.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 367)
+        Me.txtPleaseSupport.Location = New System.Drawing.Point(6, 420)
         Me.txtPleaseSupport.Name = "txtPleaseSupport"
         Me.txtPleaseSupport.ReadOnly = True
         Me.txtPleaseSupport.Size = New System.Drawing.Size(501, 27)
@@ -2311,23 +2336,11 @@ Partial Class frmMain
         '
         Me.timerDoStuff.Interval = 10
         '
-        'chkShowATemp
-        '
-        Me.chkShowATemp.AutoSize = True
-        Me.chkShowATemp.Checked = True
-        Me.chkShowATemp.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkShowATemp.Location = New System.Drawing.Point(9, 47)
-        Me.chkShowATemp.Name = "chkShowATemp"
-        Me.chkShowATemp.Size = New System.Drawing.Size(84, 24)
-        Me.chkShowATemp.TabIndex = 1
-        Me.chkShowATemp.Text = "ATemp"
-        Me.chkShowATemp.UseVisualStyleBackColor = True
-        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1175, 401)
+        Me.ClientSize = New System.Drawing.Size(1320, 454)
         Me.ContextMenuStrip = Me.menuStripMain
         Me.Controls.Add(Me.txtPleaseSupport)
         Me.Controls.Add(Me.cmdPause)
@@ -2580,5 +2593,6 @@ Partial Class frmMain
     Friend WithEvents chkMinerDoNotReboot As System.Windows.Forms.CheckBox
     Friend WithEvents chkShowQueue As System.Windows.Forms.CheckBox
     Friend WithEvents chkShowATemp As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMinerUseHTTPS As System.Windows.Forms.CheckBox
 
 End Class

@@ -1,3 +1,15 @@
+v4.7
+- Added the ability to use HTTPS for non API use.  Probably does not work with Bitmain hardware, and may not work with all hosting configurations for Spondoolie hardware.
+
+v4.6
+- Enables alerts on XCount for Spondoolie units.  This value is populated when using the Web monitoring for a Spondoolie unit.
+- Fixes a potential memory leak.
+
+v4.5
+- Adds support for web scraping for S4s.
+- Fixes the problem with web scraping no longer working for anything after v4.4.
+- Adds web support for Spondoolie hardware.  Note this isn't "web scraping", as with Bitmain hardware.  This will allow you to monitor your spondoolie hardware without having API access.
+
 v4.4
 - Added a new miner flag "Do Not Reboot".  If that's checked off, no matter how you try, it will not reboot.
 - Fixed numerous problems with the update pool logic.  Note that the pool update functionality operates via the API, which means API update access must be enabled (W: in your cgminer config).  Also note this is not a permanent update; changes will be lost if you update the miner via the UI or the miner is
