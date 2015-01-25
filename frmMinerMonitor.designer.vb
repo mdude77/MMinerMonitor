@@ -78,6 +78,7 @@ Partial Class frmMain
         Me.Label6 = New System.Windows.Forms.Label()
         Me.lblWBUserName = New System.Windows.Forms.Label()
         Me.tabConfig = New System.Windows.Forms.TabPage()
+        Me.momDashHistCheck = New System.Windows.Forms.CheckBox()
         Me.Label18 = New System.Windows.Forms.Label()
         Me.Label17 = New System.Windows.Forms.Label()
         Me.momAppKeyLabel = New System.Windows.Forms.Label()
@@ -786,6 +787,7 @@ Partial Class frmMain
         '
         'tabConfig
         '
+        Me.tabConfig.Controls.Add(Me.momDashHistCheck)
         Me.tabConfig.Controls.Add(Me.Label18)
         Me.tabConfig.Controls.Add(Me.Label17)
         Me.tabConfig.Controls.Add(Me.momAppKeyLabel)
@@ -807,6 +809,17 @@ Partial Class frmMain
         Me.tabConfig.TabIndex = 1
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
+        '
+        'momDashHistCheck
+        '
+        Me.momDashHistCheck.Checked = True
+        Me.momDashHistCheck.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.momDashHistCheck.Location = New System.Drawing.Point(353, 299)
+        Me.momDashHistCheck.Name = "momDashHistCheck"
+        Me.momDashHistCheck.Size = New System.Drawing.Size(122, 56)
+        Me.momDashHistCheck.TabIndex = 79
+        Me.momDashHistCheck.Text = "Enable MobileMiner Dashboard && History"
+        Me.momDashHistCheck.UseVisualStyleBackColor = True
         '
         'Label18
         '
@@ -2572,6 +2585,7 @@ Partial Class frmMain
     Friend WithEvents momEmailEdit As System.Windows.Forms.TextBox
     Friend WithEvents momAppKeyLabel As System.Windows.Forms.Label
     Friend WithEvents Label29 As System.Windows.Forms.Label
+    Friend WithEvents momDashHistCheck As System.Windows.Forms.CheckBox
     Friend WithEvents timerDoStuff As System.Windows.Forms.Timer
     Friend WithEvents cmdChangeThreads As System.Windows.Forms.Button
     Friend WithEvents trackThreadCount As System.Windows.Forms.TrackBar

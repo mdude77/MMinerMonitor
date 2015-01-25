@@ -43,7 +43,7 @@ namespace MMinerMonitor.MobileMinerApi
             bool postCredentials = !embeddedBrowserAuthenticated && !String.IsNullOrEmpty(emailAddress);
             if (postCredentials)
             {
-                var postString = String.Format("email={1}&key={2}", emailAddress, applicationKey);
+                var postString = String.Format("email={0}&key={1}", emailAddress, applicationKey);
                 byte[] data = Encoding.UTF8.GetBytes(postString);
 
                 //use POST-Redirect-GET to login without leaving credentials in history

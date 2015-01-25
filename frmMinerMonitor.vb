@@ -1088,6 +1088,8 @@ Public Class frmMain
             .Columns("ID").Width = 49
         End With
 
+        SetupMobileMinerTabs()
+
         ctlsByKey = New ControlsByRegistry(csRegKey)
 
         Call SetGridSizes("\Columns\dataMiners", Me.dataMiners)
@@ -1194,6 +1196,7 @@ Public Class frmMain
             ' MobileMiner settings
             .AddControl(Me.momEmailEdit, "MobileMinerEmail")
             .AddControl(Me.momAppKeyEdit, "MobileMinerAppKey")
+            .AddControl(Me.momDashHistCheck, "MobileMinerDashHist")
 
             .SetControlByRegKey(Me.txtRefreshRate, "300")
             .SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
@@ -1255,6 +1258,7 @@ Public Class frmMain
             'MobileMiner settings
             .SetControlByRegKey(Me.momEmailEdit)
             .SetControlByRegKey(Me.momAppKeyEdit)
+            .SetControlByRegKey(Me.momDashHistCheck)
 
             'email settings
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPServer)
@@ -1503,12 +1507,35 @@ Public Class frmMain
 
     End Sub
 
+    Private momDashTabPage As TabPage
+    Private momHistTabPage As TabPage
+    Private momTabsSetup As Boolean
+
+    Private Sub SetupMobileMinerTabs()
+        momDashTabPage = New TabPage("Dashboard")
+        momHistTabPage = New TabPage("History")
+        momTabsSetup = True
+
+        SetupMobileMinerTabVisibility()
+    End Sub
+
+    Private Sub SetupMobileMinerTabVisibility()
+        If momTabsSetup Then
+            If momDashHistCheck.Checked Then
+                Me.TabControl1.TabPages.Add(momDashTabPage)
+                Me.TabControl1.TabPages.Add(momHistTabPage)
+            Else
+                Me.TabControl1.TabPages.Remove(momDashTabPage)
+                Me.TabControl1.TabPages.Remove(momHistTabPage)
+            End If
+        End If
+    End Sub
+
     Private Sub SetupMobileMinerTimer()
         Me.mobileMinerTimer.Interval = 35000
         RemoveHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
         AddHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
         Me.mobileMinerTimer.Enabled = True
-
     End Sub
 
     Private Function AddOrSaveMiner(ByVal ID As Integer, ByVal sMinerName As String, ByVal MinerInfo As clsSupportedMinerInfo.clsMinerInfo, ByVal sIPAddress As String, _
@@ -4304,6 +4331,7 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.momEmailEdit)
             .SetRegKeyByControl(Me.momAppKeyEdit)
+            .SetRegKeyByControl(Me.momDashHistCheck)
         End With
 
     End Sub
@@ -6084,6 +6112,28 @@ Public Class frmMain
                     End If
 
             End Select
+        End If
+
+    End Sub
+
+    Private Sub momDashHistCheck_CheckedChanged(sender As Object, e As EventArgs) Handles momDashHistCheck.CheckedChanged
+        SetupMobileMinerTabVisibility()
+    End Sub
+
+    Private Sub TabControl1_Selected(sender As Object, e As TabControlEventArgs) Handles TabControl1.Selected
+
+        Dim controller As String = Nothing
+
+        If e.TabPage.Equals(Me.momDashTabPage) Then
+            controller = MobileMinerApi.WebBrowserProvider.DashboardController
+        ElseIf e.TabPage.Equals(Me.momHistTabPage) Then
+            controller = MobileMinerApi.WebBrowserProvider.HistoryController
+        End If
+
+        If controller IsNot Nothing Then
+            Dim webBrowser As WebBrowser = MobileMinerApi.WebBrowserProvider.GetWebBrowser(controller, momEmailEdit.Text, momAppKeyEdit.Text)
+            webBrowser.Dock = DockStyle.Fill
+            webBrowser.Parent = e.TabPage
         End If
 
     End Sub
