@@ -228,6 +228,7 @@ Partial Class frmMain
         Me.menuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.timerDoStuff = New System.Windows.Forms.Timer(Me.components)
+        Me.mobileMinerTimer = New System.Windows.Forms.Timer(Me.components)
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabMiners.SuspendLayout()
@@ -2523,6 +2524,7 @@ Partial Class frmMain
     Friend WithEvents lblPools1 As System.Windows.Forms.Label
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
+    Friend WithEvents mobileMinerTimer As System.Windows.Forms.Timer
     Friend WithEvents timerDoStuff As System.Windows.Forms.Timer
     Friend WithEvents cmdChangeThreads As System.Windows.Forms.Button
     Friend WithEvents trackThreadCount As System.Windows.Forms.TrackBar

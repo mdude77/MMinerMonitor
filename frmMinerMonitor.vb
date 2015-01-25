@@ -1042,6 +1042,7 @@ Public Class frmMain
                 .Add("ACount", GetType(Integer))
                 .Add("ID")
                 .Add("Type")
+                .Add("CurHash", GetType(Double))
                 .Add("HashSHA256", GetType(Double))
                 .Add("HashScrypt", GetType(Double))
                 .Add("Data", GetType(Object))
@@ -1051,6 +1052,7 @@ Public Class frmMain
         Me.dataMiners.Columns("PoolData").Visible = False
         Me.dataMiners.Columns("PoolData2").Visible = False
         Me.dataMiners.Columns("Type").Visible = False
+        Me.dataMiners.Columns("CurHash").Visible = False
         Me.dataMiners.Columns("HashSHA256").Visible = False
         Me.dataMiners.Columns("HashScrypt").Visible = False
         Me.dataMiners.Columns("Data").Visible = False
@@ -1488,6 +1490,10 @@ Public Class frmMain
             Me.TimerRefresh.Enabled = True
         End If
 
+        Me.mobileMinerTimer.Interval = 35000
+        AddHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
+        Me.mobileMinerTimer.Enabled = True
+
     End Sub
 
     Private Function AddOrSaveMiner(ByVal ID As Integer, ByVal sMinerName As String, ByVal MinerInfo As clsSupportedMinerInfo.clsMinerInfo, ByVal sIPAddress As String, _
@@ -1725,6 +1731,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(91).OuterText) * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(94).OuterText) * 1000)
 
+                            dr.Item("CurHash") = Val(wb.Document.All(91).OuterText) * 1000000
                             dr.Item("HashSHA256") = Val(wb.Document.All(94).OuterText) * 1000000
                             dr.Item("HashScrypt") = 0
 
@@ -1826,6 +1833,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(74).OuterText * 1000))
                             dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(77).OuterText * 1000))
 
+                            dr.Item("CurHash") = Val(wb.Document.All(74).OuterText) * 1000000
                             dr.Item("HashSHA256") = Val(wb.Document.All(77).OuterText) * 1000000
                             dr.Item("HashScrypt") = 0
 
@@ -1940,6 +1948,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(wb.Document.All(126).OuterText.TrimEnd * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(wb.Document.All(130).OuterText.TrimEnd * 1000)
 
+                            dr.Item("CurHash") = Val(wb.Document.All(126).OuterText) * 1000000
                             dr.Item("HashSHA256") = Val(wb.Document.All(130).OuterText) * 1000000
                             dr.Item("HashScrypt") = 0
 
@@ -3075,6 +3084,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(jp1.Value(Of String)("GHS 5s")) * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(Val(jp1.Value(Of String)("GHS av")) * 1000)
 
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("GHS 5s")) * 1000
                             dr.Item("HashSHA256") = Val(jp1.Value(Of String)("GHS av")) * 1000
                             dr.Item("HashScrypt") = 0
 
@@ -3097,6 +3107,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("Speed(avg)") = FormatHashRate(jp1.Value(Of String)("MHS av"))
 
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("HashSHA256") = Val(jp1.Value(Of String)("MHS av"))
                             dr.Item("HashScrypt") = 0
 
@@ -3116,6 +3127,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("Speed(avg)") = FormatHashRate(jp1.Value(Of String)("MHS av"))
 
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("HashSHA256") = 0
                             dr.Item("HashScrypt") = Val(jp1.Value(Of String)("MHS av"))
 
@@ -5925,6 +5937,44 @@ Public Class frmMain
         Finally
             Me.cmdGetMinerInfo.Enabled = True
         End Try
+
+    End Sub
+
+    Private Sub mobileMinerTimer_Tick(sender As Object, e As EventArgs) Handles mobileMinerTimer.Tick
+        Dim statistics As MobileMinerApi.Data.MiningStatistics
+        Dim statisticsList As List(Of MobileMinerApi.Data.MiningStatistics) = New List(Of MobileMinerApi.Data.MiningStatistics)
+
+
+        For Each dr As DataRow In Me.ds.Tables(0).Rows
+            statistics = New MobileMinerApi.Data.MiningStatistics
+
+            Dim isScryptAsic As Object = dr.Item("HashScrypt") > 0
+
+            statistics.Algorithm = If(isScryptAsic, "Scrypt", "SHA-256")
+            statistics.Appliance = True
+            statistics.AverageHashrate = If(isScryptAsic, dr.Item("HashScrypt"), dr.Item("HashSHA256"))
+            statistics.CurrentHashrate = dr.Item("CurHash")
+            statistics.CoinSymbol = If(isScryptAsic, "LTC", "BTC")
+            statistics.CoinName = If(isScryptAsic, "Litecoin", "Bitcoin")
+            statistics.Enabled = True
+            statistics.FanSpeed = dr.Item("HFan")
+            statistics.FullName = dr.Item("Name")
+            statistics.HardwareErrorsPercent = dr.Item("HWE%").ToString().TrimEnd("%")
+            statistics.Kind = "ASC"
+            statistics.MachineName = dr.Item("Name")
+            statistics.MinerName = "MMinerMonitor"
+            statistics.Name = dr.Item("Name")
+            statistics.RejectedSharesPercent = dr.Item("Rej%")
+            statistics.Temperature = dr.Item("HTemp")
+            statistics.PoolName = "Unknown"
+
+            statisticsList.Add(statistics)
+        Next
+
+        Dim commandList As List(Of MobileMinerApi.Data.RemoteCommand)
+        ' no remote commands just yet - flip to True and process the commandList to enable
+        Dim processCommands As Boolean = False
+        commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics("https://api.mobileminerapp.com", "P3mVX95iP7xfoI", "username", "password", statisticsList, processCommands)
 
     End Sub
 
