@@ -6011,7 +6011,12 @@ Public Class frmMain
         Dim processCommands As Boolean = False
         Const MobileMinerUrl As String = "https://api.mobileminerapp.com"
         Const MobileMinerApiKey As String = "mCJMjV2iKtdOLT"
-        commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics(MobileMinerUrl, MobileMinerApiKey, emailAddress, applicationKey, statisticsList, processCommands)
+
+        Try
+            commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics(MobileMinerUrl, MobileMinerApiKey, emailAddress, applicationKey, statisticsList, processCommands)
+        Catch ex As Exception When bErrorHandle = True
+            AddToLogQueue("Error occurred submitting MobileMiner stats: " & ex.Message)
+        End Try
     End Sub
 
     Private Sub momAppKeyLabel_Click(sender As Object, e As EventArgs) Handles momAppKeyLabel.Click
