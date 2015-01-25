@@ -1,4 +1,5 @@
 ﻿Imports MMinerMonitor.Extensions
+Imports MMinerMonitor.MobileMinerApi.Helpers
 
 Public Class frmMain
 
@@ -1190,6 +1191,10 @@ Public Class frmMain
             .AddControl(Me.txtRebootAntsByUptime, "RebootAntsByUptimeValue")
             .AddControl(Me.cmbRebootAntsByUptime, "RebootAntsByUptimeSecMinHour")
 
+            ' MobileMiner settings
+            .AddControl(Me.momEmailEdit, "MobileMinerEmail")
+            .AddControl(Me.momAppKeyEdit, "MobileMinerAppKey")
+
             .SetControlByRegKey(Me.txtRefreshRate, "300")
             .SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
             .SetControlByRegKey(Me.chkShowBestShare, True)
@@ -1246,6 +1251,10 @@ Public Class frmMain
             .SetControlByRegKey(Me.chkRebootAntsByUptime)
             .SetControlByRegKey(Me.txtRebootAntsByUptime)
             .SetControlByRegKey(Me.cmbRebootAntsByUptime)
+
+            'MobileMiner settings
+            .SetControlByRegKey(Me.momEmailEdit)
+            .SetControlByRegKey(Me.momAppKeyEdit)
 
             'email settings
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPServer)
@@ -1490,7 +1499,13 @@ Public Class frmMain
             Me.TimerRefresh.Enabled = True
         End If
 
+        SetupMobileMinerTimer()
+
+    End Sub
+
+    Private Sub SetupMobileMinerTimer()
         Me.mobileMinerTimer.Interval = 35000
+        RemoveHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
         AddHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
         Me.mobileMinerTimer.Enabled = True
 
@@ -4286,6 +4301,9 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.trackThreadCount)
             .SetRegKeyByControl(Me.txtDisplayRefreshInSecs)
+
+            .SetRegKeyByControl(Me.momEmailEdit)
+            .SetRegKeyByControl(Me.momAppKeyEdit)
         End With
 
     End Sub
@@ -5941,6 +5959,23 @@ Public Class frmMain
     End Sub
 
     Private Sub mobileMinerTimer_Tick(sender As Object, e As EventArgs) Handles mobileMinerTimer.Tick
+        Dim emailAddress As String = momEmailEdit.Text
+        Dim applicationKey As String = momAppKeyEdit.Text
+        Dim isConfigured As Boolean = InputValidation.IsValidEmailAddress(emailAddress) And InputValidation.IsValidApplicationKey(applicationKey)
+
+        If isConfigured Then
+
+            mobileMinerTimer.Enabled = False
+            Try
+                SubmitMobileMinerStatistics(emailAddress, applicationKey)
+            Finally
+                mobileMinerTimer.Enabled = True
+            End Try
+
+        End If
+    End Sub
+
+    Private Sub SubmitMobileMinerStatistics(emailAddress As String, applicationKey As String)
         Dim statistics As MobileMinerApi.Data.MiningStatistics
         Dim statisticsList As List(Of MobileMinerApi.Data.MiningStatistics) = New List(Of MobileMinerApi.Data.MiningStatistics)
 
@@ -5974,8 +6009,13 @@ Public Class frmMain
         Dim commandList As List(Of MobileMinerApi.Data.RemoteCommand)
         ' no remote commands just yet - flip to True and process the commandList to enable
         Dim processCommands As Boolean = False
-        commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics("https://api.mobileminerapp.com", "P3mVX95iP7xfoI", "username", "password", statisticsList, processCommands)
+        Const MobileMinerUrl As String = "https://api.mobileminerapp.com"
+        Const MobileMinerApiKey As String = "mCJMjV2iKtdOLT"
+        commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics(MobileMinerUrl, MobileMinerApiKey, emailAddress, applicationKey, statisticsList, processCommands)
+    End Sub
 
+    Private Sub momAppKeyLabel_Click(sender As Object, e As EventArgs) Handles momAppKeyLabel.Click
+        Process.Start("http://web.mobileminerapp.com/")
     End Sub
 
     Private Sub cmbAlertMinerType_SelectedIndexChanged(sender As Object, e As System.EventArgs) Handles cmbAlertMinerType.SelectedIndexChanged

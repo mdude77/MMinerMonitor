@@ -80,6 +80,10 @@ Partial Class frmMain
         Me.tabConfig = New System.Windows.Forms.TabPage()
         Me.Label18 = New System.Windows.Forms.Label()
         Me.Label17 = New System.Windows.Forms.Label()
+        Me.momAppKeyLabel = New System.Windows.Forms.Label()
+        Me.momAppKeyEdit = New System.Windows.Forms.TextBox()
+        Me.Label29 = New System.Windows.Forms.Label()
+        Me.momEmailEdit = New System.Windows.Forms.TextBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label14 = New System.Windows.Forms.Label()
@@ -784,6 +788,10 @@ Partial Class frmMain
         '
         Me.tabConfig.Controls.Add(Me.Label18)
         Me.tabConfig.Controls.Add(Me.Label17)
+        Me.tabConfig.Controls.Add(Me.momAppKeyLabel)
+        Me.tabConfig.Controls.Add(Me.momAppKeyEdit)
+        Me.tabConfig.Controls.Add(Me.Label29)
+        Me.tabConfig.Controls.Add(Me.momEmailEdit)
         Me.tabConfig.Controls.Add(Me.Label5)
         Me.tabConfig.Controls.Add(Me.Label4)
         Me.tabConfig.Controls.Add(Me.Label14)
@@ -816,6 +824,41 @@ Partial Class frmMain
         Me.Label17.Size = New System.Drawing.Size(343, 103)
         Me.Label17.TabIndex = 73
         Me.Label17.Text = resources.GetString("Label17.Text")
+        '
+        'momAppKeyLabel
+        '
+        Me.momAppKeyLabel.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.momAppKeyLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+        Me.momAppKeyLabel.ForeColor = System.Drawing.SystemColors.HotTrack
+        Me.momAppKeyLabel.Location = New System.Drawing.Point(7, 331)
+        Me.momAppKeyLabel.Name = "momAppKeyLabel"
+        Me.momAppKeyLabel.Size = New System.Drawing.Size(133, 24)
+        Me.momAppKeyLabel.TabIndex = 78
+        Me.momAppKeyLabel.Text = "Application key:"
+        '
+        'momAppKeyEdit
+        '
+        Me.momAppKeyEdit.Location = New System.Drawing.Point(187, 328)
+        Me.momAppKeyEdit.Name = "momAppKeyEdit"
+        Me.momAppKeyEdit.Size = New System.Drawing.Size(153, 23)
+        Me.momAppKeyEdit.TabIndex = 77
+        Me.momAppKeyEdit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label29
+        '
+        Me.Label29.Location = New System.Drawing.Point(7, 302)
+        Me.Label29.Name = "Label29"
+        Me.Label29.Size = New System.Drawing.Size(133, 24)
+        Me.Label29.TabIndex = 76
+        Me.Label29.Text = "MobileMiner email:"
+        '
+        'momEmailEdit
+        '
+        Me.momEmailEdit.Location = New System.Drawing.Point(187, 299)
+        Me.momEmailEdit.Name = "momEmailEdit"
+        Me.momEmailEdit.Size = New System.Drawing.Size(153, 23)
+        Me.momEmailEdit.TabIndex = 75
+        Me.momEmailEdit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label5
         '
@@ -2525,6 +2568,10 @@ Partial Class frmMain
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
     Friend WithEvents mobileMinerTimer As System.Windows.Forms.Timer
+    Friend WithEvents momAppKeyEdit As System.Windows.Forms.TextBox
+    Friend WithEvents momEmailEdit As System.Windows.Forms.TextBox
+    Friend WithEvents momAppKeyLabel As System.Windows.Forms.Label
+    Friend WithEvents Label29 As System.Windows.Forms.Label
     Friend WithEvents timerDoStuff As System.Windows.Forms.Timer
     Friend WithEvents cmdChangeThreads As System.Windows.Forms.Button
     Friend WithEvents trackThreadCount As System.Windows.Forms.TrackBar
