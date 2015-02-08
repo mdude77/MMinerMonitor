@@ -1,10 +1,8 @@
-MAntMonitor
+MMinerMonitor
 ===========
 
-M's Ant Monitor
+M's Miner Monitor
 
-Used to keep close tabs on your AntMiner S1 machines.  Shows at a glance all the pertinent info about your S1s:
+Used to keep close tabs on your Bitmain AntMiner machines (S1/S2/S3/S4/S5/C1) and Spondoolie hardware (SP10, SP20, SP30, SP31, SP35). 
 
-Uptime, Hashspeed (5s), Hashspeed (avg), Blocks found, Hardware Error %, BestShare, Pool0/1/2 Status, Fan speeds, and the status 1/2 of your blades (ooooooo's are good, xxxxxxxxx's are not).  It can also reboot your Ants when Xs appear.
-
-Written in vb.net.
+Written in vb.net, requires .net 4.0, build in VS 2010.
