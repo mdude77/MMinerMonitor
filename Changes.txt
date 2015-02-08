@@ -1,3 +1,9 @@
+v4.9
+- Fixed the problem with pool data popups not occurring for S4 webscraping.
+
+v4.8
+- Minor tweaks for SP10 Web/HTTP support.
+
 v4.7
 - Added the ability to use HTTPS for non API use.  Probably does not work with Bitmain hardware, and may not work with all hosting configurations for Spondoolie hardware.
 

@@ -27,7 +27,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v4.7"
+    Private Const csVersion As String = "M's Miner Monitor v4.9"
 
     'alert string   
     Private sAlerts As String
@@ -1653,12 +1653,14 @@ Public Class frmMain
         Dim dr As DataRow
         Dim x, y, z As Integer
         Dim wb As WebBrowser
-        Dim sbTemp, sbTemp2, sbTemp3 As System.Text.StringBuilder
+        Dim sbTemp, sbTemp2, sbTemp3, sbTemp4 As System.Text.StringBuilder
         Dim count(0 To 9) As Integer
         Dim sIP As String
         Dim s(), p() As String
         Dim antConfigRow As DataRow
         Dim avg As clsAverage
+        Dim pdl As System.Collections.Generic.List(Of clsPoolData)
+        Dim pd As clsPoolData
 
         Try
             wb = sender
@@ -1666,6 +1668,7 @@ Public Class frmMain
             sbTemp = New System.Text.StringBuilder
             sbTemp2 = New System.Text.StringBuilder
             sbTemp3 = New System.Text.StringBuilder
+            sbTemp4 = New System.Text.StringBuilder
 
             avg = New clsAverage
 
@@ -1837,6 +1840,13 @@ Public Class frmMain
 
                             dr.Item("BestShare") = Format(UInt64.Parse(wb.Document.All(91).OuterText), "###,###,###,###,###,##0")
 
+                            If IsDBNull(dr.Item("PoolData2")) = True Then
+                                dr.Item("PoolData2") = New System.Collections.Generic.List(Of clsPoolData)
+                            End If
+
+                            pdl = dr.Item("PoolData2")
+                            pdl.Clear()
+
                             Select Case wb.Document.All(148).OuterText
                                 Case "Alive"
                                     sbTemp.Append("U")
@@ -1846,8 +1856,17 @@ Public Class frmMain
 
                             End Select
 
+                            sbTemp2.Append("0: " & wb.Document.All(142).OuterText & " (" & wb.Document.All(145).OuterText & ") " & wb.Document.All(148).OuterText)
+
+                            pd = New clsPoolData
+
+                            pd.URL = wb.Document.All(142).OuterText
+                            pd.UID = wb.Document.All(145).OuterText
+
+                            pdl.Add(pd)
+
                             'reject
-                            sbTemp2.Append(Format(Val(wb.Document.All(175).OuterText.Replace(",", "")) / (Val(wb.Document.All(160).OuterText.Replace(",", "")) + Val(wb.Document.All(175).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                            sbTemp4.Append(Format(Val(wb.Document.All(175).OuterText.Replace(",", "")) / (Val(wb.Document.All(160).OuterText.Replace(",", "")) + Val(wb.Document.All(175).OuterText.Replace(",", ""))) * 100, "##0.0"))
                             'stale
                             sbTemp3.Append(Format(Val(wb.Document.All(181).OuterText.Replace(",", "")) / (Val(wb.Document.All(160).OuterText.Replace(",", "")) + Val(wb.Document.All(181).OuterText.Replace(",", ""))) * 100, "##0.0"))
 
@@ -1860,8 +1879,19 @@ Public Class frmMain
 
                             End Select
 
+                            sbTemp2.Append(vbCrLf)
+
+                            sbTemp2.Append("1: " & wb.Document.All(194).OuterText & " (" & wb.Document.All(197).OuterText & ") " & wb.Document.All(200).OuterText)
+
+                            pd = New clsPoolData
+
+                            pd.URL = wb.Document.All(194).OuterText
+                            pd.UID = wb.Document.All(197).OuterText
+
+                            pdl.Add(pd)
+
                             'reject
-                            sbTemp2.Append(" " & Format(Val(wb.Document.All(227).OuterText.Replace(",", "")) / (Val(wb.Document.All(212).OuterText.Replace(",", "")) + Val(wb.Document.All(227).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                            sbTemp4.Append(" " & Format(Val(wb.Document.All(227).OuterText.Replace(",", "")) / (Val(wb.Document.All(212).OuterText.Replace(",", "")) + Val(wb.Document.All(227).OuterText.Replace(",", ""))) * 100, "##0.0"))
                             'stale
                             sbTemp3.Append(" " & Format(Val(wb.Document.All(233).OuterText.Replace(",", "")) / (Val(wb.Document.All(212).OuterText.Replace(",", "")) + Val(wb.Document.All(233).OuterText.Replace(",", ""))) * 100, "##0.0"))
 
@@ -1874,18 +1904,31 @@ Public Class frmMain
 
                             End Select
 
+                            sbTemp2.Append(vbCrLf)
+
+                            sbTemp2.Append("2: " & wb.Document.All(246).OuterText & " (" & wb.Document.All(249).OuterText & ") " & wb.Document.All(252).OuterText)
+
+                            pd = New clsPoolData
+
+                            pd.URL = wb.Document.All(246).OuterText
+                            pd.UID = wb.Document.All(249).OuterText
+
+                            pdl.Add(pd)
+
+                            dr.Item("PoolData") = sbTemp2.ToString
+
                             'reject
-                            sbTemp2.Append(" " & Format(Val(wb.Document.All(279).OuterText.Replace(",", "")) / (Val(wb.Document.All(264).OuterText.Replace(",", "")) + Val(wb.Document.All(279).OuterText.Replace(",", ""))) * 100, "##0.0"))
+                            sbTemp4.Append(" " & Format(Val(wb.Document.All(279).OuterText.Replace(",", "")) / (Val(wb.Document.All(264).OuterText.Replace(",", "")) + Val(wb.Document.All(279).OuterText.Replace(",", ""))) * 100, "##0.0"))
                             'stale
                             sbTemp3.Append(" " & Format(Val(wb.Document.All(285).OuterText.Replace(",", "")) / (Val(wb.Document.All(264).OuterText.Replace(",", "")) + Val(wb.Document.All(285).OuterText.Replace(",", ""))) * 100, "##0.0"))
-                
+
                             dr.Item("Pools") = sbTemp.ToString
 
                             sbTemp.Clear()
 
                             dr.Item("Diff") = wb.Document.All(184).OuterText & " " & wb.Document.All(236).OuterText & " " & wb.Document.All(288).OuterText
 
-                            dr.Item("Rej%") = sbTemp2.ToString.Replace("NaN", "").Trim
+                            dr.Item("Rej%") = sbTemp4.ToString.Replace("NaN", "").Trim
 
                             dr.Item("Stale%") = sbTemp3.ToString.Replace("NaN", "").Trim
 
@@ -2496,6 +2539,7 @@ Public Class frmMain
         Dim pd As clsPoolData
         Dim pdl As System.Collections.Generic.List(Of clsPoolData)
         Dim bStep As Byte
+        Dim s() As String
 
         Try
             configRow = e.UserState
@@ -2506,6 +2550,10 @@ Public Class frmMain
                 DisplayColumns = New clsDisplayColumns(dr)
 
                 j = Newtonsoft.Json.Linq.JObject.Parse(e.Result)
+
+#If DEBUG Then
+                'j = Newtonsoft.Json.Linq.JObject.Parse("{""stats"":{""STATS"":0,""ID"":""SPN0"",""Elapsed"":1064271,""Calls"":0,""Wait"":0,""Max"":0,""Min"":99999999,""ASICstotalrate"":1410975,""Temparaturefront"":29,""Temparaturereartop"":65,""Temparaturerearbot"":77},""pools"":[{""POOL"":0,""URL"":""stratum+tcp:\/\/us1.ghash.io:3333"",""Status"":""Alive"",""Priority"":0,""Quota"":1,""LongPoll"":""N"",""Getworks"":27338,""Accepted"":433670,""Rejected"":639,""Works"":17579759,""Discarded"":636545,""Stale"":59,""GetFailures"":1,""RemoteFailures"":0,""User"":""MichaelDiggs.SP10"",""LastShareTime"":1422188852,""Diff1Shares"":55661888,""ProxyType"":"""",""Proxy"":"""",""DifficultyAccepted"":346986496,""DifficultyRejected"":488960,""DifficultyStale"":0,""LastShareDifficulty"":512,""HasStratum"":true,""StratumActive"":true,""StratumURL"":""us1.ghash.io"",""HasGBT"":false,""BestShare"":670139018,""PoolRejected%"":0.1407,""PoolStale%"":0}],""notify"":[{""NOTIFY"":0,""Name"":""SPN"",""ID"":0,""LastWell"":1422188852,""LastNotWell"":0,""ReasonNotWell"":""None"",""*ThreadFailInit"":0,""*ThreadZeroHash"":0,""*ThreadFailQueue"":0,""*DevSickIdle60s"":0,""*DevDeadIdle600s"":0,""*DevNostart"":0,""*DevOverHeat"":0,""*DevThermalCutoff"":0,""*DevCommsError"":0,""*DevThrottle"":0}],""summary"":[{""Elapsed"":1064271,""MHSav"":1309615.15,""MHS5s"":1313744.36,""MHS1m"":1305496.07,""MHS5m"":1307374.55,""MHS15m"":1308144.31,""FoundBlocks"":0,""Getworks"":27338,""Accepted"":433670,""Rejected"":639,""HardwareErrors"":2912,""Utility"":24.45,""Discarded"":636546,""Stale"":59,""GetFailures"":1,""LocalWork"":18218002,""RemoteFailures"":0,""NetworkBlocks"":1693,""TotalMH"":1393785480000,""WorkUtility"":3138.03,""DifficultyAccepted"":346986496,""DifficultyRejected"":488960,""DifficultyStale"":0,""BestShare"":670139018,""DeviceHardware%"":0.0052,""DeviceRejected%"":0.8784,""PoolRejected%"":0.1407,""PoolStale%"":0,""Lastgetwork"":1422188852}],""conf"":{""api-listen"":true,""api-allow"":""W:127.0.0.1"",""pools"":[{""url"":""us1.ghash.io:3333"",""user"":""MichaelDiggs.SP10"",""pass"":""123""}]},""miner"":{""model_id"":""SP10"",""model_class"":""SP1x"",""board_ver"":""FL1421003541"",""fw_ver"":""1.5.8"",""mac"":""7C:66:9D:36:3E:4C"",""uptime"":2089383,""free_mem"":""254""},""mg_events"":"""",""mg_status"":""DCRTOP 1 DCRBOT 0"",""workmode"":{""fan_speed"":""80"",""start_voltage_top"":""664"",""start_voltage_bot"":""664"",""max_voltage"":""750"",""max_watts"":""1260"",""dc2dc_current"":""62""}}")
+#End If
 
                 avg = New clsAverage
                 sbTemp = New System.Text.StringBuilder
@@ -2521,9 +2569,15 @@ Public Class frmMain
 
                     DisplayColumns.Uptime = Format(ts.Days, "0d") & " " & Format(ts.Hours, "0h") & " " & Format(ts.Minutes, "0m") & " " & Format(ts.Seconds, "0s")
 
-                    count(0) = jp1.Value(Of Integer)("Temperaturefront")
-                    count(1) = jp1.Value(Of Integer)("Temperaturereartop")
-                    count(2) = jp1.Value(Of Integer)("Temperaturerearbot")
+                    If configRow("Type") = "SP10" Then
+                        count(0) = jp1.Value(Of Integer)("Temparaturefront")
+                        count(1) = jp1.Value(Of Integer)("Temparaturereartop")
+                        count(2) = jp1.Value(Of Integer)("Temparaturerearbot")
+                    Else
+                        count(0) = jp1.Value(Of Integer)("Temperaturefront")
+                        count(1) = jp1.Value(Of Integer)("Temperaturereartop")
+                        count(2) = jp1.Value(Of Integer)("Temperaturerearbot")
+                    End If
 
                     avg.AddNumber(count(0))
                     avg.AddNumber(count(1))
@@ -2538,7 +2592,6 @@ Public Class frmMain
 
                 DisplayColumns.Freq = DBNull.Value
                 DisplayColumns.HFan = DBNull.Value
-                DisplayColumns.Fans = ""
 
                 bStep = 2
 
@@ -2636,6 +2689,28 @@ Public Class frmMain
                 DisplayColumns.BestShare = Format(dBestShare, "###,###,###,###,###,##0")
                 DisplayColumns.Pools = sbTemp.ToString
                 DisplayColumns.PoolData = sbTemp2.ToString
+
+                If configRow("Type") = "SP10" Then
+                    For Each jp1 In j.Property("workmode")
+                        If jp1.Value(Of String)("fan_speed") = "0" Then
+                            DisplayColumns.Fans = "Auto"
+                        Else
+                            DisplayColumns.Fans = jp1.Value(Of String)("fan_speed")
+                        End If
+                    Next
+                Else
+                    For Each jp1 In j.Property("miner")
+                        s = jp1.Value(Of String)("mg_custom_mode").Split(" ")
+
+                        s = s(0).Split(":")
+
+                        If s(1) = "0" Then
+                            DisplayColumns.Fans = "Auto"
+                        Else
+                            DisplayColumns.Fans = s(1)
+                        End If
+                    Next
+                End If
 
                 If dr("ID") = -1 Then
                     dr("ID") = configRow("ID")
@@ -2766,7 +2841,7 @@ Public Class frmMain
             sbStep.Append("1.0")
 
 #If DEBUG Then
-            'MinerData.sStats = "{""STATUS"":[{""STATUS"":""S"",""When"":1420194081,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 3.9.0""}],""STATS"":[{""STATS"":0,""ID"":""BA10"",""Elapsed"":4855,""CS"":0,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":31.25,""TEMP(SOLO)"":""30-34-29-29-34-28-46-50""},{""STATS"":1,""ID"":""BA11"",""Elapsed"":4855,""CS"":1,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":31.50,""TEMP(SOLO)"":""29-34-29-34-34-34-44-43""},{""STATS"":2,""ID"":""BA12"",""Elapsed"":4855,""CS"":2,""ASIC"":8,""CORES(TOTAL)"":389,""CORES(SOLO)"":""53-53-37-53-49-40-53-51"",""TEMP(AVG)"":31.25,""TEMP(SOLO)"":""29-29-29-34-29-34-47-48""},{""STATS"":3,""ID"":""BA13"",""Elapsed"":4855,""CS"":3,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":32.00,""TEMP(SOLO)"":""29-34-29-34-34-34-43-48""},{""STATS"":4,""ID"":""BA14"",""Elapsed"":4855,""CS"":4,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":29.62,""TEMP(SOLO)"":""29-29-29-34-34-29-36-46""},{""STATS"":5,""ID"":""BA15"",""Elapsed"":4855,""CS"":5,""ASIC"":8,""CORES(TOTAL)"":432,""CORES(SOLO)"":""54-54-54-54-54-54-54-54"",""TEMP(AVG)"":29.88,""TEMP(SOLO)"":""29-29-29-29-29-34-43-46""},{""STATS"":6,""ID"":""POOL0"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":2048.00000000,""Min Diff"":16.00000000,""Max Diff"":2048.00000000,""Min Diff Count"":313,""Max Diff Count"":28835,""Times Sent"":3852,""Bytes Sent"":426659,""Times Recv"":8891,""Bytes Recv"":883114,""Net Bytes Sent"":426659,""Net Bytes Recv"":883114},{""STATS"":7,""ID"":""POOL1"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":1024.00000000,""Min Diff"":20.00000000,""Max Diff"":1024.00000000,""Min Diff Count"":533,""Max Diff Count"":218,""Times Sent"":159,""Bytes Sent"":19658,""Times Recv"":187,""Bytes Recv"":17716,""Net Bytes Sent"":19658,""Net Bytes Recv"":17716},{""STATS"":8,""ID"":""POOL2"",""Elapsed"":4855,""Pool Calls"":0,""Pool Attempts"":0,""Pool Wait"":0.000000,""Pool Max"":0.000000,""Pool Min"":99999999.000000,""Pool Av"":0.000000,""Work Had Roll Time"":false,""Work Can Roll"":false,""Work Had Expire"":false,""Work Roll Time"":0,""Work Diff"":4096.00000000,""Min Diff"":4096.00000000,""Max Diff"":4096.00000000,""Min Diff Count"":1,""Max Diff Count"":1,""Times Sent"":2,""Bytes Sent"":150,""Times Recv"":5,""Bytes Recv"":1385,""Net Bytes Sent"":150,""Net Bytes Recv"":1385}],""id"":1}"
+            MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1419209685,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.6.1""}],""STATS"":[{""CGMiner"":""4.6.1"",""Miner"":""7.0.0.3"",""CompileTime"":""Fri Oct 24 19:46:59 CST 2014"",""Type"":""S3""}{""STATS"":0,""ID"":""BMM0"",""Elapsed"":88,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":465.19,""GHS av"":490.97,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":17,""frequency"":""231.25"",""voltage"":"""",""hwv1"":7,""hwv2"":0,""hwv3"":0,""hwv4"":3,""fan_num"":2,""fan1"":900,""fan2"":720,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":33,""temp2"":35,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":34,""temp_max"":35,""Device Hardware%"":0.0000,""no_matching_work"":0,""chain_acn1"":16,""chain_acn2"":16,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":65535,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooooo oooooooo "",""chain_acs2"":""oooooooo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}", "}{", "},{")
 #End If
 
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sStats)
