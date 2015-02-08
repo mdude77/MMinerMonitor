@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MMinerMonitor", "MMinerMonitor.vbproj", "{B06F37FA-6108-4D9E-8590-760FD02F06B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMinerMonitor.MobileMinerApi", "MMinerMonitor.MobileMinerApi\MMinerMonitor.MobileMinerApi.csproj", "{17E9B7AF-4C14-47B7-B6FD-F09EA4136896}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

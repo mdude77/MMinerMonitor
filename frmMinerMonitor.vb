@@ -1,4 +1,5 @@
 ﻿Imports MMinerMonitor.Extensions
+Imports MMinerMonitor.MobileMinerApi.Helpers
 
 Public Class frmMain
 
@@ -1042,6 +1043,7 @@ Public Class frmMain
                 .Add("ACount", GetType(Integer))
                 .Add("ID")
                 .Add("Type")
+                .Add("CurHash", GetType(Double))
                 .Add("HashSHA256", GetType(Double))
                 .Add("HashScrypt", GetType(Double))
                 .Add("Data", GetType(Object))
@@ -1051,6 +1053,7 @@ Public Class frmMain
         Me.dataMiners.Columns("PoolData").Visible = False
         Me.dataMiners.Columns("PoolData2").Visible = False
         Me.dataMiners.Columns("Type").Visible = False
+        Me.dataMiners.Columns("CurHash").Visible = False
         Me.dataMiners.Columns("HashSHA256").Visible = False
         Me.dataMiners.Columns("HashScrypt").Visible = False
         Me.dataMiners.Columns("Data").Visible = False
@@ -1084,6 +1087,8 @@ Public Class frmMain
             .Columns("XCount").Width = 71
             .Columns("ID").Width = 49
         End With
+
+        SetupMobileMinerTabs()
 
         ctlsByKey = New ControlsByRegistry(csRegKey)
 
@@ -1188,6 +1193,11 @@ Public Class frmMain
             .AddControl(Me.txtRebootAntsByUptime, "RebootAntsByUptimeValue")
             .AddControl(Me.cmbRebootAntsByUptime, "RebootAntsByUptimeSecMinHour")
 
+            ' MobileMiner settings
+            .AddControl(Me.momEmailEdit, "MobileMinerEmail")
+            .AddControl(Me.momAppKeyEdit, "MobileMinerAppKey")
+            .AddControl(Me.momDashHistCheck, "MobileMinerDashHist")
+
             .SetControlByRegKey(Me.txtRefreshRate, "300")
             .SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
             .SetControlByRegKey(Me.chkShowBestShare, True)
@@ -1244,6 +1254,11 @@ Public Class frmMain
             .SetControlByRegKey(Me.chkRebootAntsByUptime)
             .SetControlByRegKey(Me.txtRebootAntsByUptime)
             .SetControlByRegKey(Me.cmbRebootAntsByUptime)
+
+            'MobileMiner settings
+            .SetControlByRegKey(Me.momEmailEdit)
+            .SetControlByRegKey(Me.momAppKeyEdit)
+            .SetControlByRegKey(Me.momDashHistCheck)
 
             'email settings
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPServer)
@@ -1488,6 +1503,39 @@ Public Class frmMain
             Me.TimerRefresh.Enabled = True
         End If
 
+        SetupMobileMinerTimer()
+
+    End Sub
+
+    Private momDashTabPage As TabPage
+    Private momHistTabPage As TabPage
+    Private momTabsSetup As Boolean
+
+    Private Sub SetupMobileMinerTabs()
+        momDashTabPage = New TabPage("Dashboard")
+        momHistTabPage = New TabPage("History")
+        momTabsSetup = True
+
+        SetupMobileMinerTabVisibility()
+    End Sub
+
+    Private Sub SetupMobileMinerTabVisibility()
+        If momTabsSetup Then
+            If momDashHistCheck.Checked Then
+                Me.TabControl1.TabPages.Add(momDashTabPage)
+                Me.TabControl1.TabPages.Add(momHistTabPage)
+            Else
+                Me.TabControl1.TabPages.Remove(momDashTabPage)
+                Me.TabControl1.TabPages.Remove(momHistTabPage)
+            End If
+        End If
+    End Sub
+
+    Private Sub SetupMobileMinerTimer()
+        Me.mobileMinerTimer.Interval = 35000
+        RemoveHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
+        AddHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
+        Me.mobileMinerTimer.Enabled = True
     End Sub
 
     Private Function AddOrSaveMiner(ByVal ID As Integer, ByVal sMinerName As String, ByVal MinerInfo As clsSupportedMinerInfo.clsMinerInfo, ByVal sIPAddress As String, _
@@ -1728,6 +1776,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(91).OuterText) * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(94).OuterText) * 1000)
 
+                            dr.Item("CurHash") = Val(wb.Document.All(91).OuterText) * 1000000
                             dr.Item("HashSHA256") = Val(wb.Document.All(94).OuterText) * 1000000
                             dr.Item("HashScrypt") = 0
 
@@ -1829,6 +1878,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(74).OuterText * 1000))
                             dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(77).OuterText * 1000))
 
+                            dr.Item("CurHash") = Val(wb.Document.All(74).OuterText) * 1000000
                             dr.Item("HashSHA256") = Val(wb.Document.All(77).OuterText) * 1000000
                             dr.Item("HashScrypt") = 0
 
@@ -1983,6 +2033,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(wb.Document.All(126).OuterText.TrimEnd * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(wb.Document.All(130).OuterText.TrimEnd * 1000)
 
+                            dr.Item("CurHash") = Val(wb.Document.All(126).OuterText) * 1000000
                             dr.Item("HashSHA256") = Val(wb.Document.All(130).OuterText) * 1000000
                             dr.Item("HashScrypt") = 0
 
@@ -3150,6 +3201,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(jp1.Value(Of String)("GHS 5s")) * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(Val(jp1.Value(Of String)("GHS av")) * 1000)
 
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("GHS 5s")) * 1000
                             dr.Item("HashSHA256") = Val(jp1.Value(Of String)("GHS av")) * 1000
                             dr.Item("HashScrypt") = 0
 
@@ -3172,6 +3224,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("Speed(avg)") = FormatHashRate(jp1.Value(Of String)("MHS av"))
 
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("HashSHA256") = Val(jp1.Value(Of String)("MHS av"))
                             dr.Item("HashScrypt") = 0
 
@@ -3191,6 +3244,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("Speed(avg)") = FormatHashRate(jp1.Value(Of String)("MHS av"))
 
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("HashSHA256") = 0
                             dr.Item("HashScrypt") = Val(jp1.Value(Of String)("MHS av"))
 
@@ -4349,6 +4403,10 @@ Public Class frmMain
 
             .SetRegKeyByControl(Me.trackThreadCount)
             .SetRegKeyByControl(Me.txtDisplayRefreshInSecs)
+
+            .SetRegKeyByControl(Me.momEmailEdit)
+            .SetRegKeyByControl(Me.momAppKeyEdit)
+            .SetRegKeyByControl(Me.momDashHistCheck)
         End With
 
     End Sub
@@ -6003,6 +6061,71 @@ Public Class frmMain
 
     End Sub
 
+    Private Sub mobileMinerTimer_Tick(sender As Object, e As EventArgs) Handles mobileMinerTimer.Tick
+        Dim emailAddress As String = momEmailEdit.Text
+        Dim applicationKey As String = momAppKeyEdit.Text
+        Dim isConfigured As Boolean = InputValidation.IsValidEmailAddress(emailAddress) And InputValidation.IsValidApplicationKey(applicationKey)
+
+        If isConfigured Then
+
+            mobileMinerTimer.Enabled = False
+            Try
+                SubmitMobileMinerStatistics(emailAddress, applicationKey)
+            Finally
+                mobileMinerTimer.Enabled = True
+            End Try
+
+        End If
+    End Sub
+
+    Private Sub SubmitMobileMinerStatistics(emailAddress As String, applicationKey As String)
+        Dim statistics As MobileMinerApi.Data.MiningStatistics
+        Dim statisticsList As List(Of MobileMinerApi.Data.MiningStatistics) = New List(Of MobileMinerApi.Data.MiningStatistics)
+
+
+        For Each dr As DataRow In Me.ds.Tables(0).Rows
+            statistics = New MobileMinerApi.Data.MiningStatistics
+
+            Dim isScryptAsic As Object = dr.Item("HashScrypt") > 0
+
+            statistics.Algorithm = If(isScryptAsic, "Scrypt", "SHA-256")
+            statistics.Appliance = True
+            statistics.AverageHashrate = If(isScryptAsic, dr.Item("HashScrypt"), dr.Item("HashSHA256"))
+            statistics.CurrentHashrate = dr.Item("CurHash")
+            statistics.CoinSymbol = If(isScryptAsic, "LTC", "BTC")
+            statistics.CoinName = If(isScryptAsic, "Litecoin", "Bitcoin")
+            statistics.Enabled = True
+            statistics.FanSpeed = dr.Item("HFan")
+            statistics.FullName = dr.Item("Name")
+            statistics.HardwareErrorsPercent = dr.Item("HWE%").ToString().TrimEnd("%")
+            statistics.Kind = "ASC"
+            statistics.MachineName = dr.Item("Name")
+            statistics.MinerName = "MMinerMonitor"
+            statistics.Name = dr.Item("Name")
+            statistics.RejectedSharesPercent = dr.Item("Rej%")
+            statistics.Temperature = dr.Item("HTemp")
+            statistics.PoolName = "Unknown"
+
+            statisticsList.Add(statistics)
+        Next
+
+        Dim commandList As List(Of MobileMinerApi.Data.RemoteCommand)
+        ' no remote commands just yet - flip to True and process the commandList to enable
+        Dim processCommands As Boolean = False
+        Const MobileMinerUrl As String = "https://api.mobileminerapp.com"
+        Const MobileMinerApiKey As String = "mCJMjV2iKtdOLT"
+
+        Try
+            commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics(MobileMinerUrl, MobileMinerApiKey, emailAddress, applicationKey, statisticsList, processCommands)
+        Catch ex As Exception When bErrorHandle = True
+            AddToLogQueue("Error occurred submitting MobileMiner stats: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub momAppKeyLabel_Click(sender As Object, e As EventArgs) Handles momAppKeyLabel.Click
+        Process.Start("http://web.mobileminerapp.com/")
+    End Sub
+
     Private Sub cmbAlertMinerType_SelectedIndexChanged(sender As Object, e As System.EventArgs) Handles cmbAlertMinerType.SelectedIndexChanged
 
         If Me.cmbAlertMinerType.Text.IsNullOrEmpty = True Then
@@ -6064,6 +6187,28 @@ Public Class frmMain
                     End If
 
             End Select
+        End If
+
+    End Sub
+
+    Private Sub momDashHistCheck_CheckedChanged(sender As Object, e As EventArgs) Handles momDashHistCheck.CheckedChanged
+        SetupMobileMinerTabVisibility()
+    End Sub
+
+    Private Sub TabControl1_Selected(sender As Object, e As TabControlEventArgs) Handles TabControl1.Selected
+
+        Dim controller As String = Nothing
+
+        If e.TabPage.Equals(Me.momDashTabPage) Then
+            controller = MobileMinerApi.WebBrowserProvider.DashboardController
+        ElseIf e.TabPage.Equals(Me.momHistTabPage) Then
+            controller = MobileMinerApi.WebBrowserProvider.HistoryController
+        End If
+
+        If controller IsNot Nothing Then
+            Dim webBrowser As WebBrowser = MobileMinerApi.WebBrowserProvider.GetWebBrowser(controller, momEmailEdit.Text, momAppKeyEdit.Text)
+            webBrowser.Dock = DockStyle.Fill
+            webBrowser.Parent = e.TabPage
         End If
 
     End Sub
