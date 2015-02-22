@@ -36,6 +36,7 @@ Partial Class frmMain
         Me.tabMiners = New System.Windows.Forms.TabPage()
         Me.dataMiners = New MMinerMonitor.dgvWrapper()
         Me.tabMinerConfig = New System.Windows.Forms.TabPage()
+        Me.chkMinerRebootViaSSH = New System.Windows.Forms.CheckBox()
         Me.chkMinerUseHTTPS = New System.Windows.Forms.CheckBox()
         Me.chkMinerDoNotReboot = New System.Windows.Forms.CheckBox()
         Me.cmbMinerType = New System.Windows.Forms.ComboBox()
@@ -52,7 +53,6 @@ Partial Class frmMain
         Me.txtMinerWebPort = New System.Windows.Forms.TextBox()
         Me.txtMinerAPIPort = New System.Windows.Forms.TextBox()
         Me.Label21 = New System.Windows.Forms.Label()
-        Me.chkMinerRebootViaSSH = New System.Windows.Forms.CheckBox()
         Me.chkMinerUseAPI = New System.Windows.Forms.CheckBox()
         Me.chkMinerActive = New System.Windows.Forms.CheckBox()
         Me.Label20 = New System.Windows.Forms.Label()
@@ -78,13 +78,13 @@ Partial Class frmMain
         Me.Label6 = New System.Windows.Forms.Label()
         Me.lblWBUserName = New System.Windows.Forms.Label()
         Me.tabConfig = New System.Windows.Forms.TabPage()
-        Me.momDashHistCheck = New System.Windows.Forms.CheckBox()
+        Me.chkMMDashHistCheck = New System.Windows.Forms.CheckBox()
         Me.Label18 = New System.Windows.Forms.Label()
         Me.Label17 = New System.Windows.Forms.Label()
-        Me.momAppKeyLabel = New System.Windows.Forms.Label()
-        Me.momAppKeyEdit = New System.Windows.Forms.TextBox()
+        Me.lblMMAppKey = New System.Windows.Forms.Label()
+        Me.txtMMAppKey = New System.Windows.Forms.TextBox()
         Me.Label29 = New System.Windows.Forms.Label()
-        Me.momEmailEdit = New System.Windows.Forms.TextBox()
+        Me.txtMMEmail = New System.Windows.Forms.TextBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label14 = New System.Windows.Forms.Label()
@@ -407,6 +407,18 @@ Partial Class frmMain
         Me.tabMinerConfig.Text = "Miner Config"
         Me.tabMinerConfig.UseVisualStyleBackColor = True
         '
+        'chkMinerRebootViaSSH
+        '
+        Me.chkMinerRebootViaSSH.AutoSize = True
+        Me.chkMinerRebootViaSSH.Checked = True
+        Me.chkMinerRebootViaSSH.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkMinerRebootViaSSH.Location = New System.Drawing.Point(428, 274)
+        Me.chkMinerRebootViaSSH.Name = "chkMinerRebootViaSSH"
+        Me.chkMinerRebootViaSSH.Size = New System.Drawing.Size(150, 24)
+        Me.chkMinerRebootViaSSH.TabIndex = 77
+        Me.chkMinerRebootViaSSH.Text = "Reboot via SSH"
+        Me.chkMinerRebootViaSSH.UseVisualStyleBackColor = True
+        '
         'chkMinerUseHTTPS
         '
         Me.chkMinerUseHTTPS.AutoSize = True
@@ -550,18 +562,6 @@ Partial Class frmMain
         Me.Label21.Size = New System.Drawing.Size(47, 27)
         Me.Label21.TabIndex = 78
         Me.Label21.Text = "Port:"
-        '
-        'chkMinerRebootViaSSH
-        '
-        Me.chkMinerRebootViaSSH.AutoSize = True
-        Me.chkMinerRebootViaSSH.Checked = True
-        Me.chkMinerRebootViaSSH.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkMinerRebootViaSSH.Location = New System.Drawing.Point(428, 274)
-        Me.chkMinerRebootViaSSH.Name = "chkMinerRebootViaSSH"
-        Me.chkMinerRebootViaSSH.Size = New System.Drawing.Size(150, 24)
-        Me.chkMinerRebootViaSSH.TabIndex = 77
-        Me.chkMinerRebootViaSSH.Text = "Reboot via SSH"
-        Me.chkMinerRebootViaSSH.UseVisualStyleBackColor = True
         '
         'chkMinerUseAPI
         '
@@ -787,13 +787,13 @@ Partial Class frmMain
         '
         'tabConfig
         '
-        Me.tabConfig.Controls.Add(Me.momDashHistCheck)
+        Me.tabConfig.Controls.Add(Me.chkMMDashHistCheck)
         Me.tabConfig.Controls.Add(Me.Label18)
         Me.tabConfig.Controls.Add(Me.Label17)
-        Me.tabConfig.Controls.Add(Me.momAppKeyLabel)
-        Me.tabConfig.Controls.Add(Me.momAppKeyEdit)
+        Me.tabConfig.Controls.Add(Me.lblMMAppKey)
+        Me.tabConfig.Controls.Add(Me.txtMMAppKey)
         Me.tabConfig.Controls.Add(Me.Label29)
-        Me.tabConfig.Controls.Add(Me.momEmailEdit)
+        Me.tabConfig.Controls.Add(Me.txtMMEmail)
         Me.tabConfig.Controls.Add(Me.Label5)
         Me.tabConfig.Controls.Add(Me.Label4)
         Me.tabConfig.Controls.Add(Me.Label14)
@@ -810,16 +810,16 @@ Partial Class frmMain
         Me.tabConfig.Text = "Config"
         Me.tabConfig.UseVisualStyleBackColor = True
         '
-        'momDashHistCheck
+        'chkMMDashHistCheck
         '
-        Me.momDashHistCheck.Checked = True
-        Me.momDashHistCheck.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.momDashHistCheck.Location = New System.Drawing.Point(353, 299)
-        Me.momDashHistCheck.Name = "momDashHistCheck"
-        Me.momDashHistCheck.Size = New System.Drawing.Size(122, 56)
-        Me.momDashHistCheck.TabIndex = 79
-        Me.momDashHistCheck.Text = "Enable MobileMiner Dashboard && History"
-        Me.momDashHistCheck.UseVisualStyleBackColor = True
+        Me.chkMMDashHistCheck.Checked = True
+        Me.chkMMDashHistCheck.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkMMDashHistCheck.Location = New System.Drawing.Point(353, 299)
+        Me.chkMMDashHistCheck.Name = "chkMMDashHistCheck"
+        Me.chkMMDashHistCheck.Size = New System.Drawing.Size(122, 56)
+        Me.chkMMDashHistCheck.TabIndex = 79
+        Me.chkMMDashHistCheck.Text = "Enable MobileMiner Dashboard && History"
+        Me.chkMMDashHistCheck.UseVisualStyleBackColor = True
         '
         'Label18
         '
@@ -838,40 +838,40 @@ Partial Class frmMain
         Me.Label17.TabIndex = 73
         Me.Label17.Text = resources.GetString("Label17.Text")
         '
-        'momAppKeyLabel
+        'lblMMAppKey
         '
-        Me.momAppKeyLabel.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.momAppKeyLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-        Me.momAppKeyLabel.ForeColor = System.Drawing.SystemColors.HotTrack
-        Me.momAppKeyLabel.Location = New System.Drawing.Point(7, 331)
-        Me.momAppKeyLabel.Name = "momAppKeyLabel"
-        Me.momAppKeyLabel.Size = New System.Drawing.Size(133, 24)
-        Me.momAppKeyLabel.TabIndex = 78
-        Me.momAppKeyLabel.Text = "Application key:"
+        Me.lblMMAppKey.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.lblMMAppKey.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblMMAppKey.ForeColor = System.Drawing.SystemColors.HotTrack
+        Me.lblMMAppKey.Location = New System.Drawing.Point(7, 331)
+        Me.lblMMAppKey.Name = "lblMMAppKey"
+        Me.lblMMAppKey.Size = New System.Drawing.Size(133, 24)
+        Me.lblMMAppKey.TabIndex = 78
+        Me.lblMMAppKey.Text = "Application key:"
         '
-        'momAppKeyEdit
+        'txtMMAppKey
         '
-        Me.momAppKeyEdit.Location = New System.Drawing.Point(187, 328)
-        Me.momAppKeyEdit.Name = "momAppKeyEdit"
-        Me.momAppKeyEdit.Size = New System.Drawing.Size(153, 23)
-        Me.momAppKeyEdit.TabIndex = 77
-        Me.momAppKeyEdit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtMMAppKey.Location = New System.Drawing.Point(187, 328)
+        Me.txtMMAppKey.Name = "txtMMAppKey"
+        Me.txtMMAppKey.Size = New System.Drawing.Size(153, 27)
+        Me.txtMMAppKey.TabIndex = 77
+        Me.txtMMAppKey.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label29
         '
         Me.Label29.Location = New System.Drawing.Point(7, 302)
         Me.Label29.Name = "Label29"
-        Me.Label29.Size = New System.Drawing.Size(133, 24)
+        Me.Label29.Size = New System.Drawing.Size(174, 24)
         Me.Label29.TabIndex = 76
         Me.Label29.Text = "MobileMiner email:"
         '
-        'momEmailEdit
+        'txtMMEmail
         '
-        Me.momEmailEdit.Location = New System.Drawing.Point(187, 299)
-        Me.momEmailEdit.Name = "momEmailEdit"
-        Me.momEmailEdit.Size = New System.Drawing.Size(153, 23)
-        Me.momEmailEdit.TabIndex = 75
-        Me.momEmailEdit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtMMEmail.Location = New System.Drawing.Point(187, 299)
+        Me.txtMMEmail.Name = "txtMMEmail"
+        Me.txtMMEmail.Size = New System.Drawing.Size(153, 27)
+        Me.txtMMEmail.TabIndex = 75
+        Me.txtMMEmail.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label5
         '
@@ -2393,6 +2393,9 @@ Partial Class frmMain
         '
         Me.timerDoStuff.Interval = 10
         '
+        'mobileMinerTimer
+        '
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
@@ -2581,11 +2584,11 @@ Partial Class frmMain
     Friend WithEvents mnuUpdatePools As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents chkAlertRebootAntsOnHashAlert As System.Windows.Forms.CheckBox
     Friend WithEvents mobileMinerTimer As System.Windows.Forms.Timer
-    Friend WithEvents momAppKeyEdit As System.Windows.Forms.TextBox
-    Friend WithEvents momEmailEdit As System.Windows.Forms.TextBox
-    Friend WithEvents momAppKeyLabel As System.Windows.Forms.Label
+    Friend WithEvents txtMMAppKey As System.Windows.Forms.TextBox
+    Friend WithEvents txtMMEmail As System.Windows.Forms.TextBox
+    Friend WithEvents lblMMAppKey As System.Windows.Forms.Label
     Friend WithEvents Label29 As System.Windows.Forms.Label
-    Friend WithEvents momDashHistCheck As System.Windows.Forms.CheckBox
+    Friend WithEvents chkMMDashHistCheck As System.Windows.Forms.CheckBox
     Friend WithEvents timerDoStuff As System.Windows.Forms.Timer
     Friend WithEvents cmdChangeThreads As System.Windows.Forms.Button
     Friend WithEvents trackThreadCount As System.Windows.Forms.TrackBar

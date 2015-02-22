@@ -28,7 +28,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v4.9"
+    Private Const csVersion As String = "M's Miner Monitor v5.0"
 
     'alert string   
     Private sAlerts As String
@@ -659,6 +659,7 @@ Public Class frmMain
         Public URL As String
         Public UID As String
         Public PW As String
+        Public PoolIsUp As Boolean
 
         Public Sub New()
             PW = ""
@@ -944,6 +945,16 @@ Public Class frmMain
                 Return Me.xDatarow.Item("Name")
             End Get
         End Property
+
+        Public Property MobileMinerHash As Double
+            Set(value As Double)
+                Me.xDatarow.Item("CurHash") = value
+            End Set
+            Get
+                Return Me.xDatarow.Item("CurHash")
+            End Get
+        End Property
+
     End Class
 
 #If DEBUG Then
@@ -1024,7 +1035,7 @@ Public Class frmMain
                 .Add("Speed(avg)")
                 .Add("Blocks")
                 .Add("HWE%")
-                .Add("BestShare")
+                .Add("BestShare", GetType(String))
                 .Add("Diff")
                 .Add("Pools")
                 .Add("PoolData")
@@ -1194,9 +1205,9 @@ Public Class frmMain
             .AddControl(Me.cmbRebootAntsByUptime, "RebootAntsByUptimeSecMinHour")
 
             ' MobileMiner settings
-            .AddControl(Me.momEmailEdit, "MobileMinerEmail")
-            .AddControl(Me.momAppKeyEdit, "MobileMinerAppKey")
-            .AddControl(Me.momDashHistCheck, "MobileMinerDashHist")
+            .AddControl(Me.txtMMEmail, "MobileMinerEmail")
+            .AddControl(Me.txtMMAppKey, "MobileMinerAppKey")
+            .AddControl(Me.chkMMDashHistCheck, "MobileMinerDashHist")
 
             .SetControlByRegKey(Me.txtRefreshRate, "300")
             .SetControlByRegKey(Me.cmbRefreshRate, "Seconds")
@@ -1256,9 +1267,9 @@ Public Class frmMain
             .SetControlByRegKey(Me.cmbRebootAntsByUptime)
 
             'MobileMiner settings
-            .SetControlByRegKey(Me.momEmailEdit)
-            .SetControlByRegKey(Me.momAppKeyEdit)
-            .SetControlByRegKey(Me.momDashHistCheck)
+            .SetControlByRegKey(Me.txtMMEmail)
+            .SetControlByRegKey(Me.txtMMAppKey)
+            .SetControlByRegKey(Me.chkMMDashHistCheck)
 
             'email settings
             Call ctlsByKey.SetControlByRegKey(Me.txtSMTPServer)
@@ -1521,7 +1532,7 @@ Public Class frmMain
 
     Private Sub SetupMobileMinerTabVisibility()
         If momTabsSetup Then
-            If momDashHistCheck.Checked Then
+            If chkMMDashHistCheck.Checked Then
                 Me.TabControl1.TabPages.Add(momDashTabPage)
                 Me.TabControl1.TabPages.Add(momHistTabPage)
             Else
@@ -1776,8 +1787,8 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(91).OuterText) * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(94).OuterText) * 1000)
 
-                            dr.Item("CurHash") = Val(wb.Document.All(91).OuterText) * 1000000
-                            dr.Item("HashSHA256") = Val(wb.Document.All(94).OuterText) * 1000000
+                            dr.Item("CurHash") = Val(wb.Document.All(94).OuterText) * 1000000
+                            dr.Item("HashSHA256") = Val(wb.Document.All(94).OuterText.Replace(",", "")) * 1000
                             dr.Item("HashScrypt") = 0
 
                             dr.Item("Blocks") = wb.Document.All(97).OuterText
@@ -1878,8 +1889,8 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(wb.Document.All(74).OuterText * 1000))
                             dr.Item("Speed(avg)") = FormatHashRate(Val(wb.Document.All(77).OuterText * 1000))
 
-                            dr.Item("CurHash") = Val(wb.Document.All(74).OuterText) * 1000000
-                            dr.Item("HashSHA256") = Val(wb.Document.All(77).OuterText) * 1000000
+                            dr.Item("CurHash") = Val(wb.Document.All(77).OuterText.Replace(",", "")) * 1000000
+                            dr.Item("HashSHA256") = Val(wb.Document.All(77).OuterText.Replace(",", "")) * 1000
                             dr.Item("HashScrypt") = 0
 
                             dr.Item("Blocks") = wb.Document.All(80).OuterText
@@ -1897,18 +1908,27 @@ Public Class frmMain
                             pdl = dr.Item("PoolData2")
                             pdl.Clear()
 
+                            pd = New clsPoolData
+
                             Select Case wb.Document.All(148).OuterText
                                 Case "Alive"
                                     sbTemp.Append("U")
 
+                                    pd.PoolIsUp = True
+
                                 Case "Dead"
                                     sbTemp.Append("D")
+
+                                    pd.PoolIsUp = False
+
+                                Case Else
+                                    sbTemp.Append("?")
+
+                                    pd.PoolIsUp = False
 
                             End Select
 
                             sbTemp2.Append("0: " & wb.Document.All(142).OuterText & " (" & wb.Document.All(145).OuterText & ") " & wb.Document.All(148).OuterText)
-
-                            pd = New clsPoolData
 
                             pd.URL = wb.Document.All(142).OuterText
                             pd.UID = wb.Document.All(145).OuterText
@@ -1920,20 +1940,29 @@ Public Class frmMain
                             'stale
                             sbTemp3.Append(Format(Val(wb.Document.All(181).OuterText.Replace(",", "")) / (Val(wb.Document.All(160).OuterText.Replace(",", "")) + Val(wb.Document.All(181).OuterText.Replace(",", ""))) * 100, "##0.0"))
 
+                            pd = New clsPoolData
+
                             Select Case wb.Document.All(200).OuterText
                                 Case "Alive"
                                     sbTemp.Append("U")
 
+                                    pd.PoolIsUp = True
+
                                 Case "Dead"
                                     sbTemp.Append("D")
+
+                                    pd.PoolIsUp = False
+
+                                Case Else
+                                    sbTemp.Append("?")
+
+                                    pd.PoolIsUp = False
 
                             End Select
 
                             sbTemp2.Append(vbCrLf)
 
                             sbTemp2.Append("1: " & wb.Document.All(194).OuterText & " (" & wb.Document.All(197).OuterText & ") " & wb.Document.All(200).OuterText)
-
-                            pd = New clsPoolData
 
                             pd.URL = wb.Document.All(194).OuterText
                             pd.UID = wb.Document.All(197).OuterText
@@ -1945,20 +1974,29 @@ Public Class frmMain
                             'stale
                             sbTemp3.Append(" " & Format(Val(wb.Document.All(233).OuterText.Replace(",", "")) / (Val(wb.Document.All(212).OuterText.Replace(",", "")) + Val(wb.Document.All(233).OuterText.Replace(",", ""))) * 100, "##0.0"))
 
+                            pd = New clsPoolData
+
                             Select Case wb.Document.All(252).OuterText
                                 Case "Alive"
                                     sbTemp.Append("U")
 
+                                    pd.PoolIsUp = True
+
                                 Case "Dead"
                                     sbTemp.Append("D")
+
+                                    pd.PoolIsUp = False
+
+                                Case Else
+                                    sbTemp.Append("?")
+
+                                    pd.PoolIsUp = False
 
                             End Select
 
                             sbTemp2.Append(vbCrLf)
 
                             sbTemp2.Append("2: " & wb.Document.All(246).OuterText & " (" & wb.Document.All(249).OuterText & ") " & wb.Document.All(252).OuterText)
-
-                            pd = New clsPoolData
 
                             pd.URL = wb.Document.All(246).OuterText
                             pd.UID = wb.Document.All(249).OuterText
@@ -2033,8 +2071,8 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(wb.Document.All(126).OuterText.TrimEnd * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(wb.Document.All(130).OuterText.TrimEnd * 1000)
 
-                            dr.Item("CurHash") = Val(wb.Document.All(126).OuterText) * 1000000
-                            dr.Item("HashSHA256") = Val(wb.Document.All(130).OuterText) * 1000000
+                            dr.Item("CurHash") = Val(wb.Document.All(130).OuterText) * 1000000
+                            dr.Item("HashSHA256") = Val(wb.Document.All(130).OuterText.Replace(",", "")) * 1000
                             dr.Item("HashScrypt") = 0
 
                             dr.Item("Blocks") = wb.Document.All(134).OuterText.TrimEnd
@@ -2653,6 +2691,7 @@ Public Class frmMain
                         DisplayColumns.Speed5s = FormatHashRate(jp1.Value(Of String)("MHS5s"))
                         DisplayColumns.SpeedAvg = FormatHashRate(jp1.Value(Of String)("MHSav"))
 
+                        DisplayColumns.MobileMinerHash = Val(jp1.Value(Of String)("MHSav")) * 1000
                         DisplayColumns.HashSHA256 = Val(jp1.Value(Of String)("MHSav"))
                         DisplayColumns.HashScrypt = 0
 
@@ -2704,6 +2743,8 @@ Public Class frmMain
                             dBestShare = jp1.Value(Of Double)("BestShare")
                         End If
 
+                        pd = New clsPoolData
+
                         Select Case jp1.Value(Of String)("Status")
                             Case "Alive"
                                 If sbTemp.ToString.Contains("U") = False Then
@@ -2712,11 +2753,17 @@ Public Class frmMain
 
                                 sbTemp.Append("U")
 
+                                pd.PoolIsUp = True
+
                             Case "Dead"
                                 sbTemp.Append("D")
 
+                                pd.PoolIsUp = False
+
                             Case Else
-                                sbTemp.Append("U")
+                                sbTemp.Append("?")
+
+                                pd.PoolIsUp = False
 
                         End Select
 
@@ -2725,8 +2772,6 @@ Public Class frmMain
                         End If
 
                         sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
-
-                        pd = New clsPoolData
 
                         pd.URL = jp1.Value(Of String)("URL")
                         pd.UID = jp1.Value(Of String)("User")
@@ -2892,7 +2937,7 @@ Public Class frmMain
             sbStep.Append("1.0")
 
 #If DEBUG Then
-            MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1419209685,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.6.1""}],""STATS"":[{""CGMiner"":""4.6.1"",""Miner"":""7.0.0.3"",""CompileTime"":""Fri Oct 24 19:46:59 CST 2014"",""Type"":""S3""}{""STATS"":0,""ID"":""BMM0"",""Elapsed"":88,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":465.19,""GHS av"":490.97,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":17,""frequency"":""231.25"",""voltage"":"""",""hwv1"":7,""hwv2"":0,""hwv3"":0,""hwv4"":3,""fan_num"":2,""fan1"":900,""fan2"":720,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":33,""temp2"":35,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":34,""temp_max"":35,""Device Hardware%"":0.0000,""no_matching_work"":0,""chain_acn1"":16,""chain_acn2"":16,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":65535,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooooo oooooooo "",""chain_acs2"":""oooooooo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}", "}{", "},{")
+            'MinerData.sStats = Replace("{""STATUS"":[{""STATUS"":""S"",""When"":1419209685,""Code"":70,""Msg"":""CGMiner stats"",""Description"":""cgminer 4.6.1""}],""STATS"":[{""CGMiner"":""4.6.1"",""Miner"":""7.0.0.3"",""CompileTime"":""Fri Oct 24 19:46:59 CST 2014"",""Type"":""S3""}{""STATS"":0,""ID"":""BMM0"",""Elapsed"":88,""Calls"":0,""Wait"":0.000000,""Max"":0.000000,""Min"":99999999.000000,""GHS 5s"":465.19,""GHS av"":490.97,""baud"":115200,""miner_count"":2,""asic_count"":8,""timeout"":17,""frequency"":""231.25"",""voltage"":"""",""hwv1"":7,""hwv2"":0,""hwv3"":0,""hwv4"":3,""fan_num"":2,""fan1"":900,""fan2"":720,""fan3"":0,""fan4"":0,""fan5"":0,""fan6"":0,""fan7"":0,""fan8"":0,""fan9"":0,""fan10"":0,""fan11"":0,""fan12"":0,""fan13"":0,""fan14"":0,""fan15"":0,""fan16"":0,""temp_num"":2,""temp1"":33,""temp2"":35,""temp3"":0,""temp4"":0,""temp5"":0,""temp6"":0,""temp7"":0,""temp8"":0,""temp9"":0,""temp10"":0,""temp11"":0,""temp12"":0,""temp13"":0,""temp14"":0,""temp15"":0,""temp16"":0,""temp_avg"":34,""temp_max"":35,""Device Hardware%"":0.0000,""no_matching_work"":0,""chain_acn1"":16,""chain_acn2"":16,""chain_acn3"":0,""chain_acn4"":0,""chain_acn5"":0,""chain_acn6"":0,""chain_acn7"":0,""chain_acn8"":0,""chain_acn9"":65535,""chain_acn10"":0,""chain_acn11"":0,""chain_acn12"":0,""chain_acn13"":0,""chain_acn14"":0,""chain_acn15"":0,""chain_acn16"":0,""chain_acs1"":""oooooooo oooooooo "",""chain_acs2"":""oooooooo oooooooo "",""chain_acs3"":"""",""chain_acs4"":"""",""chain_acs5"":"""",""chain_acs6"":"""",""chain_acs7"":"""",""chain_acs8"":"""",""chain_acs9"":"""",""chain_acs10"":"""",""chain_acs11"":"""",""chain_acs12"":"""",""chain_acs13"":"""",""chain_acs14"":"""",""chain_acs15"":"""",""chain_acs16"":"""",""USB Pipe"":""0""}],""id"":1}", "}{", "},{")
 #End If
 
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sStats)
@@ -3201,7 +3246,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(Val(jp1.Value(Of String)("GHS 5s")) * 1000)
                             dr.Item("Speed(avg)") = FormatHashRate(Val(jp1.Value(Of String)("GHS av")) * 1000)
 
-                            dr.Item("CurHash") = Val(jp1.Value(Of String)("GHS 5s")) * 1000
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("GHS av")) * 1000000
                             dr.Item("HashSHA256") = Val(jp1.Value(Of String)("GHS av")) * 1000
                             dr.Item("HashScrypt") = 0
 
@@ -3224,7 +3269,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("Speed(avg)") = FormatHashRate(jp1.Value(Of String)("MHS av"))
 
-                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS 5s"))
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS av")) * 1000
                             dr.Item("HashSHA256") = Val(jp1.Value(Of String)("MHS av"))
                             dr.Item("HashScrypt") = 0
 
@@ -3244,7 +3289,7 @@ Public Class frmMain
                             dr.Item("Speed(5s)") = FormatHashRate(jp1.Value(Of String)("MHS 5s"))
                             dr.Item("Speed(avg)") = FormatHashRate(jp1.Value(Of String)("MHS av"))
 
-                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS 5s"))
+                            dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS av"))
                             dr.Item("HashSHA256") = 0
                             dr.Item("HashScrypt") = Val(jp1.Value(Of String)("MHS av"))
 
@@ -3297,6 +3342,8 @@ Public Class frmMain
                                 dBestShare = jp1.Value(Of Double)("Best Share")
                             End If
 
+                            pd = New clsPoolData
+
                             Select Case jp1.Value(Of String)("Status")
                                 Case "Alive"
                                     If sbTemp.ToString.Contains("U") = False Then
@@ -3305,11 +3352,17 @@ Public Class frmMain
 
                                     sbTemp.Append("U")
 
+                                    pd.PoolIsUp = True
+
                                 Case "Dead"
                                     sbTemp.Append("D")
 
+                                    pd.PoolIsUp = False
+
                                 Case Else
-                                    sbTemp.Append("U")
+                                    sbTemp.Append("?")
+
+                                    pd.PoolIsUp = False
 
                             End Select
 
@@ -3321,8 +3374,6 @@ Public Class frmMain
                             End If
 
                             sbTemp2.Append(jp1.Value(Of String)("POOL") & ": " & jp1.Value(Of String)("URL") & " (" & jp1.Value(Of String)("User") & ") " & jp1.Value(Of String)("Status"))
-
-                            pd = New clsPoolData
 
                             pd.URL = jp1.Value(Of String)("URL")
                             pd.UID = jp1.Value(Of String)("User")
@@ -3343,6 +3394,8 @@ Public Class frmMain
                                 dBestShare = jp1.Value(Of Double)("Best Share")
                             End If
 
+                            pd = New clsPoolData
+
                             Select Case jp1.Value(Of String)("Status")
                                 Case "Alive"
                                     If sbTemp.ToString.Contains("U") = False Then
@@ -3351,11 +3404,17 @@ Public Class frmMain
 
                                     sbTemp.Append("U")
 
+                                    pd.PoolIsUp = True
+
                                 Case "Dead"
                                     sbTemp.Append("D")
 
+                                    pd.PoolIsUp = False
+
                                 Case Else
-                                    sbTemp.Append("U")
+                                    sbTemp.Append("?")
+
+                                    pd.PoolIsUp = False
 
                             End Select
 
@@ -3371,8 +3430,6 @@ Public Class frmMain
                             sbStep.Clear()
                             sbStep.Append("3.8")
 
-                            pd = New clsPoolData
-
                             pd.URL = jp1.Value(Of String)("URL")
                             pd.UID = jp1.Value(Of String)("User")
 
@@ -3386,6 +3443,8 @@ Public Class frmMain
                                 dBestShare = jp1.Value(Of Double)("Best Share")
                             End If
 
+                            pd = New clsPoolData
+
                             Select Case jp1.Value(Of String)("Status")
                                 Case "Alive"
                                     If sbTemp.ToString.Contains("U") = False Then
@@ -3394,11 +3453,17 @@ Public Class frmMain
 
                                     sbTemp.Append("U")
 
+                                    pd.PoolIsUp = True
+
                                 Case "Dead"
                                     sbTemp.Append("D")
 
+                                    pd.PoolIsUp = False
+
                                 Case Else
-                                    sbTemp.Append("U")
+                                    sbTemp.Append("?")
+
+                                    pd.PoolIsUp = False
 
                             End Select
 
@@ -3413,8 +3478,6 @@ Public Class frmMain
 
                             sbStep.Clear()
                             sbStep.Append("3.92")
-
-                            pd = New clsPoolData
 
                             pd.URL = jp1.Value(Of String)("URL")
                             pd.UID = jp1.Value(Of String)("User")
@@ -4404,9 +4467,9 @@ Public Class frmMain
             .SetRegKeyByControl(Me.trackThreadCount)
             .SetRegKeyByControl(Me.txtDisplayRefreshInSecs)
 
-            .SetRegKeyByControl(Me.momEmailEdit)
-            .SetRegKeyByControl(Me.momAppKeyEdit)
-            .SetRegKeyByControl(Me.momDashHistCheck)
+            .SetRegKeyByControl(Me.txtMMEmail)
+            .SetRegKeyByControl(Me.txtMMAppKey)
+            .SetRegKeyByControl(Me.chkMMDashHistCheck)
         End With
 
     End Sub
@@ -6062,8 +6125,8 @@ Public Class frmMain
     End Sub
 
     Private Sub mobileMinerTimer_Tick(sender As Object, e As EventArgs) Handles mobileMinerTimer.Tick
-        Dim emailAddress As String = momEmailEdit.Text
-        Dim applicationKey As String = momAppKeyEdit.Text
+        Dim emailAddress As String = txtMMEmail.Text
+        Dim applicationKey As String = txtMMAppKey.Text
         Dim isConfigured As Boolean = InputValidation.IsValidEmailAddress(emailAddress) And InputValidation.IsValidApplicationKey(applicationKey)
 
         If isConfigured Then
@@ -6079,50 +6142,106 @@ Public Class frmMain
     End Sub
 
     Private Sub SubmitMobileMinerStatistics(emailAddress As String, applicationKey As String)
+
         Dim statistics As MobileMinerApi.Data.MiningStatistics
         Dim statisticsList As List(Of MobileMinerApi.Data.MiningStatistics) = New List(Of MobileMinerApi.Data.MiningStatistics)
-
-
-        For Each dr As DataRow In Me.ds.Tables(0).Rows
-            statistics = New MobileMinerApi.Data.MiningStatistics
-
-            Dim isScryptAsic As Object = dr.Item("HashScrypt") > 0
-
-            statistics.Algorithm = If(isScryptAsic, "Scrypt", "SHA-256")
-            statistics.Appliance = True
-            statistics.AverageHashrate = If(isScryptAsic, dr.Item("HashScrypt"), dr.Item("HashSHA256"))
-            statistics.CurrentHashrate = dr.Item("CurHash")
-            statistics.CoinSymbol = If(isScryptAsic, "LTC", "BTC")
-            statistics.CoinName = If(isScryptAsic, "Litecoin", "Bitcoin")
-            statistics.Enabled = True
-            statistics.FanSpeed = dr.Item("HFan")
-            statistics.FullName = dr.Item("Name")
-            statistics.HardwareErrorsPercent = dr.Item("HWE%").ToString().TrimEnd("%")
-            statistics.Kind = "ASC"
-            statistics.MachineName = dr.Item("Name")
-            statistics.MinerName = "MMinerMonitor"
-            statistics.Name = dr.Item("Name")
-            statistics.RejectedSharesPercent = dr.Item("Rej%")
-            statistics.Temperature = dr.Item("HTemp")
-            statistics.PoolName = "Unknown"
-
-            statisticsList.Add(statistics)
-        Next
-
-        Dim commandList As List(Of MobileMinerApi.Data.RemoteCommand)
-        ' no remote commands just yet - flip to True and process the commandList to enable
-        Dim processCommands As Boolean = False
-        Const MobileMinerUrl As String = "https://api.mobileminerapp.com"
-        Const MobileMinerApiKey As String = "mCJMjV2iKtdOLT"
+        Dim pd As clsPoolData
+        Dim pdl As System.Collections.Generic.List(Of clsPoolData)
+        Dim s() As String
 
         Try
+            For Each dr As DataRow In Me.ds.Tables(0).Rows
+                statistics = New MobileMinerApi.Data.MiningStatistics
+
+                Dim isScryptAsic As Object = dr.Item("HashScrypt") > 0
+
+                statistics.Algorithm = If(isScryptAsic, "Scrypt", "SHA-256")
+                statistics.Appliance = True
+                statistics.AverageHashrate = If(isScryptAsic, dr.Item("HashScrypt"), dr.Item("HashSHA256"))
+
+                If IsDBNull(dr.Item("CurHash")) = False Then
+                    statistics.CurrentHashrate = dr.Item("CurHash")
+                    statistics.CoinSymbol = If(isScryptAsic, "LTC", "BTC")
+                    statistics.CoinName = If(isScryptAsic, "Litecoin", "Bitcoin")
+                    statistics.Enabled = True
+
+                    If IsDBNull(dr.Item("HFan")) = False Then
+                        statistics.FanSpeed = dr.Item("HFan")
+                    Else
+                        statistics.FanSpeed = 0
+                    End If
+
+                    statistics.FullName = dr.Item("Name")
+                    statistics.HardwareErrorsPercent = dr.Item("HWE%").ToString().TrimEnd("%")
+                    statistics.Kind = "ASC"
+                    statistics.MachineName = dr.Item("Name")
+                    statistics.MinerName = "MMinerMonitor"
+                    statistics.Name = dr.Item("Name")
+                    statistics.Temperature = dr.Item("HTemp")
+
+                    'all miner types may not have this ... especially for web scraping
+                    pdl = TryCast(dr.Item("PoolData2"), System.Collections.Generic.List(Of clsPoolData))
+
+                    If pdl IsNot Nothing Then
+                        'if using web scraping, there could be multiple values here
+                        'if there is only one value, assume that's the right one
+                        'otherwise, iterate through the pools object and assume the first one that is up is the one being used
+                        s = dr.Item("Rej%").ToString.Split(" ")
+
+                        If s.Count = 1 Then
+                            statistics.RejectedSharesPercent = Val(dr.Item("Rej%"))
+                        Else
+                            For x = 0 To pdl.Count - 1
+                                pd = pdl(x)
+
+                                If pd.PoolIsUp = True Then
+                                    If s.Count >= x Then
+                                        statistics.RejectedSharesPercent = Val(s(x))
+                                    Else
+                                        'unable to determine
+                                        statistics.RejectedSharesPercent = 0
+                                    End If
+
+                                    Exit For
+                                End If
+                            Next
+                        End If
+
+                        For Each pd In pdl
+                            If pd.PoolIsUp = True Then
+                                statistics.PoolName = pd.URL
+
+                                Exit For
+                            End If
+                        Next
+                    Else
+                        If dr.Item("Rej%").ToString.Contains(" ") = False Then
+                            statistics.RejectedSharesPercent = dr.Item("Rej%")
+                        Else
+                            'unable to determine
+                            statistics.RejectedSharesPercent = 0
+                        End If
+
+                        statistics.PoolName = "Unknown"
+                    End If
+
+                    statisticsList.Add(statistics)
+                End If
+            Next
+
+            Dim commandList As List(Of MobileMinerApi.Data.RemoteCommand)
+            ' no remote commands just yet - flip to True and process the commandList to enable
+            Dim processCommands As Boolean = False
+            Const MobileMinerUrl As String = "https://api.mobileminerapp.com"
+            Const MobileMinerApiKey As String = "mCJMjV2iKtdOLT"
+
             commandList = MobileMinerApi.ApiContext.SubmitMiningStatistics(MobileMinerUrl, MobileMinerApiKey, emailAddress, applicationKey, statisticsList, processCommands)
         Catch ex As Exception When bErrorHandle = True
             AddToLogQueue("Error occurred submitting MobileMiner stats: " & ex.Message)
         End Try
     End Sub
 
-    Private Sub momAppKeyLabel_Click(sender As Object, e As EventArgs) Handles momAppKeyLabel.Click
+    Private Sub momAppKeyLabel_Click(sender As Object, e As EventArgs) Handles lblMMAppKey.Click
         Process.Start("http://web.mobileminerapp.com/")
     End Sub
 
@@ -6191,7 +6310,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub momDashHistCheck_CheckedChanged(sender As Object, e As EventArgs) Handles momDashHistCheck.CheckedChanged
+    Private Sub momDashHistCheck_CheckedChanged(sender As Object, e As EventArgs) Handles chkMMDashHistCheck.CheckedChanged
         SetupMobileMinerTabVisibility()
     End Sub
 
@@ -6206,10 +6325,22 @@ Public Class frmMain
         End If
 
         If controller IsNot Nothing Then
-            Dim webBrowser As WebBrowser = MobileMinerApi.WebBrowserProvider.GetWebBrowser(controller, momEmailEdit.Text, momAppKeyEdit.Text)
+            Dim webBrowser As WebBrowser = MobileMinerApi.WebBrowserProvider.GetWebBrowser(controller, txtMMEmail.Text, txtMMAppKey.Text)
             webBrowser.Dock = DockStyle.Fill
             webBrowser.Parent = e.TabPage
         End If
+
+    End Sub
+
+    Private Sub txtMMAppKey_LostFocus(sender As Object, e As System.EventArgs) Handles txtMMAppKey.LostFocus
+
+        Me.txtMMAppKey.Text = Me.txtMMAppKey.Text.Trim
+
+    End Sub
+
+    Private Sub txtMMEmail_LostFocus(sender As Object, e As System.EventArgs) Handles txtMMEmail.LostFocus
+
+        Me.txtMMEmail.Text = Me.txtMMEmail.Text.Trim
 
     End Sub
 End Class

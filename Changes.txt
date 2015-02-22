@@ -1,3 +1,6 @@
+v5.0
+- Adds support for MobileMiner.
+
 v4.9
 - Fixed the problem with pool data popups not occurring for S4 webscraping.
 

@@ -52,9 +52,8 @@
     <ApplicationIcon>ant.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Json60r4\Bin\Net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\vb.net\Json60r4\Bin\Net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Renci.SshNet">
       <HintPath>..\..\vc#\Renci.SshNet\Renci.SshNet\bin\Release\Renci.SshNet.dll</HintPath>
