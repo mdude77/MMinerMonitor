@@ -28,7 +28,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v5.0"
+    Private Const csVersion As String = "M's Miner Monitor v5.1"
 
     'alert string   
     Private sAlerts As String
@@ -5183,7 +5183,7 @@ Public Class frmMain
 
     End Sub
 
-    Private Sub chkShowSelectionColumn_Click(sender As Object, e As System.EventArgs) Handles chkShowSelectionColumn.Click
+    Private Sub chkShowSelectionColumn_CheckedChanged(sender As Object, e As System.EventArgs) Handles chkShowSelectionColumn.CheckedChanged
 
         Me.dataMiners.RowHeadersVisible = Me.chkShowSelectionColumn.Checked
 
@@ -6209,7 +6209,11 @@ Public Class frmMain
 
                         For Each pd In pdl
                             If pd.PoolIsUp = True Then
-                                statistics.PoolName = pd.URL
+                                If pd.URL.Contains("//") Then
+                                    statistics.PoolName = pd.URL.Substring(InStr(pd.URL, "//") + 1)
+                                Else
+                                    statistics.PoolName = pd.URL
+                                End If
 
                                 Exit For
                             End If
@@ -6343,6 +6347,7 @@ Public Class frmMain
         Me.txtMMEmail.Text = Me.txtMMEmail.Text.Trim
 
     End Sub
+
 End Class
 
 'wrapper around the datagridview to allow disabling the paint event

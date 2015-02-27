@@ -1,3 +1,7 @@
+v5.1
+- Changed to submit the URL of the pool without the leading http:// or stratum+tcp:// for MobileMiner.
+- Fixed the problem with the selection column not being properly set on startup.
+
 v5.0
 - Adds support for MobileMiner.
 

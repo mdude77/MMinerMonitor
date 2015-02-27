@@ -34,7 +34,6 @@ Partial Class frmMain
         Me.cmdRefresh = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tabMiners = New System.Windows.Forms.TabPage()
-        Me.dataMiners = New MMinerMonitor.dgvWrapper()
         Me.tabMinerConfig = New System.Windows.Forms.TabPage()
         Me.chkMinerRebootViaSSH = New System.Windows.Forms.CheckBox()
         Me.chkMinerUseHTTPS = New System.Windows.Forms.CheckBox()
@@ -136,7 +135,6 @@ Partial Class frmMain
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
-        Me.lstPools = New MMinerMonitor.enListbox()
         Me.tabAlerts = New System.Windows.Forms.TabPage()
         Me.tabAlertsAndReboots = New System.Windows.Forms.TabControl()
         Me.tabAlertSettings = New System.Windows.Forms.TabPage()
@@ -234,10 +232,11 @@ Partial Class frmMain
         Me.mnuMainExit = New System.Windows.Forms.ToolStripMenuItem()
         Me.timerDoStuff = New System.Windows.Forms.Timer(Me.components)
         Me.mobileMinerTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.dataMiners = New MMinerMonitor.dgvWrapper()
+        Me.lstPools = New MMinerMonitor.enListbox()
         Me.mnuAntMenu.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.tabMiners.SuspendLayout()
-        CType(Me.dataMiners, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabMinerConfig.SuspendLayout()
         CType(Me.dataMinerConfig, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabConfig.SuspendLayout()
@@ -253,6 +252,7 @@ Partial Class frmMain
         Me.tabLog.SuspendLayout()
         Me.menuStripNotifyIcon.SuspendLayout()
         Me.menuStripMain.SuspendLayout()
+        CType(Me.dataMiners, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'mnuAntMenu
@@ -338,24 +338,6 @@ Partial Class frmMain
         Me.tabMiners.TabIndex = 0
         Me.tabMiners.Text = "Miner Output"
         Me.tabMiners.UseVisualStyleBackColor = True
-        '
-        'dataMiners
-        '
-        Me.dataMiners.AllowUserToAddRows = False
-        Me.dataMiners.AllowUserToDeleteRows = False
-        Me.dataMiners.AllowUserToOrderColumns = True
-        Me.dataMiners.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.dataMiners.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dataMiners.Location = New System.Drawing.Point(7, 7)
-        Me.dataMiners.Margin = New System.Windows.Forms.Padding(4)
-        Me.dataMiners.Name = "dataMiners"
-        Me.dataMiners.ReadOnly = True
-        Me.dataMiners.RowHeadersVisible = False
-        Me.dataMiners.RowTemplate.Height = 24
-        Me.dataMiners.Size = New System.Drawing.Size(1284, 364)
-        Me.dataMiners.TabIndex = 0
         '
         'tabMinerConfig
         '
@@ -1433,17 +1415,6 @@ Partial Class frmMain
         Me.Label9.TabIndex = 1
         Me.Label9.Text = "Desc:"
         '
-        'lstPools
-        '
-        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lstPools.FormattingEnabled = True
-        Me.lstPools.ItemHeight = 20
-        Me.lstPools.Location = New System.Drawing.Point(6, 7)
-        Me.lstPools.Name = "lstPools"
-        Me.lstPools.Size = New System.Drawing.Size(269, 284)
-        Me.lstPools.TabIndex = 12
-        '
         'tabAlerts
         '
         Me.tabAlerts.Controls.Add(Me.tabAlertsAndReboots)
@@ -2396,6 +2367,35 @@ Partial Class frmMain
         'mobileMinerTimer
         '
         '
+        'dataMiners
+        '
+        Me.dataMiners.AllowUserToAddRows = False
+        Me.dataMiners.AllowUserToDeleteRows = False
+        Me.dataMiners.AllowUserToOrderColumns = True
+        Me.dataMiners.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dataMiners.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dataMiners.Location = New System.Drawing.Point(7, 7)
+        Me.dataMiners.Margin = New System.Windows.Forms.Padding(4)
+        Me.dataMiners.Name = "dataMiners"
+        Me.dataMiners.ReadOnly = True
+        Me.dataMiners.RowHeadersVisible = False
+        Me.dataMiners.RowTemplate.Height = 24
+        Me.dataMiners.Size = New System.Drawing.Size(1284, 360)
+        Me.dataMiners.TabIndex = 0
+        '
+        'lstPools
+        '
+        Me.lstPools.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lstPools.FormattingEnabled = True
+        Me.lstPools.ItemHeight = 20
+        Me.lstPools.Location = New System.Drawing.Point(6, 7)
+        Me.lstPools.Name = "lstPools"
+        Me.lstPools.Size = New System.Drawing.Size(269, 284)
+        Me.lstPools.TabIndex = 12
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 20.0!)
@@ -2420,7 +2420,6 @@ Partial Class frmMain
         Me.mnuAntMenu.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.tabMiners.ResumeLayout(False)
-        CType(Me.dataMiners, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tabMinerConfig.ResumeLayout(False)
         Me.tabMinerConfig.PerformLayout()
         CType(Me.dataMinerConfig, System.ComponentModel.ISupportInitialize).EndInit()
@@ -2445,6 +2444,7 @@ Partial Class frmMain
         Me.tabLog.PerformLayout()
         Me.menuStripNotifyIcon.ResumeLayout(False)
         Me.menuStripMain.ResumeLayout(False)
+        CType(Me.dataMiners, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
