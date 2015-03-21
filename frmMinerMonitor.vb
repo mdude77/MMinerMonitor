@@ -28,7 +28,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v5.1"
+    Private Const csVersion As String = "M's Miner Monitor v5.2"
 
     'alert string   
     Private sAlerts As String
@@ -3703,7 +3703,7 @@ Public Class frmMain
                             'enabled for this miner type?
                             If MinerInfo.AlertValues.HashLow.Enabled.Value = True Then
                                 'compare
-                                x = Val(MinerInfo.AlertValues.HashLow.Item.Value)
+                                x = Val(MinerInfo.AlertValues.HashLow.Item.Value) * 1000
 
                                 Select Case MinerInfo.HashType
                                     Case clsSupportedMinerInfo.enHashType.SHA256
