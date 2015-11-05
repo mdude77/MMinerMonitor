@@ -28,7 +28,7 @@ Public Class frmMain
     Private Const csRegKey As String = "Software\MAntMonitor"
 
     'version
-    Private Const csVersion As String = "M's Miner Monitor v5.2"
+    Private Const csVersion As String = "M's Miner Monitor v5.3b1"
 
     'alert string   
     Private sAlerts As String
@@ -1546,7 +1546,10 @@ Public Class frmMain
         Me.mobileMinerTimer.Interval = 35000
         RemoveHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
         AddHandler Me.mobileMinerTimer.Tick, AddressOf mobileMinerTimer_Tick
-        Me.mobileMinerTimer.Enabled = True
+
+        If Me.chkMMDashHistCheck.Checked = True Then
+            Me.mobileMinerTimer.Enabled = True
+        End If
     End Sub
 
     Private Function AddOrSaveMiner(ByVal ID As Integer, ByVal sMinerName As String, ByVal MinerInfo As clsSupportedMinerInfo.clsMinerInfo, ByVal sIPAddress As String, _
@@ -3225,7 +3228,7 @@ Public Class frmMain
             sbStep.Append("2.0")
 
 #If DEBUG Then
-            'MinerData.sSummary = "{""STATUS"":[{""STATUS"":""S"",""When"":1420194081,""Code"":11,""Msg"":""Summary"",""Description"":""cgminer 3.9.0""}],""SUMMARY"":[{""Elapsed"":4855,""MHS av"":91.87,""MHS 5s"":92.68,""Found Blocks"":1,""Getworks"":1201,""Accepted"":6718,""Rejected"":1119,""Hardware Errors"":361,""Utility"":83.03,""Discarded"":2290,""Stale"":12,""Get Failures"":1,""Local Work"":33046,""Remote Failures"":2,""Network Blocks"":281,""Total MH"":446027.8491,""Work Utility"":76652.61,""Difficulty Accepted"":11684812.00000000,""Difficulty Rejected"":754364.00000000,""Difficulty Stale"":120.00000000,""Best Share"":9179304,""Device Hardware%"":0.0058,""Device Rejected%"":12.1630,""Pool Rejected%"":6.0644,""Pool Stale%"":0.0010}],""id"":1}"
+            'MinerData.sSummary = "{""STATUS"":[{""STATUS"":""S"",""When"":1436391577,""Code"":11,""Msg"":""Summary"",""Description"":""cgminer 4.9.2""}],""SUMMARY"":[{""Elapsed"":68781,""MHS av"":457640.76,""MHS 5s"":639176.95,""MHS 1m"":374915.21,""MHS 5m"":419473.45,""MHS 15m"":466951.68,""Found Blocks"":0,""Getworks"":1325,""Accepted"":6691,""Rejected"":16,""Hardware Errors"":371,""Utility"":5.84,""Discarded"":7190403,""Stale"":0,""Get Failures"":0,""Local Work"":14382932,""Remote Failures"":0,""Network Blocks"":133,""Total MH"":31476815798.0000,""Work Utility"":6393.17,""Difficulty Accepted"":7289856.00000000,""Difficulty Rejected"":17408.00000000,""Difficulty Stale"":0.00000000,""Best Share"":5037839,""Device Hardware%"":0.0051,""Device Rejected%"":0.2375,""Pool Rejected%"":0.2382,""Pool Stale%"":0.0000,""Last getwork"":1436391577}],""id"":1}"
 #End If
 
             j = Newtonsoft.Json.Linq.JObject.Parse(MinerData.sSummary)
@@ -3243,11 +3246,21 @@ Public Class frmMain
                         sbStep.Append("2.2")
 
                         For Each jp1 In ja
-                            dr.Item("Speed(5s)") = FormatHashRate(Val(jp1.Value(Of String)("GHS 5s")) * 1000)
-                            dr.Item("Speed(avg)") = FormatHashRate(Val(jp1.Value(Of String)("GHS av")) * 1000)
+                            If jp1.Value(Of String)("GHS 5s") IsNot Nothing Then
+                                dr.Item("Speed(5s)") = FormatHashRate(Val(jp1.Value(Of String)("GHS 5s")) * 1000)
+                                dr.Item("Speed(avg)") = FormatHashRate(Val(jp1.Value(Of String)("GHS av")) * 1000)
 
-                            dr.Item("CurHash") = Val(jp1.Value(Of String)("GHS av")) * 1000000
-                            dr.Item("HashSHA256") = Val(jp1.Value(Of String)("GHS av")) * 1000
+                                dr.Item("CurHash") = Val(jp1.Value(Of String)("GHS av")) * 1000000
+                                dr.Item("HashSHA256") = Val(jp1.Value(Of String)("GHS av")) * 1000
+                            Else
+                                'try the MHS values
+                                dr.Item("Speed(5s)") = FormatHashRate(Val(jp1.Value(Of String)("MHS 5s")))
+                                dr.Item("Speed(avg)") = FormatHashRate(Val(jp1.Value(Of String)("MHS av")))
+
+                                dr.Item("CurHash") = Val(jp1.Value(Of String)("MHS av")) * 1000
+                                dr.Item("HashSHA256") = Val(jp1.Value(Of String)("MHS av"))
+                            End If
+
                             dr.Item("HashScrypt") = 0
 
                             dr.Item("Rej%") = jp1.Value(Of String)("Pool Rejected%")
@@ -6172,7 +6185,7 @@ Public Class frmMain
                     End If
 
                     statistics.FullName = dr.Item("Name")
-                    statistics.HardwareErrorsPercent = dr.Item("HWE%").ToString().TrimEnd("%")
+                    statistics.HardwareErrorsPercent = Val(dr.Item("HWE%").ToString().TrimEnd("%"))
                     statistics.Kind = "ASC"
                     statistics.MachineName = dr.Item("Name")
                     statistics.MinerName = "MMinerMonitor"
@@ -6220,7 +6233,7 @@ Public Class frmMain
                         Next
                     Else
                         If dr.Item("Rej%").ToString.Contains(" ") = False Then
-                            statistics.RejectedSharesPercent = dr.Item("Rej%")
+                            statistics.RejectedSharesPercent = Val(dr.Item("Rej%"))
                         Else
                             'unable to determine
                             statistics.RejectedSharesPercent = 0
@@ -6315,6 +6328,12 @@ Public Class frmMain
     End Sub
 
     Private Sub momDashHistCheck_CheckedChanged(sender As Object, e As EventArgs) Handles chkMMDashHistCheck.CheckedChanged
+        If chkMMDashHistCheck.Checked = True Then
+            Me.mobileMinerTimer.Enabled = True
+        Else
+            Me.mobileMinerTimer.Enabled = False
+        End If
+
         SetupMobileMinerTabVisibility()
     End Sub
 
